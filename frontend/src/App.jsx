@@ -32,8 +32,6 @@
 
 // export default App;
 
-
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -44,7 +42,7 @@ import AdminHome from "./components/admin/AdminHome";
 import AdminDashboard from "./components/admin/AdminDashboard/AdminDashboard";
 import AdminCreateTemplate from "./components/admin/AdminCreateTemplates/AdminCreateTemplate";
 import AdminUsers from "./components/admin/AdminUser/AdminUsers";
-import Resume from "./components/admin/resume"; // 🔥 templates page
+import Resume from "./components/admin/resume";
 
 const App = () => {
   return (
@@ -57,11 +55,12 @@ const App = () => {
         <Route index element={<AdminHome />} /> {/* /admin */}
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="create-templates" element={<AdminCreateTemplate />} />
-        <Route path="templates" element={<Resume />} /> {/* 🔥 THIS FIXES IT */}
-        <Route path="user" element={<AdminUsers />} />
+        <Route path="templates" element={<Resume />} />
+        <Route path="users" element={<AdminUsers />} /> {/* ✅ FIXED */}
       </Route>
     </Routes>
   );
 };
 
 export default App;
+
