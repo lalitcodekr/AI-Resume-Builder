@@ -32,8 +32,6 @@
 
 // export default App;
 
-
-
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -45,6 +43,10 @@ import AdminDashboard from "./components/admin/AdminDashboard/AdminDashboard";
 import AdminCreateTemplate from "./components/admin/AdminCreateTemplates/AdminCreateTemplate";
 import AdminUsers from "./components/admin/AdminUser/AdminUsers";
 import Resume from "./components/admin/resume"; // 🔥 templates page
+import Templates from "./components/admin/AdminCreateTemplates/Templates";
+import TemplateDocs from "./components/admin/AdminCreateTemplates/TemplateDocs";
+import AdminSubscription from "./components/admin/AdminSubscription/AdminSubscription";
+import AdminAcceptUser from "./components/admin/AdminAcceptUserTemplate/AdminAcceptUser";
 
 const App = () => {
   return (
@@ -56,9 +58,13 @@ const App = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminHome />} /> {/* /admin */}
         <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="create-templates" element={<AdminCreateTemplate />} />
-        <Route path="templates" element={<Resume />} /> {/* 🔥 THIS FIXES IT */}
-        <Route path="user" element={<AdminUsers />} />
+        {/* <Route path="create-templates" element={<AdminCreateTemplate />} /> */}
+        {/* <Route path="create-templates" element={<Templates />} /> */}
+        <Route path="create-templates" element={<TemplateDocs />} />
+        <Route path="templates" element={<Resume />} />
+        <Route path="user" element={<AdminUsers head={"User Management"} />} />
+        <Route path="subscription" element={<AdminSubscription />} />
+        <Route path="/admin/template-requests" element={<AdminAcceptUser />} />
       </Route>
     </Routes>
   );

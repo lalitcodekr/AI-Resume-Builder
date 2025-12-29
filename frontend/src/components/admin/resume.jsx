@@ -61,8 +61,6 @@
 //   );
 // }
 
-
-
 // import React, { useEffect, useState } from "react";
 // import TemplateCard from "./templatecard";
 // import "./resume.css";
@@ -101,7 +99,6 @@
 //     </div>
 //   );
 // }
-
 
 // import React, { useEffect, useState } from "react";
 // import TemplateCard from "./templatecard";
@@ -149,10 +146,6 @@
 //   );
 // }
 
-
-
-
-
 // import React, { useEffect, useState } from "react";
 // import TemplateCard from "./templatecard";
 // import "./resume.css";
@@ -185,9 +178,6 @@
 //     </div>
 //   );
 // }
-
-
-
 
 import React, { useEffect, useState } from "react";
 import TemplateCard from "./templatecard";

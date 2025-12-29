@@ -12,6 +12,7 @@ import {
   Plus,
   IndianRupee,
   User,
+  Drone,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -46,13 +47,19 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
       id: "subscription",
       icon: IndianRupee,
       label: "Subscription",
-      path: "/admin/analytics",
+      path: "/admin/subscription",
     },
     {
       id: "user",
       icon: User,
       label: "User",
       path: "/admin/user",
+    },
+    {
+      id: "Accepttemplate",
+      icon: Drone,
+      label: "Accept User Template",
+      path: "/admin/template-requests",
     },
   ];
 
@@ -95,25 +102,6 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
       >
         {/* Header */}
         <div className="h-16 flex items-center justify-center px-3 border-b border-slate-700">
-          {/* Admin Panel Badge */}
-          {!isCollapsed && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
-              className="
-              
-                px-3 py-1 text-sm font-semibold text-indigo-400
-                border border-indigo-500/50
-                rounded-tr-xl rounded-bl-xl
-                shadow-[0_0_12px_rgba(99,102,241,0.7)]
-                bg-indigo-600/10
-              "
-            >
-              Admin Panel
-            </motion.div>
-          )}
-
           {/* Collapse Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}

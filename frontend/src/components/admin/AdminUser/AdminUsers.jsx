@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import AdminNavbar from "../AdminNavBar/AdminNavBar";
 
-export default function AdminUsers() {
+export default function AdminUsers({head}) {
   const navigate = useNavigate();
 
   // Mock users (replace with API later)
@@ -15,6 +15,7 @@ export default function AdminUsers() {
       email: "rahul@gmail.com",
       role: "User",
       status: "Active",
+      plan: "Pro",
     },
     {
       id: 2,
@@ -22,6 +23,7 @@ export default function AdminUsers() {
       email: "ananya@gmail.com",
       role: "Admin",
       status: "Active",
+      plan: "Enterprise",
     },
     {
       id: 3,
@@ -29,6 +31,7 @@ export default function AdminUsers() {
       email: "vikram@gmail.com",
       role: "User",
       status: "Blocked",
+      plan: "Free",
     },
   ];
 
@@ -43,9 +46,9 @@ export default function AdminUsers() {
       <main className="flex-1 p-6 sm:p-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold">User Management</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">{head}</h1>
           <p className="text-slate-400 mt-2">
-            View, manage, block, or remove users.
+            View, manage users and their subscription plans.
           </p>
         </div>
 
@@ -57,6 +60,7 @@ export default function AdminUsers() {
                 <th className="px-6 py-4">Name</th>
                 <th className="px-6 py-4">Email</th>
                 <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4">Plan</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-center">Actions</th>
               </tr>
@@ -71,6 +75,15 @@ export default function AdminUsers() {
                   <td className="px-6 py-4 font-medium">{user.name}</td>
                   <td className="px-6 py-4 text-slate-400">{user.email}</td>
                   <td className="px-6 py-4">{user.role}</td>
+
+                  {/* Plan */}
+                  <td className="px-6 py-4">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400">
+                      {user.plan}
+                    </span>
+                  </td>
+
+                  {/* Status */}
                   <td className="px-6 py-4">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
@@ -82,6 +95,8 @@ export default function AdminUsers() {
                       {user.status}
                     </span>
                   </td>
+
+                  {/* Actions */}
                   <td className="px-6 py-4 flex items-center justify-center gap-3">
                     {user.status === "Active" ? (
                       <button

@@ -1,7 +1,9 @@
 import React from "react";
 import { Users, FileText, Sparkles, TrendingUp, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const stats = [
     {
       title: "Total Users",
@@ -100,19 +102,25 @@ export default function AdminDashboard() {
           </h2>
 
           <div className="space-y-3">
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg sm:rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm sm:text-base">
+            <button
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg sm:rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm sm:text-base"
+              onClick={() => navigate("/admin/create-templates")}
+            >
               <Plus size={18} />
               Create Template
             </button>
 
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg sm:rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm sm:text-base">
+            <button
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg sm:rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm sm:text-base"
+              onClick={() => navigate("/admin/user")}
+            >
               <Users size={18} />
               Manage Users
             </button>
 
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg sm:rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm sm:text-base">
+            <button  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg sm:rounded-xl bg-slate-800 hover:bg-slate-700 transition text-sm sm:text-base">
               <Sparkles size={18} />
-              AI Settings
+              Resumes
             </button>
           </div>
         </div>
