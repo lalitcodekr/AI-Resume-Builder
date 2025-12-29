@@ -8,14 +8,13 @@ import RegisterPage from './pages/Register'
 import ForgotPasswordPage from './pages/ForgotPassword'
 import TemplateEditor from './pages/TemplateEditor'
 import NotFound from './pages/NotFound'
-import './App.css'
 
-// NOTE: ensure `react-router-dom` is installed in your frontend dependencies
+
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="app">
+      <div className="min-h-screen flex flex-col">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/templates" element={<TemplatesPage />} />
