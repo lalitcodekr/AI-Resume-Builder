@@ -23,86 +23,84 @@ function LandingPage() {
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
-      const cardWidth = 300 + 24; // card width (300px) + gap (24px from gap-6)
+      const cardWidth = 300 + 24;
       const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   const templates = [
-    { 
-      name: "AI Assistant", 
-      desc: "Smart resume generation powered by AI", 
+    {
+      name: "AI Assistant",
+      desc: "Smart resume generation powered by AI",
       image: featureImage1,
       bgColor: "from-blue-500 to-cyan-500"
     },
-    { 
-      name: "Tailored Summary", 
-      desc: "Customized professional summary", 
+    {
+      name: "Tailored Summary",
+      desc: "Customized professional summary",
       image: featureImage2,
       bgColor: "from-purple-500 to-pink-500"
     },
-    { 
-      name: "Tailor to Job", 
-      desc: "Match your resume to job requirements", 
+    {
+      name: "Tailor to Job",
+      desc: "Match your resume to job requirements",
       image: featureImage3,
       bgColor: "from-orange-500 to-red-500"
     },
-    { 
-      name: "Resume Preview", 
-      desc: "Real-time resume preview and editing", 
+    {
+      name: "Resume Preview",
+      desc: "Real-time resume preview and editing",
       image: featureImage4,
       bgColor: "from-green-500 to-teal-500"
     },
   ]
 
-  // Separate templates for the showcase section
   const resumeTemplates = [
-    { 
-      id: 1, 
-      name: "Atlantic Blue", 
-      category: "modern", 
+    {
+      id: 1,
+      name: "Atlantic Blue",
+      category: "modern",
       desc: "Modern and professional design",
-      image: `${base}templates/chronological.png` 
+      image: `${base}templates/chronological.png`
     },
-    { 
-      id: 2, 
-      name: "Classic", 
-      category: "traditional", 
+    {
+      id: 2,
+      name: "Classic",
+      category: "traditional",
       desc: "Traditional and timeless layout",
-      image: `${base}templates/functional.png` 
+      image: `${base}templates/functional.png`
     },
-    { 
-      id: 3, 
-      name: "Corporate", 
-      category: "traditional", 
+    {
+      id: 3,
+      name: "Corporate",
+      category: "traditional",
       desc: "Professional corporate style",
-      image: `${base}templates/creative.png` 
+      image: `${base}templates/creative.png`
     },
-    { 
-      id: 4, 
-      name: "Modern Pro", 
-      category: "modern", 
+    {
+      id: 4,
+      name: "Modern Pro",
+      category: "modern",
       desc: "Sleek and contemporary design",
-      image: `${base}templates/modern.png` 
+      image: `${base}templates/modern.png`
     },
-    { 
-      id: 5, 
-      name: "Executive", 
-      category: "executive", 
+    {
+      id: 5,
+      name: "Executive",
+      category: "executive",
       desc: "Perfect for senior positions",
-      image: `${base}templates/minimalist.png` 
+      image: `${base}templates/minimalist.png`
     },
-    { 
-      id: 6, 
-      name: "Creative Edge", 
-      category: "creative", 
+    {
+      id: 6,
+      name: "Creative Edge",
+      category: "creative",
       desc: "Stand out with creative flair",
-      image: `${base}templates/executive.png` 
+      image: `${base}templates/executive.png`
     },
   ]
 
-  // Auto-rotate single template image every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTemplateIndex((prev) => (prev + 1) % templates.length)
@@ -111,23 +109,20 @@ function LandingPage() {
     return () => clearInterval(interval)
   }, [templates.length])
 
-  // Auto-scroll templates in Access Free Templates section
   useEffect(() => {
     const scrollInterval = setInterval(() => {
       if (scrollContainerRef.current) {
-        const cardWidth = 300 + 24; // card width + gap
+        const cardWidth = 300 + 24;
         const maxScroll = scrollContainerRef.current.scrollWidth - scrollContainerRef.current.clientWidth;
         const currentScroll = scrollContainerRef.current.scrollLeft;
-        
+
         if (currentScroll >= maxScroll) {
-          // Reset to beginning
           scrollContainerRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          // Scroll one card
           scrollContainerRef.current.scrollBy({ left: cardWidth, behavior: 'smooth' });
         }
       }
-    }, 3000); // Auto-scroll every 3 seconds
+    }, 3000);
 
     return () => clearInterval(scrollInterval);
   }, []);
@@ -182,13 +177,11 @@ function LandingPage() {
           </div>
 
           <div className="items-center hidden gap-6 md:flex">
-            {/* Login Button */}
             <button onClick={() => navigate('/login')} className="flex items-center gap-3 px-6 py-2.5 border-2 border-[#0077cc] text-[#0077cc] rounded-xl font-bold transition-all duration-300 hover:bg-[#0077cc] hover:text-white hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 active:scale-95">
               <i className="fas fa-sign-in-alt"></i>
               <span>Login</span>
             </button>
 
-            {/* Sign up Button */}
             <button onClick={() => navigate('/register')} className="flex items-center gap-3 px-6 py-2.5 bg-[#e65100] text-white rounded-xl font-bold transition-all duration-300 border-2 border-transparent hover:bg-[#ff6d00] hover:shadow-xl hover:shadow-orange-200 hover:-translate-y-1 active:scale-95">
               <i className="fas fa-user-plus"></i>
               <span>Sign up</span>
@@ -201,14 +194,11 @@ function LandingPage() {
 
       {/* HERO SECTION */}
       <section className="relative px-8 py-20 overflow-hidden bg-white">
-        {/* Background Decorative Gradients */}
         <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
         <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
 
-        {/* Main Container */}
         <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          
-          {/* LEFT SIDE: Text Content */}
+
           <div className="flex flex-col gap-8">
             <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight font-['Space_Grotesk']">
               <span className="bg-gradient-to-r from-[#e65100] to-[#ff8f00] bg-clip-text text-transparent">
@@ -220,13 +210,13 @@ function LandingPage() {
               <br />
               <span className="text-4xl text-[#1a2e52] mt-4 block">Craft Your Perfect Resume in Minutes!</span>
             </h1>
-            
+
             <h2 className="text-3xl font-bold text-[#0077cc]">AI Resume Builder</h2>
-            
+
             <p className="text-xl font-normal leading-relaxed text-gray-600">
               AI-Powered Content, Professional Templates, ATS-Friendly.
             </p>
-            
+
             <div className="flex flex-wrap gap-4 mt-2">
               <button onClick={() => navigate('/login')} className="flex items-center gap-3 px-10 py-5 text-lg font-bold text-white bg-gradient-to-r from-[#e65100] to-[#f4511e] rounded-xl transition-all duration-300 hover:-translate-y-1 shadow-[0_10px_25px_rgba(230,81,0,0.3)] hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)]">
                 <i className="fas fa-graduation-cap"></i>
@@ -243,27 +233,24 @@ function LandingPage() {
             </div>
           </div>
 
-          {/* RIGHT SIDE: Image Carousel - INCREASED SIZE */}
           <div className="flex items-center justify-center">
             <div className="w-full max-w-2xl relative h-[600px] lg:h-[700px]">
               {templates.map((template, idx) => (
                 <div
                   key={idx}
-                  className={`absolute inset-0 transition-all duration-700 ease-out flex items-center justify-center ${
-                    idx === currentTemplateIndex
-                      ? 'opacity-100 scale-100'
-                      : 'opacity-0 scale-95'
-                  }`}
-                >
-                  <img 
-                    src={template.image} 
-                    alt={template.name}
-                    className={`object-contain ${
-                      template.name === 'Tailored Summary' || template.name === 'Tailor to Job'
-                        ? 'w-[70%] h-[70%]'
-                        : 'w-full h-full'
+                  className={`absolute inset-0 transition-all duration-700 ease-out flex items-center justify-center ${idx === currentTemplateIndex
+                    ? 'opacity-100 scale-100'
+                    : 'opacity-0 scale-95'
                     }`}
-                    onError={(e) => { e.target.style.display='none'; }} 
+                >
+                  <img
+                    src={template.image}
+                    alt={template.name}
+                    className={`object-contain ${template.name === 'Tailored Summary' || template.name === 'Tailor to Job'
+                      ? 'w-[70%] h-[70%]'
+                      : 'w-full h-full'
+                      }`}
+                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 </div>
               ))}
@@ -304,12 +291,11 @@ function LandingPage() {
         </div>
       </section>
 
-      
+
       {/* TEMPLATE SHOWCASE */}
       <section className="px-8 py-24 overflow-hidden bg-white">
         <div className="max-w-[1400px] mx-auto">
-          
-          {/* Centered Header */}
+
           <div className="flex flex-col items-center mb-12 text-center">
             <h2 className="mb-4 text-3xl font-black leading-tight md:text-4xl">
               Access Free <span className="text-[#0077cc]">Templates</span>
@@ -318,26 +304,23 @@ function LandingPage() {
               All templates are ATS-compliant and fully customizable.
             </p>
           </div>
-          
-          {/* Scroll Container Wrapper */}
+
           <div className="relative group">
-            
-            {/* LEFT SCROLL BUTTON */}
-            <button 
+
+            <button
               onClick={() => scroll('left')}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-[#0077cc] border border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-2 hover:bg-[#0077cc] hover:text-white"
             >
               <i className="text-sm fas fa-chevron-left"></i>
             </button>
 
-            {/* THE SCROLLABLE CONTENT */}
-            <div 
+            <div
               ref={scrollContainerRef}
               className="flex gap-6 px-4 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {resumeTemplates.map((t, i) => (
-                <div 
+                <div
                   key={t.name + i}
                   className="min-w-[220px] sm:min-w-[260px] md:min-w-[300px] snap-center relative transition-all duration-500 group/card bg-white"
                 >
@@ -346,10 +329,10 @@ function LandingPage() {
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-[#0077cc]">
                       ATS READY
                     </div>
-                    
+
                     <div className="absolute inset-0 flex items-center justify-center transition-all duration-300 opacity-0 bg-[#1a2e52]/70 backdrop-blur-[2px] group-hover/card:opacity-100 rounded-2xl">
-                      <button 
-                        onClick={() => navigate('/login')} 
+                      <button
+                        onClick={() => navigate('/login')}
                         className="px-6 py-2 text-sm font-bold text-white bg-gradient-to-r from-[#e65100] to-[#f4511e] rounded-lg"
                       >
                         Use Template
@@ -365,8 +348,7 @@ function LandingPage() {
               ))}
             </div>
 
-            {/* RIGHT SCROLL BUTTON */}
-            <button 
+            <button
               onClick={() => scroll('right')}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-[#0077cc] border border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-x-2 hover:bg-[#0077cc] hover:text-white"
             >
@@ -395,7 +377,93 @@ function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <Footer />
+      <footer className="px-8 pt-20 pb-10 bg-white border-t border-gray-100">
+        <div className="max-w-[1400px] mx-auto grid md:grid-cols-4 gap-12 mb-16">
+
+          {/* Logo */}
+          <div className="col-span-1 md:col-span-1">
+            <img src={UpToSkillsImg} alt="Logo" className="w-40 mb-6" />
+            <p className="text-sm leading-relaxed text-gray-500">
+              The ultimate AI-powered toolkit for job seekers to build professional
+              resumes and land dream roles.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="mb-6 font-bold">Quick Links</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
+              <li
+                onClick={() => navigate("/templates")}
+                className="hover:text-[#0077cc] cursor-pointer transition-colors"
+              >
+                Templates
+              </li>
+              <li
+                onClick={() => navigate("/builder")}
+                className="hover:text-[#0077cc] cursor-pointer transition-colors"
+              >
+                AI Resume Checker
+              </li>
+              <li
+                onClick={() => navigate("/login")}
+                className="hover:text-[#0077cc] cursor-pointer transition-colors"
+              >
+                Job Tracker
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="mb-6 font-bold">Company</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
+              <li className="hover:text-[#0077cc] cursor-pointer transition-colors">
+                About Us
+              </li>
+              <li className="hover:text-[#0077cc] cursor-pointer transition-colors">
+                Careers
+              </li>
+              <li className="hover:text-[#0077cc] cursor-pointer transition-colors">
+                Blog
+              </li>
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h4 className="mb-6 font-bold">Support</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
+              <li
+                onClick={() => navigate("/help-center")}
+                className="hover:text-[#0077cc] cursor-pointer transition-colors"
+              >
+                Help Center
+              </li>
+              <li
+                onClick={() => navigate("/contact")}
+                className="hover:text-[#0077cc] cursor-pointer transition-colors"
+              >
+                Contact Us
+              </li>
+              <li className="hover:text-[#0077cc] cursor-pointer transition-colors">
+                Privacy Policy
+              </li>
+              <li className="hover:text-[#0077cc] cursor-pointer transition-colors">
+                Terms of Service
+              </li>
+            </ul>
+          </div>
+
+
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="max-w-[1400px] mx-auto pt-8 border-t border-gray-50 text-center text-gray-400 text-xs">
+          © {new Date().getFullYear()} UptoSkills. All rights reserved.
+        </div>
+      </footer>
+
 
       <style jsx>{`
         @keyframes fadeIn {
