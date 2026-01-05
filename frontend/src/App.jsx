@@ -11,7 +11,17 @@ import TemplateEditor from "./pages/TemplateEditor";
 import Contact from "./pages/Contact";
 import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
-import UserHome from "./pages/UserHome";
+
+//admin
+
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./components/admin/AdminDashboard/AdminDashboard";
+import TemplateDocs from "./components/admin/AdminCreateTemplates/TemplateDocs";
+import Resume from "./components/admin/resume";
+import AdminUsers from "./components/admin/AdminUser/AdminUsers";
+import AdminSubscription from "./components/admin/AdminSubscription/AdminSubscription";
+import AdminAcceptUser from "./components/admin/AdminAcceptUserTemplate/AdminAcceptUser";
+import AdminAnalytics from "./components/admin/AdminAnalytics/AdminAnalytics";
 
 function App() {
   return (
@@ -28,7 +38,20 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/help-center" element={<HelpCenter />} />
-          <Route path="/userhome" element={<UserHome />} />
+          <Route path="*" element={<NotFound />} />
+
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="create-templates" element={<TemplateDocs />} />
+            <Route path="templates" element={<Resume />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="subscription" element={<AdminSubscription />} />
+            <Route path="template-requests" element={<AdminAcceptUser />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+          </Route>
+
+          {/* Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
@@ -37,4 +60,3 @@ function App() {
 }
 
 export default App;
-
