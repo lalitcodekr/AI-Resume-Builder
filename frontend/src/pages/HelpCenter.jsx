@@ -221,7 +221,7 @@ function HelpCenter() {
         <div className="min-h-screen bg-white font-['Outfit']">
 
             {/* NAVIGATION */}
-            <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+            <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm select-none">
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div onClick={() => navigate('/')} className="cursor-pointer transition-transform hover:scale-105">
@@ -245,7 +245,7 @@ function HelpCenter() {
 
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
                     <div className="text-center max-w-4xl mx-auto">
-                        <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-full border border-gray-100 shadow-sm animate-fade-in-up">
+                        <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-full border border-gray-100 shadow-sm animate-fade-in-up select-none">
                             <div className="relative">
                                 <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse-slow"></div>
                             </div>
@@ -254,7 +254,7 @@ function HelpCenter() {
                             </span>
                         </div>
 
-                        <h1 className="text-5xl lg:text-7xl font-black mb-6 leading-[1.1] animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                        <h1 className="text-5xl lg:text-7xl font-black mb-6 leading-[1.1] animate-fade-in-up select-none" style={{ animationDelay: '0.1s' }}>
                             <span className="bg-gradient-to-r from-[#0077cc] via-[#0077cc] to-[#1a2e52] bg-clip-text text-transparent">
                                 Resume Help Center
                             </span>
@@ -273,7 +273,7 @@ function HelpCenter() {
                                     placeholder="Search for help..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-14 pr-6 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-[#0077cc] transition-all duration-300 text-gray-900 placeholder-gray-400 shadow-lg"
+                                    className="w-full pl-14 pr-6 py-4 bg-white border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-[#0077cc] transition-all duration-300 text-gray-900 placeholder-gray-400 shadow-lg select-none"
                                 />
                             </div>
                         </div>
@@ -289,7 +289,7 @@ function HelpCenter() {
                             <button
                                 key={key}
                                 onClick={() => setActiveTab(key)}
-                                className={`group px-6 py-3 rounded-full font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === key
+                                className={`group px-6 py-3 rounded-full font-bold transition-all duration-300 flex items-center gap-2 select-none ${activeTab === key
                                     ? 'bg-gradient-to-r from-[#0077cc] to-[#0056b3] text-white shadow-lg scale-105'
                                     : 'bg-gray-50 border-2 border-gray-100 text-gray-700 hover:border-[#0077cc] hover:text-[#0077cc]'
                                     }`}
@@ -365,7 +365,7 @@ function HelpCenter() {
             {/* FAQ SECTION */}
             <section className="py-20 px-6 lg:px-8 bg-white">
                 <div className="max-w-[1000px] mx-auto">
-                    <div className="text-center mb-16 animate-fade-in-up">
+                    <div className="text-center mb-16 animate-fade-in-up select-none">
                         <h2 className="text-4xl lg:text-5xl font-black mb-4">
                             <span className="bg-gradient-to-r from-[#0077cc] to-[#e65100] bg-clip-text text-transparent">Frequently Asked</span> Questions
                         </h2>
@@ -386,7 +386,7 @@ function HelpCenter() {
                                     className="w-full px-6 lg:px-8 py-6 flex items-start justify-between gap-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-orange-50 transition-all duration-300"
                                 >
                                     <div className="text-left flex-1">
-                                        <span className="inline-block px-3 py-1 bg-blue-100 text-[#0077cc] text-xs font-bold rounded-full mb-2">
+                                        <span className="inline-block px-3 py-1 bg-blue-100 text-[#0077cc] text-xs font-bold rounded-full mb-2 select-none">
                                             {faq.category || 'FAQ'}
                                         </span>
                                         <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#0077cc] transition-colors duration-300">
@@ -413,7 +413,7 @@ function HelpCenter() {
             </section>
 
             {/* CTA SECTION */}
-            <section className="py-20 px-6 lg:px-8 bg-gradient-to-r from-[#0077cc] via-[#0056b3] to-[#1a2e52]">
+            <section className="py-20 px-6 lg:px-8 bg-gradient-to-r from-[#0077cc] via-[#0056b3] to-[#1a2e52] select-none">
                 <div className="max-w-[1000px] mx-auto text-center">
                     <h2 className="text-4xl lg:text-5xl font-black text-white mb-6 animate-fade-in-up">
                         Still Need Help?
@@ -440,6 +440,7 @@ function HelpCenter() {
                     </div>
                 </div>
             </section>
+            <Footer />
 
 
             <style jsx>{`

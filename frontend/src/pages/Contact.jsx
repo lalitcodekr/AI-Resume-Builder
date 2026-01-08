@@ -78,7 +78,7 @@ function ContactUs() {
           <div className="flex items-center justify-between">
             <div onClick={() => navigate('/')} className="cursor-pointer transition-transform hover:scale-105">
               <div onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="cursor-pointer">
-                <img src={UpToSkillsImg} alt="UpToSkills Logo" className="w-[150px]" />
+                <img src={UpToSkillsImg} alt="UpToSkills Logo" className="w-[150px] select-none" />
               </div>
             </div>
 
@@ -96,7 +96,7 @@ function ContactUs() {
 
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-full border border-gray-100 shadow-sm">
+            <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-full border border-gray-100 shadow-sm select-none">
               <i className="fas fa-headset text-[#0077cc]"></i>
               <span className="text-sm font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
                 24/7 Support • Fast Response • Expert Guidance
@@ -104,7 +104,7 @@ function ContactUs() {
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black mb-6 leading-[1.1]">
-              <span className="bg-gradient-to-r from-[#0077cc] via-[#0077cc] to-[#1a2e52] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#0077cc] via-[#0077cc] to-[#1a2e52] bg-clip-text text-transparent select-none">
                 Get in Touch
               </span>
             </h1>
@@ -147,7 +147,7 @@ function ContactUs() {
       <section className="py-20 px-6 lg:px-8 bg-white">
         <div className="max-w-[800px] mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl lg:text-5xl font-black mb-4">
+            <h2 className="text-4xl lg:text-5xl font-black mb-4 select-none">
               <span className="bg-gradient-to-r from-[#0077cc] to-[#e65100] bg-clip-text text-transparent">Send Us</span> a Message
             </h2>
             <p className="text-lg text-gray-600">
@@ -155,7 +155,7 @@ function ContactUs() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-white border-2 border-gray-100 rounded-3xl p-8 lg:p-12 shadow-xl">
+          <form onSubmit={handleSubmit} className="bg-white border-2 border-gray-100 rounded-3xl p-8 lg:p-12 shadow-xl select-none">
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -211,7 +211,7 @@ function ContactUs() {
                   value={formData.category}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#0077cc] transition-all duration-300 bg-white"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#0077cc] transition-all duration-300 bg-white select-none"
                 >
                   <option value="general">General Inquiry</option>
                   <option value="technical">Technical Support</option>
@@ -258,7 +258,7 @@ function ContactUs() {
       </section>
 
       {/* FAQ QUICK LINKS */}
-      <section className="py-20 px-6 lg:px-8 bg-gradient-to-r from-[#0077cc] via-[#0056b3] to-[#1a2e52]">
+      <section className="py-20 px-6 lg:px-8 bg-gradient-to-r from-[#0077cc] via-[#0056b3] to-[#1a2e52] select-none">
         <div className="max-w-[1000px] mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl font-black text-white mb-6">
             Looking for Quick Answers?
