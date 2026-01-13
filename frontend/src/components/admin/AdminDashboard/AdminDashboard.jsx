@@ -13,7 +13,7 @@ import {
   PieChart,
   Pie,
 } from "recharts";
-import axios from "axios";
+import axiosInstance from "../../../api/axios";
 
 export default function AdminDashboard() {
   const [totalUser, setTotalUser] = useState(0);
@@ -70,9 +70,8 @@ export default function AdminDashboard() {
 
   const fetchTotalUser = async () => {
     try {
-      const result = await axios.get(
-        "http://localhost:8000/api/user/dashboard-stat",
-        { withCredentials: true }
+      const result = await axiosInstance.get(
+        "/api/user/dashboard-stat"
       );
 
       setTotalUser(result.data.users.total);
