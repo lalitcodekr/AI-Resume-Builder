@@ -39,16 +39,16 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
 
   /* -------------------- HELPERS -------------------- */
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleUseSummary = (text) => {
-    setFormData(prev => ({ ...prev, summary: text }));
+    setFormData((prev) => ({ ...prev, summary: text }));
   };
 
   const handleSelectTemplate = (id) => {
     setSelectedTemplate(id);
-    setActiveTab('builder');
+    setActiveTab("builder");
   };
 
   const currentTemplate = templates?.find(t => t.id === selectedTemplate);
@@ -56,7 +56,7 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
   /* -------------------- FORM RENDER -------------------- */
   const renderFormContent = () => {
     switch (activeSection) {
-      case 'personal':
+      case "personal":
         return (
           <PersonalInfoForm
             formData={formData}
@@ -64,16 +64,18 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
             onUseSummary={handleUseSummary}
           />
         );
-      case 'work':
+      case "work":
         return <ExperienceForm formData={formData} setFormData={setFormData} />;
-      case 'education':
+      case "education":
         return <EducationForm formData={formData} setFormData={setFormData} />;
-      case 'skills':
+      case "skills":
         return <SkillsForm formData={formData} setFormData={setFormData} />;
-      case 'projects':
+      case "projects":
         return <ProjectsForm formData={formData} setFormData={setFormData} />;
-      case 'certs':
-        return <CertificationsForm formData={formData} setFormData={setFormData} />;
+      case "certs":
+        return (
+          <CertificationsForm formData={formData} setFormData={setFormData} />
+        );
       default:
         return null;
     }
@@ -96,7 +98,7 @@ const goBack = () => {
 
   /* -------------------- MAIN CONTENT -------------------- */
   const renderMainContent = () => {
-    if (activeTab === 'templates') {
+    if (activeTab === "templates") {
       return (
         <TemplatesPage
           templates={templates}
@@ -183,15 +185,33 @@ const goBack = () => {
 
   /* -------------------- BUILDER PAGE -------------------- */
   return (
-    <div className="resume-builder-page">
-      <div className="main-header">
-        <h1>
-          {resumeMode === 'create' ? 'Create Resume' : 'Edit Resume'}
-        </h1>
-        <div className="header-actions">
-          <button className="upload-btn">Upload</button>
-          <button className="export-btn">Export</button>
+    <div>
+      <UserNavBar />
+      <div className="resume-builder-page">
+        <div className="main-header">
+          <h1>{resumeMode === "create" ? "Create Resume" : "Edit Resume"}</h1>
+          <div className="header-actions">
+            <button className="upload-btn">Upload</button>
+            <button className="export-btn">Export</button>
+          </div>
         </div>
+
+        <div className="main-tabs">
+          <button
+            className={activeTab === "builder" ? "active" : ""}
+            onClick={() => setActiveTab("builder")}
+          >
+            Builder
+          </button>
+          <button
+            className={activeTab === "templates" ? "active" : ""}
+            onClick={() => setActiveTab("templates")}
+          >
+            Templates
+          </button>
+        </div>
+
+        {renderMainContent()}
       </div>
 
       <div className="main-tabs">

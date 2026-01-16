@@ -1,4 +1,11 @@
-import { useRef } from 'react';
+import {
+  User,
+  Briefcase,
+  GraduationCap,
+  Zap,
+  FolderKanban,
+  Award
+} from 'lucide-react';
 
 /* ===== ICONS ===== */
 const ChevronLeft = () => (

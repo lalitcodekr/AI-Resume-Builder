@@ -46,9 +46,9 @@ button {
 }
 
 /* Smooth scrolling */
-html {
+/* html {
   scroll-behavior: smooth;
-}
+} */
 
 .animate-slide-in {
   opacity: 1 !important;

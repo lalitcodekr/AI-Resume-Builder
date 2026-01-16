@@ -11,10 +11,10 @@ import TemplateEditor from "./pages/TemplateEditor";
 import Contact from "./pages/Contact";
 import HelpCenter from "./pages/HelpCenter";
 import About from "./pages/About";
+import Pricing from "./pages/Pricing";
 import BlogPage from "./pages/Blogpage";
 import CareersPage from "./pages/Careerpage";
-import JobTrackerPro from "./pages/JobTracker (1)";
-import RequireAuth from "./components/RequireAuth";
+
 import ScrollToTop from "./components/ScrollToTop";
 // Removed unused import of PrivacyPolicy to avoid dev-server requesting a file that may be blocked by extensions
 // If you need a privacy policy page, add an explicit route and import it lazily.
@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard/AdminDashboard";
+
 // import TemplateDocs from "./components/admin/AdminCreateTemplates/TemplateDocs";
 import Resume from "./components/admin/resume";
 import AdminUsers from "./components/admin/AdminUser/AdminUsers";
@@ -47,6 +48,22 @@ function App() {
           <Route path="/templates" element={<TemplatesPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+          {/* Landing page routes */}
+          <Route path="/templates" element={<TemplatesPage />} />
+          <Route path="/templates/:id" element={<TemplateEditor />} />
+          <Route path="/builder" element={<BuilderPage />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/resume-checker" element={<ResumeChecker />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/help-center" element={<HelpCenter />} />
 
           {/* USER ROUTES */}
           <Route path="/user/*" element={<UserRoutes />} />
@@ -54,6 +71,7 @@ function App() {
           {/* Admin routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+
             <Route path="create-templates" element={<AdminTemplates />} />
             <Route path="templates" element={<Resume />} />
             <Route path="users" element={<AdminUsers />} />
