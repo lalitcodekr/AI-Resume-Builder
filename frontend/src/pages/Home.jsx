@@ -11,7 +11,7 @@ import work2 from "../assets/analysis.png";
 import work1 from "../assets/goodResume.png";
 import work4 from "../assets/oneClick.png";
 import work5 from "../assets/win.png";
-import Footer from "../components/Footer";
+import Footer from "./Footer";
 import {
   ArrowRight,
   BarChart3,
@@ -265,7 +265,9 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1a2e52] font-['Outfit']">
+     
       {/* NAVIGATION */}
+
       <nav className="fixed top-0 w-full z-50 py-4 border-b border-gray-100 bg-white/95 backdrop-blur-md select-none">
         <div className="max-w-[1400px] mx-auto px-8 flex items-center justify-between z-50">
           <div
@@ -279,17 +281,63 @@ function LandingPage() {
             />
           </div>
 
-          <div className={`${mobileMenuOpen ? "hidden" : ""}`}>
+          <div className={`absolute left-1/2 transform -translate-x-1/2 ${mobileMenuOpen ? "hidden" : ""}`}>
             <ul className="flex items-center gap-8 hidden md:flex">
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to="/">Home</Link>
-              </li>
+              
               <li className="cursor-pointer hover:text-orange-600">
                 <Link to="/about">About us</Link>
               </li>
+
               <li className="cursor-pointer hover:text-orange-600">
                 <Link to="/#free-templates">Templates</Link>
               </li>
+
+              
+              {/* Features Dropdown */}
+              <li className="relative group cursor-pointer hover:text-orange-600">
+                <div className="flex items-center gap-1">
+                  <span>Features</span>
+                  <i className="fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+                </div>
+                
+              {/* Features Dropdown Menu */}
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                  <ul className="py-2">
+                    <li className="px-4 py-3 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
+                      <Link to="/resume-checker" className="flex items-center gap-3 text-black">
+                        <i className="fas fa-clipboard-check text-blue-600"></i>
+                        <span>AI Resume Checker</span>
+                      </Link>
+                    </li>
+                    <li className="px-4 py-3 hover:bg-green-50 hover:text-green-600 transition-colors duration-200">
+                      <Link to={`${isLoggedIn ? "/user/resume-builder" : "/login"}`} className="flex items-center gap-3 text-black">
+                        <i className="fas fa-file-alt text-green-600"></i>
+                        <span>AI Resume Builder</span>
+                      </Link>
+                    </li>
+                    <li className="px-4 py-3 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200">
+                      <Link to="/" className="flex items-center gap-3 text-black">
+                        <i className="fas fa-check-circle text-purple-600"></i>
+                        <span>ATS Optimization</span>
+                      </Link>
+                    </li>
+                    <li className="px-4 py-3 hover:bg-teal-50 hover:text-teal-600 transition-colors duration-200">
+                      <Link to="/" className="flex items-center gap-3 text-black">
+                        <i className="fas fa-envelope text-teal-600"></i>
+                        <span>Cover Letter Gen</span>
+                      </Link>
+                    </li>
+                    <li className="px-4 py-3 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
+                      <Link to="/" className="flex items-center gap-3 text-black">
+                        <i className="fas fa-magic text-indigo-600"></i>
+                        <span>Smart Formatting</span>
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+
+
               {isLoggedIn && (
                 <li className="cursor-pointer hover:text-orange-600">
                   <Link to="/user/dashboard">Dashboard</Link>
@@ -303,6 +351,7 @@ function LandingPage() {
               </li>
             </ul>
           </div>
+
 
           {!isLoggedIn && (
             <div className="items-center hidden gap-6 md:flex">
@@ -334,7 +383,7 @@ function LandingPage() {
                 className="flex items-center gap-3 px-6 py-2.5 bg-[#e65100] text-white rounded-xl font-bold transition-all duration-300 border-2 border-transparent hover:bg-[#ff6d00] hover:shadow-xl hover:shadow-orange-200 hover:-translate-y-1 active:scale-95"
               >
                 <LogOut size={20} />
-                <span>logout</span>
+                <span>Logout</span>
               </button>
             </div>
           )}
@@ -410,7 +459,7 @@ function LandingPage() {
                 }}
                 className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
               >
-                logout
+                Logout
               </div>
             </>
           )}

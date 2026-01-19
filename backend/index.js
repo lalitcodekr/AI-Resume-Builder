@@ -14,22 +14,19 @@ const app = express();
 app.use(express.json());
 
 const port = process.env.PORT || 5000;
+
+// Allow CORS from local dev frontends (handles varying dev ports like 5173/5174/5175)
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        process.env.FRONTEND_URL,
-      ];
-      // Allow requests with no origin (like mobile apps or curl requests)
+      // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
-
-      if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith("http://localhost:")) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+      // Allow any localhost origin (http) for development
+      if (origin.startsWith("http://localhost")) return callback(null, true);
+      // Fallback: allow if matches env CLIENT_URL
+      const clientUrl = process.env.CLIENT_URL;
+      if (clientUrl && origin === clientUrl) return callback(null, true);
+      return callback(new Error(`CORS policy: origin ${origin} not allowed`));
     },
     credentials: true,
   })

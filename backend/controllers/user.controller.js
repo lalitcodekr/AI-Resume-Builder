@@ -84,6 +84,111 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+// -------------------- GET ANALYTICS STATS --------------------
+export const getAnalyticsStats = async (req, res) => {
+  try {
+    const lastMonth = getLastMonthDate();
+    const last30Days = new Date();
+    last30Days.setDate(last30Days.getDate() - 30);
+
+    // ---------- USER GROWTH (New users in last 30 days) ----------
+    const newUsersLast30Days = await User.countDocuments({
+      createdAt: { $gte: last30Days },
+    });
+
+    const totalUsers = await User.countDocuments();
+
+    // ---------- CONVERSION RATE (Users with paid subscriptions) ----------
+    const paidSubscriptions = await Subscription.countDocuments({
+      plan: { $in: ["basic", "premium"] },
+      status: "active",
+    });
+
+    // ---------- ACTIVE USERS (Users who logged in last 7 days) ----------
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+    
+    const activeUsersLast7Days = await User.countDocuments({
+      updatedAt: { $gte: last7Days },
+    });
+
+    // ---------- CHURNED USERS (Cancelled/expired subscriptions this quarter) ----------
+    const quarterStartDate = new Date();
+    quarterStartDate.setMonth(quarterStartDate.getMonth() - 3);
+    
+    const churnedUsers = await Subscription.countDocuments({
+      status: { $in: ["cancelled", "expired"] },
+      updatedAt: { $gte: quarterStartDate },
+    });
+
+    // ---------- TOTAL ACTIVE SUBSCRIPTIONS ----------
+    const activeSubscriptions = await Subscription.countDocuments({
+      status: "active",
+    });
+
+    // ---------- TOTAL TEMPLATES USED ----------
+    const totalTemplatesUsed = await Resume.distinct("templateId").then(
+      (templates) => templates.length
+    );
+
+    // ---------- TOTAL RESUMES CREATED ----------
+    const totalResumesCreated = await Resume.countDocuments();
+
+    // ---------- MOST USED TEMPLATES (Top 5) ----------
+    const mostUsedTemplatesAgg = await Resume.aggregate([
+      {
+        $group: {
+          _id: "$templateId",
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+      { $limit: 5 },
+    ]);
+
+    const totalTemplateUsage = mostUsedTemplatesAgg.reduce(
+      (sum, item) => sum + item.count,
+      0
+    );
+
+    const mostUsedTemplates = mostUsedTemplatesAgg.map((item) => ({
+      templateId: item._id,
+      count: item.count,
+      percentage: totalTemplateUsage > 0 
+        ? Math.round((item.count / totalTemplateUsage) * 100) 
+        : 0,
+    }));
+
+    // ---------- FINAL RESPONSE ----------
+    res.status(200).json({
+      userGrowth: {
+        count: newUsersLast30Days,
+        note: "New users in last 30 days",
+      },
+      conversions: {
+        count: paidSubscriptions,
+        note: `${activeSubscriptions} total active subscriptions`,
+      },
+      activeUsers: {
+        count: activeUsersLast7Days,
+        note: "Active users in last 7 days",
+      },
+      churnRate: {
+        count: churnedUsers,
+        note: "Churned users this quarter",
+      },
+      templatesUsed: {
+        count: totalTemplatesUsed,
+        note: `${totalResumesCreated} total resumes used`,
+      },
+      mostUsedTemplates: mostUsedTemplates,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Analytics stats fetch failed" });
+  }
+};
+
 export const getAdminDashboardStats = async (req, res) => {
   try {
     const lastMonth = getLastMonthDate();
