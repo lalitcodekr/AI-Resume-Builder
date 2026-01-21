@@ -1,37 +1,36 @@
-import { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { useState } from "react";
+import { AlertTriangle } from "lucide-react";
 
-import ModeSelection from './ModeSelection';
-import ResumeUpload from './ResumeUpload';
-import FormTabs from './FormTabs';
+import UserNavBar from "../UserNavBar/UserNavBar";
+import ModeSelection from "./ModeSelection";
+import ResumeUpload from "./ResumeUpload";
+import FormTabs from "./FormTabs";
 
-import PersonalInfoForm from './forms/PersonalInfoForm';
-import ExperienceForm from './forms/ExperienceForm';
-import EducationForm from './forms/EducationForm';
-import SkillsForm from './forms/SkillsForm';
-import ProjectsForm from './forms/ProjectsForm';
-import CertificationsForm from './forms/CertificationsForm';
+import PersonalInfoForm from "./forms/PersonalInfoForm";
+import ExperienceForm from "./forms/ExperienceForm";
+import EducationForm from "./forms/EducationForm";
+import SkillsForm from "./forms/SkillsForm";
+import ProjectsForm from "./forms/ProjectsForm";
+import CertificationsForm from "./forms/CertificationsForm";
 
-import LivePreview from '../Preview/LivePreview';
-import FullPreview from '../Preview/FullPreview';
-import TemplatesPage from '../Templates/TemplatesDashboardPage';
+import LivePreview from "../Preview/LivePreview";
+import FullPreview from "../Preview/FullPreview";
+import TemplatesPage from "../Templates/TemplatesDashboardPage";
 
-import './ResumeBuilder.css';
-
-const sections = ['personal', 'work', 'education', 'skills', 'projects', 'certs'];
+import "./ResumeBuilder.css";
 
 
-const ResumeBuilder = ({ setActivePage = () => {} }) => {
+const ResumeBuilder = () => {
   /* -------------------- CORE STATE -------------------- */
   const [formData, setFormData] = useState({});
-  const [templates] = useState([]);
+  const [templates] = useState([]); // TODO: load from API
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const [resumeMode, setResumeMode] = useState(null);
   const [uploadedResume, setUploadedResume] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('builder');
-  const [activeSection, setActiveSection] = useState('personal');
+  const [activeTab, setActiveTab] = useState("builder");
+  const [activeSection, setActiveSection] = useState("personal");
 
   /* -------------------- PREVIEW STATE -------------------- */
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
@@ -51,7 +50,10 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
     setActiveTab("builder");
   };
 
-  const currentTemplate = templates?.find(t => t.id === selectedTemplate);
+  const currentTemplate =
+    templates.length > 0
+      ? templates.find((t) => t.id === selectedTemplate)
+      : null;
 
   /* -------------------- FORM RENDER -------------------- */
   const renderFormContent = () => {
@@ -72,7 +74,7 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
         return <SkillsForm formData={formData} setFormData={setFormData} />;
       case "projects":
         return <ProjectsForm formData={formData} setFormData={setFormData} />;
-      case "certs":
+      case "certifications":
         return (
           <CertificationsForm formData={formData} setFormData={setFormData} />
         );
@@ -80,21 +82,6 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
         return null;
     }
   };
-
-  const currentIndex = sections.indexOf(activeSection);
-
-const goNext = () => {
-  if (currentIndex < sections.length - 1) {
-    setActiveSection(sections[currentIndex + 1]);
-  }
-};
-
-const goBack = () => {
-  if (currentIndex > 0) {
-    setActiveSection(sections[currentIndex - 1]);
-  }
-};
-
 
   /* -------------------- MAIN CONTENT -------------------- */
   const renderMainContent = () => {
@@ -108,7 +95,7 @@ const goBack = () => {
       );
     }
 
-    if (activeTab === 'preview') {
+    if (activeTab === "preview") {
       return (
         <FullPreview
           formData={formData}
@@ -125,28 +112,19 @@ const goBack = () => {
           <AlertTriangle size={20} />
           <div className="alert-content">
             <strong>Complete Your Resume</strong>
-            <p>Add the following information to enable export functionality:</p>
-          </div>
-          <div className="alert-tags">
-            <span className="alert-tag warning">Personal Info</span>
-            <span className="alert-tag warning">Experience / Education</span>
-            <span className="alert-tag success">Skills</span>
+            <p>Add required sections to enable export.</p>
           </div>
         </div>
 
         {/* BUILDER + PREVIEW */}
-        <div className={`content-area ${isPreviewExpanded ? 'expanded-preview' : ''}`}>
+        <div className={`content-area ${isPreviewExpanded ? "expanded-preview" : ""}`}>
           <div className="builder-section">
             <FormTabs
               activeSection={activeSection}
               setActiveSection={setActiveSection}
             />
-            <div className="form-content">{renderFormContent()}
- 
-  
-            </div>
+            <div className="form-content">{renderFormContent()}</div>
           </div>
-          
 
           {!isPreviewHidden && (
             <LivePreview
@@ -158,6 +136,15 @@ const goBack = () => {
               onMinimize={() => setIsPreviewHidden(true)}
             />
           )}
+
+          {isPreviewHidden && (
+            <button
+              className="restore-preview-btn"
+              onClick={() => setIsPreviewHidden(false)}
+            >
+              Restore Preview
+            </button>
+          )}
         </div>
       </>
     );
@@ -166,33 +153,45 @@ const goBack = () => {
   /* -------------------- MODE SELECTION -------------------- */
   if (!resumeMode) {
     return (
-      <div className="resume-builder-page">
-        <h1>📝 AI Resume Builder</h1>
-        <ModeSelection onSelectMode={setResumeMode} />
-      </div>
+      <>
+        <UserNavBar />
+        <div className="resume-builder-page">
+          <h1>📝 AI Resume Builder</h1>
+          <ModeSelection onSelectMode={setResumeMode} />
+        </div>
+      </>
     );
   }
 
   /* -------------------- UPLOAD MODE -------------------- */
-  if (resumeMode === 'edit' && !uploadedResume) {
+  if (resumeMode === "edit" && !uploadedResume) {
     return (
-      <ResumeUpload
-        onUpload={setUploadedResume}
-        onBack={() => setResumeMode(null)}
-      />
+      <>
+        <UserNavBar />
+        <ResumeUpload
+          onUpload={(data) => {
+            setUploadedResume(data);
+            setFormData(data); // hydrate builder
+          }}
+          onBack={() => setResumeMode(null)}
+        />
+      </>
     );
   }
 
   /* -------------------- BUILDER PAGE -------------------- */
   return (
-    <div>
+    <>
       <UserNavBar />
       <div className="resume-builder-page">
         <div className="main-header">
           <h1>{resumeMode === "create" ? "Create Resume" : "Edit Resume"}</h1>
+
           <div className="header-actions">
-            <button className="upload-btn">Upload</button>
-            <button className="export-btn">Export</button>
+            <button onClick={() => setActiveTab("preview")}>Preview</button>
+            <button className="export-btn" disabled={!formData?.personal}>
+              Export
+            </button>
           </div>
         </div>
 
@@ -213,24 +212,7 @@ const goBack = () => {
 
         {renderMainContent()}
       </div>
-
-      <div className="main-tabs">
-        <button
-          className={activeTab === 'builder' ? 'active' : ''}
-          onClick={() => setActiveTab('builder')}
-        >
-          Builder
-        </button>
-        <button
-          className={activeTab === 'templates' ? 'active' : ''}
-          onClick={() => setActiveTab('templates')}
-        >
-          Templates
-        </button>
-      </div>
-
-      {renderMainContent()}
-    </div>
+    </>
   );
 };
 

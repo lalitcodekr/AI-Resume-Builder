@@ -49,7 +49,7 @@ const TemplatesDashboardPage = ({ templates = [] }) => {
       <UserNavBar onMenuClick={() => console.log("Toggle sidebar")} />
 
       {/* CONTENT BELOW NAVBAR */}
-      <div style={{ marginTop: "80px", padding: "1rem" }}> {/* ensures content is below fixed navbar */}
+      <div style={{ padding: "1rem" }}> {/* ensures content is below fixed navbar */}
         {/* HEADER */}
         <div className="page-header">
           <div>

@@ -16,13 +16,15 @@ import BlogPage from "./pages/Blogpage";
 import CareersPage from "./pages/Careerpage";
 
 import ScrollToTop from "./components/ScrollToTop";
-// Removed unused import of PrivacyPolicy to avoid dev-server requesting a file that may be blocked by extensions
-// If you need a privacy policy page, add an explicit route and import it lazily.
+
+// PrivacyPolicy route REMOVED because component is not imported
+// If needed later, import it explicitly and add the route back safely
+
 import ResumeChecker from "./pages/ResumeChecker";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
-//admin
+// ================= ADMIN =================
 
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard/AdminDashboard";
@@ -34,7 +36,9 @@ import AdminSubscription from "./components/admin/AdminSubscription/AdminSubscri
 import AdminAcceptUser from "./components/admin/AdminAcceptUserTemplate/AdminAcceptUser";
 import AdminAnalytics from "./components/admin/AdminAnalytics/AdminAnalytics";
 import AdminTemplates from "./components/admin/AdminCreateTemplates/Template";
-// User routes
+
+// ================= USER ROUTES =================
+
 import UserRoutes from "./pages/UserRoutes";
 
 function App() {
@@ -43,35 +47,32 @@ function App() {
       <ScrollToTop />
       <div className="min-h-screen flex flex-col">
         <Routes>
-          {/* Public routes */}
+          {/* ================= PUBLIC ROUTES ================= */}
           <Route path="/" element={<Home />} />
           <Route path="/templates" element={<TemplatesPage />} />
+          <Route path="/templates/:id" element={<TemplateEditor />} />
+          <Route path="/builder" element={<BuilderPage />} />
+
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-          {/* Landing page routes */}
-          <Route path="/templates" element={<TemplatesPage />} />
-          <Route path="/templates/:id" element={<TemplateEditor />} />
-          <Route path="/builder" element={<BuilderPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/about" element={<About />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/careers" element={<CareersPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
           <Route path="/resume-checker" element={<ResumeChecker />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/help-center" element={<HelpCenter />} />
 
-          {/* USER ROUTES */}
+          {/* ================= USER DASHBOARD ROUTES ================= */}
           <Route path="/user/*" element={<UserRoutes />} />
 
-          {/* Admin routes */}
+          {/* ================= ADMIN ROUTES ================= */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-
             <Route path="create-templates" element={<AdminTemplates />} />
             <Route path="templates" element={<Resume />} />
             <Route path="users" element={<AdminUsers />} />
@@ -80,7 +81,7 @@ function App() {
             <Route path="analytics" element={<AdminAnalytics />} />
           </Route>
 
-          {/* 404 */}
+          {/* ================= 404 ================= */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

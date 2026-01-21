@@ -17,7 +17,7 @@ const Dashboard = ({ user, resumes, setActivePage, onSidebarToggle }) => {
       <UserNavBar onMenuClick={onSidebarToggle || (() => console.log("Toggle sidebar"))} />
 
       {/* CONTENT BELOW NAVBAR */}
-      <div style={{ marginTop: "80px", padding: "1rem" }}>
+      <div style={{ padding: "1rem" }}>
         <div className="page-header">
           <h1>👋 Welcome back, {user?.name || "User"}!</h1>
           <p>Here's your resume building progress</p>
