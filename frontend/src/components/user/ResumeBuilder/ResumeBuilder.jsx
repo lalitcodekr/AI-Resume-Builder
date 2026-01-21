@@ -29,7 +29,7 @@ import FullPreview from "../Preview/FullPreview";
 import TemplatesPage from "../Templates/TemplatesDashboardPage";
 
 import "./ResumeBuilder.css";
-import UserNavbar from "../UserNavBar/UserNavBar";
+import UserNavBar from "../UserNavBar/UserNavBar";
 
 const ResumeBuilder = () => {
   /* -------------------- CORE STATE -------------------- */
