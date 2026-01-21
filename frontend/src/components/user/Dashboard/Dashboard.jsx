@@ -2,7 +2,7 @@ import StatCard from "./StatCard";
 import RecentResumes from "./RecentResumes";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import NavBar  from "../../NavBar"; 
+import NavBar from "../../NavBar"; 
 import axios from "axios";
 
 import {
@@ -13,8 +13,6 @@ import {
 } from "react-icons/fa";
 
 import "./Dashboard.css";
-
-
 
 const Dashboard = ({ setActivePage }) => {
   const navigate = useNavigate();
@@ -47,7 +45,9 @@ const Dashboard = ({ setActivePage }) => {
 
   return (
     <div className="dashboard-page">
-      
+      {/* 1. Integrated NavBar at the top of the page */}
+      <NavBar />
+
       <div className="dashboard-content-container">
         <p className="breadcrumb-text">Home / Dashboard</p>
 
@@ -70,7 +70,7 @@ const Dashboard = ({ setActivePage }) => {
             <div className="ai-progress">
               <div
                 className="ai-progress-fill"
-                style={{ width: `${avgAtsScore}%` }}
+                style={{ width: `${Math.min(avgAtsScore, 100)}%` }}
               />
             </div>
 
@@ -110,18 +110,9 @@ const Dashboard = ({ setActivePage }) => {
             trend="+0 vs last week"
             icon={<FaEye />}
           />
-
-          {/*
-          <StatCard
-            label="Downloads"
-            value="24"
-            trend="+6 this week"
-            icon={<FaDownload />}
-          />
-          */}
         </div>
 
-        {/* Main Grid - Now simplified to only show Recent Resumes */}
+        {/* Main Grid - Recent Resumes */}
         <div className="dashboard-grid full-width-list">
           <RecentResumes
             resumes={dashboardData?.recentResumes || []}
