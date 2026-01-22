@@ -200,7 +200,7 @@ const CoverLetterBuilder = ({ onSidebarToggle }) => {
               setActiveSection={setActiveSection}
             />
             {/* form-content */}
-            <div className="w-full h-[55%] mt-5 overflow-auto">{renderFormContent()}</div>
+            <div className="w-full h-[55%] mt-5 overflow-auto no-scrollbar">{renderFormContent()}</div>
             {/* Previous & Next */}
             <div className="w-full flex items-center justify-between mt-10">
               <button
