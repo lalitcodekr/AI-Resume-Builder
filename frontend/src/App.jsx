@@ -15,13 +15,19 @@ import Pricing from "./pages/Pricing-FIXED";
 import BlogPage from "./pages/Blogpage";
 import CareersPage from "./pages/Careerpage";
 import PrivacyPolicy from "./pages/Privacypolicy";
-
-
 import ScrollToTop from "./components/ScrollToTop";
-import PrivacyPolicy from "./pages/Privacypolicy";
 import ResumeChecker from "./pages/ResumeChecker";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import ATSCheckerPage from "./pages/ATSChecker";
+import TemplatesFeature from "./pages/TemplatesFeature";
+import AIBuilderPage from "./pages/AIBuilder";
+import AIContentEnhancementPage from "./pages/AIContentEnhance";
+import ScoreChecker from "./pages/ScoreChecker";
+import ResumeHubPage from "./pages/ResumeHub";
+import GrowthInsightsPage from "./pages/GrowthInsights";
+import AICoverLetterPage from "./pages/CoverLetter";
+import CVFormattingPage from "./pages/CV";
 
 // ================= ADMIN =================
 
@@ -61,6 +67,7 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/careers" element={<CareersPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           <Route path="/resume-checker" element={<ResumeChecker />} />
           <Route path="/terms" element={<Terms />} />

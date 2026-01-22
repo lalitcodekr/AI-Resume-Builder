@@ -14,7 +14,6 @@ import ResumeBuilder from "../components/user/ResumeBuilder/ResumeBuilder";
 import Templates from "../components/user/Templates/TemplatesDashboardPage";
 import CVBuilder from "../components/user/CV/CVBuilder";
 import CoverLetterBuilder from "../components/user/CoverLetter/CoverLetterBuilder";
-import CVBuilder from"../components/user/CV/CVBuilder";
 
 
 const UserRoutes = () => {
@@ -45,7 +44,6 @@ const UserRoutes = () => {
         <Route path="my-resumes" element={<MyResumes />} />
         <Route path="full-preview" element={<Preview />} />
         <Route path="edit-profile" element={<Profile />} />
-         <Route path="cv" element={<CVBuilder />} />
 
 
       </Route>
