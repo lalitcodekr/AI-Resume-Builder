@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
+import Footer from "./Footer";
 import { usePricing } from "../context/Pricingcontext";
 
 const Pricing = () => {
