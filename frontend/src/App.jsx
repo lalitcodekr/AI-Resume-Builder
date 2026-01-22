@@ -14,15 +14,8 @@ import About from "./pages/About";
 import Pricing from "./pages/Pricing-FIXED";
 import BlogPage from "./pages/Blogpage";
 import CareersPage from "./pages/Careerpage";
-import ATSCheckerPage from "./pages/ATSChecker";
-import TemplatesFeature from "./pages/TemplatesFeature";
-import AIBuilderPage from "./pages/AIBuilder";
-import AIContentEnhancementPage  from "./pages/AIContentEnhance";
-import ScoreChecker   from "./pages/ScoreChecker";
-import ResumeHubPage from "./pages/ResumeHub";
-import GrowthInsightsPage  from "./pages/GrowthInsights";
-import AICoverLetterPage  from "./pages/CoverLetter";
-import CVFormattingPage from "./pages/CV";
+import PrivacyPolicy from "./pages/Privacypolicy";
+
 
 import ScrollToTop from "./components/ScrollToTop";
 import PrivacyPolicy from "./pages/Privacypolicy";

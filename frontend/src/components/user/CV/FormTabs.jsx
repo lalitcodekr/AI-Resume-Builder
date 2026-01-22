@@ -34,3 +34,6 @@ const FormTabs = ({ activeSection, setActiveSection }) => {
 };
 
 export default FormTabs;
+
+
+
