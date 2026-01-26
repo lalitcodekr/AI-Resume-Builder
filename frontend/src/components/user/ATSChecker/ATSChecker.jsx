@@ -355,30 +355,25 @@ function ATSUpload({ onFileUpload }) {
     fileInputRef.current?.click();
   };
 
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-      <h2 className="font-semibold text-lg mb-4">Upload Resume</h2>
-      
-      <button
-        onClick={handleClick}
-        className="w-full py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        Upload Resume
-      </button>
+ return (
+  <p >
+    <button
+      onClick={handleClick}
+      className="w-full py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+    >
+      Upload Resume
+    </button>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".pdf,.docx,.txt"
-        onChange={handleFileChange}
-        className="hidden"
-      />
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept=".pdf,.docx,.txt"
+      onChange={handleFileChange}
+      className="hidden"
+    />
+  </p>
+);
 
-      <div className="mt-4 text-xs text-slate-500">
-        
-      </div>
-    </div>
-  );
 }
 
 // Main ATSChecker Component
@@ -521,18 +516,18 @@ export default function ATSChecker() {
             </div>
 
             {uploadedFile ? (
-              <div className=" w-full max-w-3xl p-2 rounded-lg  min-h-[600px]">
+              <div className="w-full max-w-3xl p-2 rounded-lg min-h-[600px]">
                 {uploadedFile.type === "application/pdf" ? (
                   <PDFViewer file={uploadedFile} />
                 ) : uploadedFile.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
                   <DOCXViewer file={uploadedFile} />
                 ) : uploadedFile.type === "text/plain" ? (
-                  <div className="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed p-4">
+                  <div className="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed p-4 bg-white rounded-lg">
                     {resumeText}
                   </div>
                 ) : (
                   <div className="text-center py-10 text-slate-500">
-                    
+                    Unsupported file type
                   </div>
                 )}
               </div>
@@ -636,8 +631,6 @@ export default function ATSChecker() {
                       </div>
                     </div>
                   )}
-
-                 
                 </>
               ) : loading ? (
                 <div className="text-center py-8">
@@ -658,16 +651,5 @@ export default function ATSChecker() {
         </div>
       </div>
     </div>
-  );
-}
-
-function Section({ title, children }) {
-  return (
-    <section className="mb-6">
-      <h2 className="text-xs font-bold uppercase tracking-wider text-blue-800 border-b mb-2">
-        {title}
-      </h2>
-      <div className="text-slate-600 text-xs">{children}</div>
-    </section>
   );
 }
