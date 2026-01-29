@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import UpToSkillsImg from "../assets/UptoSkills.webp";
 
 // Import React Icons
-import { 
-  SiYoutube, 
-  SiInstagram, 
-  SiLinkedin, 
-  SiFacebook 
+import {
+  SiYoutube,
+  SiInstagram,
+  SiLinkedin,
+  SiFacebook
 } from "react-icons/si";
 import { FaArrowRight } from "react-icons/fa6";
 
@@ -19,25 +19,25 @@ function Footer() {
 
   // Updated socialLinks to use React Icon Components directly
   const socialLinks = [
-    { 
-        icon: <SiYoutube size={18} />, 
-        bgColor: "bg-[#ff0000]", 
-        href: "https://www.youtube.com/channel/UCJzITNWKW5njk0AWkEZxSrw" 
+    {
+      icon: <SiYoutube size={18} />,
+      bgColor: "bg-[#ff0000]",
+      href: "https://www.youtube.com/channel/UCJzITNWKW5njk0AWkEZxSrw"
     },
-    { 
-        icon: <SiInstagram size={18} />, 
-        bgColor: "bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]", 
-        href: "https://www.instagram.com/uptoskills?utm_medium=copy_link" 
+    {
+      icon: <SiInstagram size={18} />,
+      bgColor: "bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]",
+      href: "https://www.instagram.com/uptoskills?utm_medium=copy_link"
     },
-    { 
-        icon: <SiLinkedin size={18} />, 
-        bgColor: "bg-[#0077b5]", 
-        href: "https://www.linkedin.com/company/uptoskills/posts/?feedView=all" 
+    {
+      icon: <SiLinkedin size={18} />,
+      bgColor: "bg-[#0077b5]",
+      href: "https://www.linkedin.com/company/uptoskills/posts/?feedView=all"
     },
-    { 
-        icon: <SiFacebook size={18} />, 
-        bgColor: "bg-[#1877f2]", 
-        href: "https://www.facebook.com/Uptoskills/" 
+    {
+      icon: <SiFacebook size={18} />,
+      bgColor: "bg-[#1877f2]",
+      href: "https://www.facebook.com/Uptoskills/"
     },
   ];
 
@@ -52,7 +52,7 @@ function Footer() {
 
       <div className="max-w-[1400px] mx-auto px-8 pt-16 pb-10">
         <div className="grid grid-cols-1 gap-10 mb-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-          
+
           {/* 1. BRAND & NEWSLETTER */}
           <div className="flex flex-col h-full">
             <img
@@ -95,44 +95,46 @@ function Footer() {
             </div>
           </div>
 
-          {/* 2. DISCOVER */}
+          {/* 2. RESUME - UPDATED */}
           <div className="flex flex-col h-full">
-            <h4 className={headerStyle}>Discover</h4>
+            <h4 className={headerStyle}>Resume & CV</h4>
             <ul className="space-y-4">
-              <li className={linkStyle}><Link to="/#free-templates">Templates</Link></li>
-              <li className={linkStyle}><Link to="/careers">Careers</Link></li>
-              <li className={linkStyle}><Link to="/blog">Blog</Link></li>
-            </ul>
-          </div>
-
-          {/* 3. AI FEATURES */}
-          <div className="flex flex-col h-full">
-            <h4 className={headerStyle}>AI Features</h4>
-            <ul className="space-y-4">
-              <li className={linkStyle}><Link to="/resume-checker">Resume Checker</Link></li>
-              <li className={linkStyle}><Link to="/cover-letter">AI Cover Letter Builder</Link></li>
+              <li className={linkStyle}><Link to="/score-checker">ATS Scorer</Link></li>
+              <li className={linkStyle}><Link to="/#free-templates">Resume Templates</Link></li>
+              <li className={linkStyle}><Link to="/blog">Resume Examples</Link></li>
               <li className={linkStyle}><Link to="/cv">Professional CV Formatting</Link></li>
-              <li className={linkStyle}><Link to="/score-checker">ATS Compatibility Audit</Link></li>
             </ul>
           </div>
 
-          {/* 4. COMPANY */}
+          {/* 3. COVER LETTER - NEW CATEGORY */}
           <div className="flex flex-col h-full">
-            <h4 className={headerStyle}>Company</h4>
+            <h4 className={headerStyle}>Cover Letter</h4>
+            <ul className="space-y-4">
+              <li className={linkStyle}><Link to="/cover-letter-examples">Cover Letter Examples</Link></li>
+              <li className={linkStyle}><Link to="/cover-letter">Cover Letter Templates</Link></li>
+              <li className={linkStyle}><Link to="/blog">Writing A Cover Letter</Link></li>
+            </ul>
+          </div>
+
+          {/* 4. OUR COMPANY - UPDATED */}
+          <div className="flex flex-col h-full">
+            <h4 className={headerStyle}>Our Company</h4>
             <ul className="space-y-4">
               <li className={linkStyle}><Link to="/about">About Us</Link></li>
-              <li className={linkStyle}><Link to="/pricing">Pricing</Link></li>
-              <li className={linkStyle}><Link to="/contact">Contact Us</Link></li>
+              <li className={linkStyle}><Link to={`${isLoggedIn ? "/pricing" : "/login"}`}>Pricing</Link></li>
+              <li className={linkStyle}><Link to="/blog">Updates</Link></li>
+              <li className={linkStyle}><Link to="/careers">Careers</Link></li>
             </ul>
           </div>
 
-          {/* 5. SUPPORT */}
+          {/* 5. SUPPORT - UPDATED */}
           <div className="flex flex-col h-full">
             <h4 className={headerStyle}>Support</h4>
             <ul className="space-y-4">
-              <li className={linkStyle}><Link to="/help-center">Help Center</Link></li>
-              <li className={linkStyle}><Link to="/privacy-policy">Privacy Policy</Link></li>
-              <li className={linkStyle}><Link to="/terms">Terms & Conditions</Link></li>
+              <li className={linkStyle}><Link to="/faq">FAQ</Link></li>
+              <li className={linkStyle}><Link to="/contact">Contact Us</Link></li>
+              <li className={linkStyle}><Link to="/terms">Terms Of Service</Link></li>
+              <li className={linkStyle}><Link to="/privacy-policy">Privacy</Link></li>
             </ul>
           </div>
         </div>
