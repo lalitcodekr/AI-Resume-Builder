@@ -341,17 +341,17 @@ function LandingPage() {
                 <div
                   key={idx}
                   className={`absolute inset-0 transition-all duration-700 ease-out flex items-center justify-center select-none ${idx === currentTemplateIndex
-                      ? "opacity-100 scale-100"
-                      : "opacity-0 scale-95"
+                    ? "opacity-100 scale-100"
+                    : "opacity-0 scale-95"
                     }`}
                 >
                   <img
                     src={template.image}
                     alt={template.name}
                     className={`object-contain ${template.name === "Tailored Summary" ||
-                        template.name === "Tailor to Job"
-                        ? "w-[70%] h-[70%]"
-                        : "w-full h-full"
+                      template.name === "Tailor to Job"
+                      ? "w-[70%] h-[70%]"
+                      : "w-full h-full"
                       }`}
                     onError={(e) => {
                       e.target.style.display = "none";
@@ -459,7 +459,7 @@ function LandingPage() {
                     <img
                       src={t.image}
                       alt={t.name}
-                      className="object-cover object-top w-full h-full transition-transform duration-500"
+                      className="object-contain object-top w-full h-full transition-transform duration-500"
                     />
 
                     {/* ATS Badge */}
