@@ -11,14 +11,9 @@ import TemplateEditor from "./pages/TemplateEditor";
 import Contact from "./pages/Contact";
 import HelpCenter from "./pages/HelpCenter";
 import About from "./pages/About";
-import Pricing from "./pages/Pricing-FIXED";
+import Pricing from "./pages/Pricing";
 import BlogPage from "./pages/Blogpage";
 import CareersPage from "./pages/Careerpage";
-import PrivacyPolicy from "./pages/Privacypolicy";
-import ScrollToTop from "./components/ScrollToTop";
-import ResumeChecker from "./pages/ResumeChecker";
-import Terms from "./pages/Terms";
-import NotFound from "./pages/NotFound";
 import ATSCheckerPage from "./pages/ATSChecker";
 import TemplatesFeature from "./pages/TemplatesFeature";
 import AIBuilderPage from "./pages/AIBuilder";
@@ -29,6 +24,14 @@ import GrowthInsightsPage from "./pages/GrowthInsights";
 import AICoverLetterPage from "./pages/CoverLetter";
 import CoverLetterExamples from "./pages/CoverLetterExamples";
 import CVFormattingPage from "./pages/CV";
+import WritingCoverLetter from "./pages/WritingCoverLetter"
+
+import ScrollToTop from "./components/ScrollToTop";
+import RequireAuth from "./components/RequireAuth";
+import PrivacyPolicy from "./pages/Privacypolicy";
+import ResumeChecker from "./pages/ResumeChecker";
+import Terms from "./pages/Terms";
+import NotFound from "./pages/NotFound";
 
 // ================= ADMIN =================
 
@@ -68,7 +71,6 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/careers" element={<CareersPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           <Route path="/resume-checker" element={<ResumeChecker />} />
           <Route path="/terms" element={<Terms />} />
@@ -85,17 +87,17 @@ function App() {
           <Route path="/cv" element={<CVFormattingPage  />}/>
 
           {/* ================= USER DASHBOARD ROUTES ================= */}
-          <Route path="/user/*" element={<UserRoutes />} />
+          <Route path="/user/*" element={<RequireAuth><UserRoutes /></RequireAuth>} />
 
           {/* ================= ADMIN ROUTES ================= */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
             <Route index element={<AdminDashboard />} />
             <Route path="create-templates" element={<AdminTemplates />} />
             <Route path="resume-editor" element={<ResumeEditor />} />
             <Route path="templates" element={<Resume />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="subscription" element={<AdminSubscription />} />
-            <Route path="template-requests" element={<AdminAcceptUser />} />
+
             <Route path="analytics" element={<AdminAnalytics />} />
           </Route>
 

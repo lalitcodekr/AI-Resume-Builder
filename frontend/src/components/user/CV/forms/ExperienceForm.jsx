@@ -28,7 +28,7 @@ const ExperienceForm = ({ formData, setFormData }) => {
       {formData.experience.map((exp, index) => (
         <div key={exp.id} className="entry-card">
           <div className="entry-header">
-            <span className="font-bold text-slate-700">Experience #{index + 1}</span>
+            <span className="">Experience {index + 1}</span>
             {formData.experience.length > 1 && (
               <button
                 className="remove-entry-btn"

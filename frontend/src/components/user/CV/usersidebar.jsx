@@ -30,7 +30,7 @@ export default function UserSidebar() {
     { id: "cv", icon: FileUser, label: "CV", path: "/user/cv" },
     { id: "coverletter", icon: FilePen, label: "Cover Letter", path: "/user/cover-letter" },
     { id: "ats", icon: CheckCircle, label: "ATS Score Checker", path: "/user/ats-checker" },
-    { id: "templates", icon: FileStack, label: "Templates", path: "/user/templates-dashboard-page" },
+
     { id: "myresumes", icon: Files, label: "My Resumes", path: "/user/my-resumes" },
   ];
 

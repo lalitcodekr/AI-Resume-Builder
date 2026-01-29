@@ -23,10 +23,11 @@ const ProjectsForm = ({ formData, setFormData }) => {
 
   return (
     <div className="form-section">
+      <h3 className="form-section-title">Projects</h3>
       {formData.projects.map((project, index) => (
         <div key={project.id} className="entry-card">
           <div className="entry-header">
-            <span className="font-bold text-slate-700">Project #{index + 1}</span>
+            <span className="">Project {index + 1}</span>
             {formData.projects.length > 1 && (
               <button
                 className="remove-entry-btn"

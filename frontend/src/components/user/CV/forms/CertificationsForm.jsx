@@ -35,7 +35,7 @@ const CertificationsForm = ({ formData, setFormData }) => {
       {formData.certifications.map((cert, index) => (
         <div key={cert.id} className="entry-card">
           <div className="entry-header">
-            <span className="font-bold text-slate-700">Certification #{index + 1}</span>
+            <span className=" ">Certification {index + 1}</span>
             {formData.certifications.length > 1 && (
               <button
                 className="remove-entry-btn"

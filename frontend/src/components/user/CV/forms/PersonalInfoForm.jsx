@@ -2,6 +2,8 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
   return (
     <div className="form-section">
       <div className="form-grid">
+        <h3 className="mb-3 text-sm font-semibold">Personal Information</h3>
+    
         <div className="form-group">
           <label>Full Name *</label>
           <input

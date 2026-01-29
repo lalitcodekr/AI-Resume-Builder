@@ -12,6 +12,13 @@ import work2 from "../assets/analysis.png";
 import work1 from "../assets/goodResume.png";
 import work4 from "../assets/oneClick.png";
 import work5 from "../assets/win.png";
+import template1 from "../assets/template_thumnail/JessicaClaire1.png";
+import template2 from "../assets/template_thumnail/JessicaClaire2.png";
+import template3 from "../assets/template_thumnail/JessicaClaire3.png";
+import template4 from "../assets/template_thumnail/JessicaClaire4.png";
+import template5 from "../assets/template_thumnail/JessicaClaire5.png";
+import template6 from "../assets/template_thumnail/JessicaClaire6.png";
+
 import Footer from "./Footer";
 import {
   ArrowRight,
@@ -93,42 +100,42 @@ function LandingPage() {
       name: "Atlantic Blue",
       category: "modern",
       desc: "Modern and professional design",
-      image: `${base}templates/chronological.png`,
+      image: template1,
     },
     {
       id: 2,
       name: "Classic",
       category: "traditional",
       desc: "Traditional and timeless layout",
-      image: `${base}templates/functional.png`,
+      image: template2,
     },
     {
       id: 3,
       name: "Corporate",
       category: "traditional",
       desc: "Professional corporate style",
-      image: `${base}templates/creative.png`,
+      image: template3,
     },
     {
       id: 4,
       name: "Modern Pro",
       category: "modern",
       desc: "Sleek and contemporary design",
-      image: `${base}templates/modern.png`,
+      image: template4,
     },
     {
       id: 5,
       name: "Executive",
       category: "executive",
       desc: "Perfect for senior positions",
-      image: `${base}templates/minimalist.png`,
+      image: template5,
     },
     {
       id: 6,
       name: "Creative Edge",
       category: "creative",
       desc: "Stand out with creative flair",
-      image: `${base}templates/executive.png`,
+      image: template6,
     },
   ];
 
@@ -269,15 +276,14 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1a2e52] font-['Segoe UI']">
-      
+
       <NavBar />
 
       {/*  OVERLAY */}
       <div
         onClick={toggleMobileMenu}
-        className={`w-full h-full absolute top-0 left-0 z-30 bg-black/20 ${
-          mobileMenuOpen ? "" : "hidden"
-        }`}
+        className={`w-full h-full absolute top-0 left-0 z-30 bg-black/20 ${mobileMenuOpen ? "" : "hidden"
+          }`}
       ></div>
 
       {/* HERO SECTION */}
@@ -334,21 +340,19 @@ function LandingPage() {
               {templates.map((template, idx) => (
                 <div
                   key={idx}
-                  className={`absolute inset-0 transition-all duration-700 ease-out flex items-center justify-center select-none ${
-                    idx === currentTemplateIndex
-                      ? "opacity-100 scale-100"
-                      : "opacity-0 scale-95"
-                  }`}
+                  className={`absolute inset-0 transition-all duration-700 ease-out flex items-center justify-center select-none ${idx === currentTemplateIndex
+                    ? "opacity-100 scale-100"
+                    : "opacity-0 scale-95"
+                    }`}
                 >
                   <img
                     src={template.image}
                     alt={template.name}
-                    className={`object-contain ${
-                      template.name === "Tailored Summary" ||
+                    className={`object-contain ${template.name === "Tailored Summary" ||
                       template.name === "Tailor to Job"
-                        ? "w-[70%] h-[70%]"
-                        : "w-full h-full"
-                    }`}
+                      ? "w-[70%] h-[70%]"
+                      : "w-full h-full"
+                      }`}
                     onError={(e) => {
                       e.target.style.display = "none";
                     }}
@@ -376,9 +380,8 @@ function LandingPage() {
             {howItWorksSteps.map((step, index) => (
               <div
                 key={index}
-                className={`flex flex-col md:flex-row items-center gap-12 ${
-                  index % 2 !== 0 ? "md:flex-row-reverse" : ""
-                }`}
+                className={`flex flex-col md:flex-row items-center gap-12 ${index % 2 !== 0 ? "md:flex-row-reverse" : ""
+                  }`}
               >
                 {/* IMAGE BOX */}
                 <div className="relative w-full md:w-1/2 bg-white  shadow-xl rounded-3xl ">
@@ -456,7 +459,7 @@ function LandingPage() {
                     <img
                       src={t.image}
                       alt={t.name}
-                      className="object-cover object-top w-full h-full transition-transform duration-500"
+                      className="object-contain object-top w-full h-full transition-transform duration-500"
                     />
 
                     {/* ATS Badge */}

@@ -30,13 +30,25 @@ export default function UserSidebar() {
     { id: "cv", icon: FileUser, label: "CV", path: "/user/cv" },
     { id: "coverletter", icon: FilePen, label: "Cover Letter", path: "/user/cover-letter" },
     { id: "ats", icon: CheckCircle, label: "ATS Score Checker", path: "/user/ats-checker" },
-    { id: "templates", icon: FileStack, label: "Templates", path: "/user/templates-dashboard-page" },
+
     { id: "myresumes", icon: Files, label: "My Resumes", path: "/user/my-resumes" },
   ];
 
   const handleNavigate = (path) => {
     navigate(path);
     setIsMobileOpen(false);
+  };
+
+  const handleLogout = () => {
+    // Clear all authentication data
+    localStorage.removeItem('token');
+    localStorage.clear(); // Clear all localStorage to ensure clean logout
+    setIsMobileOpen(false);
+    // Navigate after ensuring localStorage is cleared
+    setTimeout(() => {
+      navigate("/", { replace: true });
+      window.location.reload(); // Force reload to clear any cached state
+    }, 100);
   };
 
   return (
@@ -100,7 +112,7 @@ export default function UserSidebar() {
         {/* Logout */}
         <div className="p-3 border-t border-slate-200 mt-auto relative">
           <button
-            onClick={() => navigate("/login")}
+            onClick={handleLogout}
             onMouseEnter={() => isCollapsed && setHoveredItem("logout")}
             onMouseLeave={() => setHoveredItem(null)}
             className={`w-full flex items-center rounded-xl transition-all text-red-500 hover:bg-red-50

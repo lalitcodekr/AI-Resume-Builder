@@ -27,7 +27,7 @@ const EducationForm = ({ formData, setFormData }) => {
       {formData.education.map((edu, index) => (
         <div key={edu.id} className="entry-card">
           <div className="entry-header">
-            <span className="font-bold text-slate-700">Education #{index + 1}</span>
+            <span className="">Education {index + 1}</span>
             {formData.education.length > 1 && (
               <button
                 className="remove-entry-btn"

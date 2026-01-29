@@ -42,10 +42,10 @@ const CVPreview = ({ formData, isMaximized, onToggleMaximize }) => {
                     </div>
                 </div>
                 {/* Contrasting Background Area - Symmetric margins */}
-                <div className={`w-full h-full overflow-y-auto cv-preview-scroll-container relative ${isMaximized ? 'p-5 lg:p-6 bg-slate-300' : 'p-5 lg:p-8 bg-slate-200'}`}>
+                <div className={`w-full h-full overflow-y-auto cv-preview-scroll-container relative ${isMaximized ? 'p-3 lg:p-4 bg-slate-300' : 'p-5 lg:p-8 bg-slate-200'}`}>
                     <div className="flex flex-col items-center w-full">
                         {/* Highlighted White Resume Paper */}
-                        <div className={`bg-white w-full shadow-2xl border border-slate-300 p-12 lg:p-20 min-h-[1400px] max-w-2xl`} style={{ fontFamily: '"Times New Roman", Times, serif', fontFeatureSettings: '"lnum" 1' }}>
+                        <div className={`bg-white w-full shadow-2xl border border-slate-300 p-12 lg:p-20 min-h-[1400px] max-w-[820px]`} style={{ fontFamily: '"Times New Roman", Times, serif', fontFeatureSettings: '"lnum" 1' }}>
                             {/* Header - Only show if there's any personal info */}
                             {(formData.fullName || formData.firstName || formData.lastName || formData.email || formData.phone || formData.location || formData.address || formData.city || formData.country || formData.linkedin || formData.github || formData.website) && (
                                 <div className="text-center mb-10">
