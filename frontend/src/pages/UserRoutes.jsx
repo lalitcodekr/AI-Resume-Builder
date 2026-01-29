@@ -14,6 +14,7 @@ import ResumeBuilder from "../components/user/ResumeBuilder/ResumeBuilder";
 import Templates from "../components/user/Templates/TemplatesDashboardPage";
 import CVBuilder from "../components/user/CV/CVBuilder";
 import CoverLetterBuilder from "../components/user/CoverLetter/CoverLetterBuilder";
+import Downloads from "../components/user/Downloads/Downloads";
 
 
 
@@ -43,6 +44,7 @@ const UserRoutes = () => {
 
         <Route path="ats-checker" element={<ATSChecker />} />
         <Route path="my-resumes" element={<MyResumes />} />
+        <Route path="downloads" element={<Downloads />} />
         <Route path="full-preview" element={<Preview />} />
         <Route path="edit-profile" element={<Profile />} />
 
