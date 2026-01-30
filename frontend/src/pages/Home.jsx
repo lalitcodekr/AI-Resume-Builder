@@ -6,12 +6,18 @@ import featureImage1 from "../assets/ai-assistant.png";
 import featureImage2 from "../assets/tailored-summary.png";
 import featureImage3 from "../assets/tailor-to-job.png";
 import featureImage4 from "../assets/resume-preview.png";
+import template1 from "../assets/template_thumnail/JessicaClaire1.png";
+import template2 from "../assets/template_thumnail/JessicaClaire2.png";
+import template3 from "../assets/template_thumnail/JessicaClaire3.png";
+import template4 from "../assets/template_thumnail/JessicaClaire4.png";
+import template5 from "../assets/template_thumnail/JessicaClaire5.png";
+import template6 from "../assets/template_thumnail/JessicaClaire6.png";
 import quick from "../assets/customize.png";
 import work2 from "../assets/analysis.png";
 import work1 from "../assets/goodResume.png";
 import work4 from "../assets/oneClick.png";
 import work5 from "../assets/win.png";
-import Footer from "./Footer"
+import Footer from "./Footer";
 import {
   ArrowRight,
   BarChart3,
@@ -88,42 +94,42 @@ function LandingPage() {
       name: "Atlantic Blue",
       category: "modern",
       desc: "Modern and professional design",
-      image: `${base}templates/chronological.png`,
+      image: template1,
     },
     {
       id: 2,
       name: "Classic",
       category: "traditional",
       desc: "Traditional and timeless layout",
-      image: `${base}templates/functional.png`,
+      image: template2,
     },
     {
       id: 3,
       name: "Corporate",
       category: "traditional",
       desc: "Professional corporate style",
-      image: `${base}templates/creative.png`,
+      image: template3,
     },
     {
       id: 4,
       name: "Modern Pro",
       category: "modern",
       desc: "Sleek and contemporary design",
-      image: `${base}templates/modern.png`,
+      image: template4,
     },
     {
       id: 5,
       name: "Executive",
       category: "executive",
       desc: "Perfect for senior positions",
-      image: `${base}templates/minimalist.png`,
+      image: template5,
     },
     {
       id: 6,
       name: "Creative Edge",
       category: "creative",
       desc: "Stand out with creative flair",
-      image: `${base}templates/executive.png`,
+      image: template6,
     },
   ];
 
@@ -170,13 +176,13 @@ function LandingPage() {
   const location = useLocation();
   useEffect(() => {
     // Handle State Navigation (From Back to Home button)
-    if (location.state?.scrollTo === 'features') {
+    if (location.state?.scrollTo === "features") {
       const el = document.getElementById("features");
       if (el) {
         el.scrollIntoView({ behavior: "auto" });
         window.history.replaceState({}, document.title);
       }
-    } 
+    }
     // Handle Hash Navigation (Existing logic for #free-templates)
     else if (location.hash === "#free-templates") {
       const el = document.getElementById("free-templates");
@@ -637,7 +643,7 @@ function LandingPage() {
                     <img
                       src={t.image}
                       alt={t.name}
-                      className="object-cover object-top w-full h-full transition-transform duration-500"
+                      className="object-contain object-top w-full h-full transition-transform duration-500"
                     />
 
                     {/* ATS Badge */}
@@ -651,7 +657,7 @@ function LandingPage() {
 
                   {/* Bottom Text */}
                   <div className="p-4 text-center">
-                    <h4 className="text-sm font-bold mt-7 mb-1 text-[#1a2e52] group-hover/card:text-[#0077cc] transition-colors">
+                    <h4 className="text-sm font-bold mb-1 text-[#1a2e52] group-hover/card:text-[#0077cc] transition-colors">
                       {t.name}
                     </h4>
                     <p className="text-xs text-gray-500">{t.desc}</p>
@@ -672,7 +678,10 @@ function LandingPage() {
 
       {/* FEATURES GRID */}
 
-      <section id="features" className="relative px-8 py-24 overflow-hidden bg-white select-none">
+      <section
+        id="features"
+        className="relative px-8 py-24 overflow-hidden bg-white select-none"
+      >
         {/* Soft Background Decorative Blurs - Switched to light pastels */}
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-100/50 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-50/50 rounded-full blur-[120px] pointer-events-none" />
@@ -698,7 +707,6 @@ function LandingPage() {
                 className="relative p-8 transition-all duration-500 bg-white/40 backdrop-blur-md border border-gray-100 group rounded-3xl
                      hover:bg-white hover:-translate-y-3 hover:border-blue-200 hover:shadow-[0_20px_40px_rgba(0,119,204,0.1)]"
               >
-
                 {/* Icon Section with Glass Effect */}
                 <div className="relative inline-flex items-center justify-center p-4 mb-8 transition-all duration-500 rounded-2xl bg-blue-50 border border-blue-100 group-hover:scale-110 group-hover:bg-[#0077cc] group-hover:shadow-[0_10px_20px_rgba(0,119,204,0.3)] group-hover:rotate-6">
                   <div className="transition-colors duration-500 text-[#0077cc] group-hover:text-white">
