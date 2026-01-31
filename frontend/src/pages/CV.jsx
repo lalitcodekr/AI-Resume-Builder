@@ -19,6 +19,7 @@ import {
 import Footer from "./Footer"
 import { useNavigate } from "react-router-dom";
 import CV from "../assets/CV.png";
+import NavBar from "../components/NavBar";
 
 const CVFormattingPage = () => {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const CVFormattingPage = () => {
     };
   return (
     <div className="min-h-screen bg-white font-['Outfit'] text-[#1a2e52] selection:bg-blue-100 overflow-x-hidden">
-      
+      <NavBar />
       {/* --- 1. HERO SECTION --- */}
       <section className="relative px-8 pt-16 pb-20 overflow-hidden bg-white">
         {/* Brand Decorative Blurs */}

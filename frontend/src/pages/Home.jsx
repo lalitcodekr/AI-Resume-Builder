@@ -17,6 +17,7 @@ import work2 from "../assets/analysis.png";
 import work1 from "../assets/goodResume.png";
 import work4 from "../assets/oneClick.png";
 import work5 from "../assets/win.png";
+import NavBar from "../components/NavBar";
 import Footer from "./Footer";
 import {
   ArrowRight,
@@ -277,187 +278,7 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1a2e52] font-['Outfit']">
-      {/* NAVIGATION */}
-      <nav className="fixed top-0 z-50 w-full py-4 border-b border-gray-100 select-none bg-white/95 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-8 flex items-center justify-between z-50">
-          <div
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="cursor-pointer"
-          >
-            <img
-              src={UpToSkillsImg}
-              alt="UpToSkills Logo"
-              className="w-[150px]"
-            />
-          </div>
-
-          <div className={`${mobileMenuOpen ? "hidden" : ""}`}>
-            <ul className="flex items-center hidden gap-8 md:flex">
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to="/about">About</Link>
-              </li>
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to="/#free-templates">Templates</Link>
-              </li>
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to={`${isLoggedIn ? "/user/resume-builder" : "/login"}`}>
-                  Builder
-                </Link>
-              </li>
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to="/pricing">Pricing</Link>
-              </li>
-              {isLoggedIn && (
-                <li className="cursor-pointer hover:text-orange-600">
-                  <Link to="/user/dashboard">Dashboard</Link>
-                </li>
-              )}
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to="/blog">Blog</Link>
-              </li>
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to="/help-center">Help</Link>
-              </li>
-              <li className="cursor-pointer hover:text-orange-600">
-                <Link to="/contact">Contact</Link>
-              </li>
-            </ul>
-          </div>
-
-          {!isLoggedIn && (
-            <div className="items-center hidden gap-6 md:flex">
-              <button
-                onClick={() => navigate("/login")}
-                className="flex items-center gap-3 px-6 py-2.5 border-2 border-[#0077cc] text-[#0077cc] rounded-xl font-bold transition-all duration-300 hover:bg-[#0077cc] hover:text-white hover:shadow-lg hover:shadow-blue-100 hover:-translate-y-1 active:scale-95"
-              >
-                <LogIn size={20} />
-                <span>Login</span>
-              </button>
-
-              <button
-                onClick={() => navigate("/register")}
-                className="flex items-center gap-3 px-6 py-2.5 bg-[#e65100] text-white rounded-xl font-bold transition-all duration-300 border-2 border-transparent hover:bg-[#ff6d00] hover:shadow-xl hover:shadow-orange-200 hover:-translate-y-1 active:scale-95"
-              >
-                <UserPlus size={20} />
-                <span>Sign up</span>
-              </button>
-            </div>
-          )}
-
-          {isLoggedIn && (
-            <div className="items-center hidden gap-6 md:flex">
-              <button
-                onClick={() => {
-                  navigate("/login");
-                  localStorage.removeItem("token");
-                }}
-                className="flex items-center gap-3 px-6 py-2.5 bg-[#e65100] text-white rounded-xl font-bold transition-all duration-300 border-2 border-transparent hover:bg-[#ff6d00] hover:shadow-xl hover:shadow-orange-200 hover:-translate-y-1 active:scale-95"
-              >
-                <LogOut size={20} />
-                <span>logout</span>
-              </button>
-            </div>
-          )}
-
-          <button className="text-2xl md:hidden" onClick={toggleMobileMenu}>
-            <Menu size={28} />
-          </button>
-        </div>
-        <div
-          className={`absolute top-19 right-0 w-full bg-white z-40 overflow-hidden
-                      transition-all duration-800 ease-in-out
-                      transform
-                      ${
-                        mobileMenuOpen
-                          ? "max-h-[500px] translate-y-0 opacity-100 pointer-events-auto"
-                          : "max-h-0 -translate-y-4 opacity-0 pointer-events-none"
-                      }
-                      md:hidden
-                    `}
-        >
-          <div
-            onClick={() => {
-              navigate("/");
-              toggleMobileMenu();
-            }}
-            className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-          >
-            Home
-          </div>
-          <div
-            onClick={() => {
-              navigate("/about");
-              toggleMobileMenu();
-            }}
-            className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-          >
-            About us
-          </div>
-          <div
-            onClick={() => {
-              navigate("/pricing");
-              toggleMobileMenu();
-            }}
-            className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-          >
-            Pricing
-          </div>
-          <div
-            onClick={() => {
-              navigate("/contact");
-              toggleMobileMenu();
-            }}
-            className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-          >
-            Contact
-          </div>
-          {isLoggedIn && (
-            <>
-              <div
-                onClick={() => {
-                  navigate("/user/dashboard");
-                  toggleMobileMenu();
-                }}
-                className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-              >
-                Dashboard
-              </div>
-              <div
-                onClick={() => {
-                  toggleMobileMenu();
-                  localStorage.removeItem("token");
-                  navigate("/login");
-                }}
-                className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-              >
-                logout
-              </div>
-            </>
-          )}
-          {!isLoggedIn && (
-            <>
-              <div
-                onClick={() => {
-                  navigate("/login");
-                  toggleMobileMenu();
-                }}
-                className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-              >
-                Login
-              </div>
-              <div
-                onClick={() => {
-                  navigate("/register");
-                  toggleMobileMenu();
-                }}
-                className="text-center p-3 border-b-[1px] border-solid border-black-500 active:bg-orange-500 active:text-white"
-              >
-                Sign up
-              </div>
-            </>
-          )}
-        </div>
-      </nav>
+      <NavBar />
 
       {/*  OVERLAY */}
       <div
@@ -467,14 +288,14 @@ function LandingPage() {
         }`}
       ></div>
 
-      {/* HERO SECTION */}
-      <section className="relative px-8 bg-white ml-5 min-h-screen flex items-center pt-[120px] lg:pt-0">
+      {/* HERO SECTION - Reduced mobile padding */}
+      <section className="relative px-4 md:px-8 bg-white ml-2 md:ml-5 min-h-screen flex items-center pt-[100px] md:pt-[120px] lg:pt-0">
         <div className="absolute top-0 right-0 w-1/3 h-1/4 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
         <div className="absolute bottom-0 left-0 w-1/3 h-1/4 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
 
-        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          <div className="flex flex-col gap-8">
-            <h1 className="text-5xl font-bold leading-tight select-none lg:text-6xl font-jakarta">
+        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
+          <div className="flex flex-col gap-4 md:gap-8">
+            <h1 className="text-3xl md:text-5xl font-bold leading-tight select-none lg:text-6xl font-jakarta">
               <span className="bg-gradient-to-r from-[#e65100] to-[#ff8f00] bg-clip-text text-transparent">
                 UptoSkills AI
               </span>{" "}
@@ -482,23 +303,23 @@ function LandingPage() {
                 Resume Builder
               </span>
               <br />
-              <span className="text-4xl text-[#1a2e52] mt-4 block">
+              <span className="text-2xl md:text-4xl text-[#1a2e52] mt-2 md:mt-4 block">
                 Craft Your Perfect Resume in Minutes!
               </span>
             </h1>
 
-            <h2 className="text-3xl font-bold text-[#0077cc]">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0077cc]">
               AI Resume Builder
             </h2>
 
-            <p className="text-xl font-normal leading-relaxed text-gray-600">
+            <p className="text-lg md:text-xl font-normal leading-relaxed text-gray-600">
               AI-Powered Content, Professional Templates, ATS-Friendly.
             </p>
 
-            <div className="flex flex-wrap gap-4 mt-2 select-none">
+            <div className="flex flex-wrap gap-3 md:gap-4 mt-1 md:mt-2 select-none">
               <button
                 onClick={() => navigate("/login")}
-                className="flex items-center gap-3 px-10 py-5 text-lg font-bold text-white bg-gradient-to-r from-[#e65100] to-[#f4511e] rounded-xl transition-all duration-300 hover:-translate-y-1 shadow-[0_10px_25px_rgba(230,81,0,0.3)] hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)]"
+                className="flex items-center gap-2 md:gap-3 px-6 md:px-10 py-3 md:py-5 text-base md:text-lg font-bold text-white bg-gradient-to-r from-[#e65100] to-[#f4511e] rounded-xl transition-all duration-300 hover:-translate-y-1 shadow-[0_10px_25px_rgba(230,81,0,0.3)] hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)]"
               >
                 <i className="fas fa-graduation-cap"></i>
                 Start Building for Free
@@ -508,7 +329,7 @@ function LandingPage() {
                   const el = document.getElementById("free-templates");
                   el?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="flex items-center gap-3 px-10 py-5 text-lg font-bold text-[#0077cc] bg-white border-2 border-[#0077cc] rounded-xl transition-all duration-300 hover:-translate-y-1 hover:bg-[#0077cc] hover:text-white shadow-[0_10px_25px_rgba(0,119,204,0.15)] hover:shadow-[0_15px_35px_rgba(0,119,204,0.25)]"
+                className="flex items-center gap-2 md:gap-3 px-6 md:px-10 py-3 md:py-5 text-base md:text-lg font-bold text-[#0077cc] bg-white border-2 border-[#0077cc] rounded-xl transition-all duration-300 hover:-translate-y-1 hover:bg-[#0077cc] hover:text-white shadow-[0_10px_25px_rgba(0,119,204,0.15)] hover:shadow-[0_15px_35px_rgba(0,119,204,0.25)]"
               >
                 <Layers size={18} />
                 View Templates
@@ -517,7 +338,7 @@ function LandingPage() {
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="w-full max-w-2xl relative h-[600px] lg:h-[700px]">
+            <div className="w-full max-w-2xl relative h-[400px] md:h-[600px] lg:h-[700px]">
               {templates.map((template, idx) => (
                 <div
                   key={idx}
@@ -547,46 +368,46 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="px-8 py-24 bg-gray-50">
+      {/* HOW IT WORKS - Reduced mobile padding and spacing */}
+      <section className="px-4 md:px-8 py-12 md:py-24 bg-gray-50">
         <div className="max-w-[1200px] mx-auto">
-          <div className="mb-20 text-center">
-            <h2 className="mb-4 text-4xl font-black md:text-5xl">
+          <div className="mb-10 md:mb-20 text-center">
+            <h2 className="mb-3 md:mb-4 text-3xl md:text-4xl lg:text-5xl font-black">
               How <span className="text-[#e65100]">It Works</span>
             </h2>
-            <p className="text-lg text-gray-500">
+            <p className="text-base md:text-lg text-gray-500">
               Your path to a professional resume in 5 simple steps.
             </p>
           </div>
 
-          <div className="space-y-24">
+          <div className="space-y-12 md:space-y-24">
             {howItWorksSteps.map((step, index) => (
               <div
                 key={index}
-                className={`flex flex-col md:flex-row items-center gap-12 ${
+                className={`flex flex-col md:flex-row items-center gap-6 md:gap-12 ${
                   index % 2 !== 0 ? "md:flex-row-reverse" : ""
                 }`}
               >
                 {/* IMAGE BOX */}
-                <div className="relative w-full bg-white shadow-xl md:w-1/2 rounded-3xl ">
+                <div className="relative w-full bg-white shadow-xl md:w-1/2 rounded-3xl">
                   <div className="w-full h-full overflow-hidden rounded-3xl aspect-video">
                     <img
                       src={step.image}
                       alt={step.heading}
-                      className="object-cover w-full h-full transition-transform duration-500 "
+                      className="object-cover w-full h-full transition-transform duration-500"
                     />
                   </div>
                 </div>
 
                 {/* TEXT CONTENT */}
-                <div className="w-full space-y-6 md:w-1/2">
-                  <span className="text-[#0077cc] font-black text-6xl opacity-10">
+                <div className="w-full space-y-3 md:space-y-6 md:w-1/2">
+                  <span className="text-[#0077cc] font-black text-4xl md:text-6xl opacity-10">
                     0{index + 1}
                   </span>
-                  <h3 className="text-3xl font-bold text-[#1a2e52] leading-tight">
+                  <h3 className="text-2xl md:text-3xl font-bold text-[#1a2e52] leading-tight">
                     {step.heading}
                   </h3>
-                  <p className="text-lg leading-relaxed text-gray-600">
+                  <p className="text-base md:text-lg leading-relaxed text-gray-600">
                     {step.description}
                   </p>
                 </div>
@@ -596,18 +417,18 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* TEMPLATE SHOWCASE */}
+      {/* TEMPLATE SHOWCASE - Reduced mobile padding */}
       <section
         id="free-templates"
-        className="px-8 py-24 overflow-hidden bg-white select-none"
+        className="px-4 md:px-8 py-12 md:py-24 overflow-hidden bg-white select-none"
       >
         <div className="max-w-[1400px] mx-auto">
           {/* Header Section */}
-          <div className="flex flex-col items-center mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-black leading-tight md:text-4xl">
+          <div className="flex flex-col items-center mb-8 md:mb-12 text-center">
+            <h2 className="mb-3 md:mb-4 text-2xl md:text-3xl lg:text-4xl font-black leading-tight">
               Access Free <span className="text-[#0077cc]">Templates</span>
             </h2>
-            <p className="max-w-2xl px-4 text-base text-gray-500">
+            <p className="max-w-2xl px-4 text-sm md:text-base text-gray-500">
               All templates are ATS-compliant and fully customizable.
             </p>
           </div>
@@ -623,8 +444,8 @@ function LandingPage() {
 
             <div
               ref={scrollContainerRef}
-              className="flex gap-8 px-4 py-10 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide"
-              style={{ perspective: "1000px" }} // Enables 3D space
+              className="flex gap-4 md:gap-8 px-2 md:px-4 py-6 md:py-10 overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide"
+              style={{ perspective: "1000px" }}
             >
               {resumeTemplates.map((t, i) => (
                 <div
@@ -632,31 +453,26 @@ function LandingPage() {
                   onClick={() => handleTemplateClick(t.id)}
                   className="min-w-[220px] sm:min-w-[260px] md:min-w-[300px] snap-center cursor-pointer group/card"
                 >
-                  {/* Modified 3D Card Container: scale-110 and z-50 for "coming to front" effect */}
                   <div
                     className="relative bg-white h-[320px] md:h-[400px] rounded-2xl transition-all duration-500 ease-out 
                             shadow-md group-hover/card:shadow-2xl 
                             group-hover/card:scale-110 group-hover/card:z-50
                             border border-gray-100 overflow-hidden"
                   >
-                    {/* Template Image - Removed scale-105 here to keep image crisp and stable */}
                     <img
                       src={t.image}
                       alt={t.name}
                       className="object-contain object-top w-full h-full transition-transform duration-500"
                     />
 
-                    {/* ATS Badge */}
                     <div className="absolute top-4 right-4 bg-[#0077cc] backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-white/90 shadow-sm z-20">
                       ATS READY
                     </div>
 
-                    {/* Removed dark gradient overlay entirely for total clarity */}
                     <div className="absolute inset-0 transition-colors duration-300 pointer-events-none group-hover/card:bg-transparent"></div>
                   </div>
 
-                  {/* Bottom Text */}
-                  <div className="p-4 text-center">
+                  <div className="p-3 md:p-4 text-center">
                     <h4 className="text-sm font-bold mb-1 text-[#1a2e52] group-hover/card:text-[#0077cc] transition-colors">
                       {t.name}
                     </h4>
@@ -676,53 +492,50 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* FEATURES GRID */}
-
+      {/* FEATURES GRID - Reduced mobile padding and spacing */}
       <section
         id="features"
-        className="relative px-8 py-24 overflow-hidden bg-white select-none"
+        className="relative px-4 md:px-8 py-12 md:py-24 overflow-hidden bg-white select-none"
       >
-        {/* Soft Background Decorative Blurs - Switched to light pastels */}
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-100/50 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-orange-50/50 rounded-full blur-[120px] pointer-events-none" />
 
-        <div className="relative z-10 px-4 mx-auto max-w-7xl">
-          {/* Header Section - Matches your "How It Works" style */}
-          <div className="flex flex-col items-center mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-black md:text-5xl text-[#1a2e52]">
+        <div className="relative z-10 px-2 md:px-4 mx-auto max-w-7xl">
+          {/* Header Section */}
+          <div className="flex flex-col items-center mb-8 md:mb-16 text-center">
+            <h2 className="mb-3 md:mb-4 text-3xl md:text-4xl lg:text-5xl font-black text-[#1a2e52]">
               AI-Powered <span className="text-[#0077cc]">Innovation</span>
             </h2>
-            <div className="h-1.5 w-20 bg-[#e65100] rounded-full mb-6"></div>
-            <p className="max-w-2xl px-4 text-lg text-gray-500">
+            <div className="h-1.5 w-20 bg-[#e65100] rounded-full mb-4 md:mb-6"></div>
+            <p className="max-w-2xl px-4 text-base md:text-lg text-gray-500">
               Advanced tools designed to bypass ATS filters and catch recruiter
               attention instantly.
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:gap-8 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
               <div
                 key={index}
                 onClick={() => feature.path && navigate(feature.path)}
-                className="relative p-8 transition-all duration-500 bg-white/40 backdrop-blur-md border border-gray-100 group rounded-3xl
+                className="relative p-6 md:p-8 transition-all duration-500 bg-white/40 backdrop-blur-md border border-gray-100 group rounded-3xl
                      hover:bg-white hover:-translate-y-3 hover:border-blue-200 hover:shadow-[0_20px_40px_rgba(0,119,204,0.1)]"
               >
-                {/* Icon Section with Glass Effect */}
-                <div className="relative inline-flex items-center justify-center p-4 mb-8 transition-all duration-500 rounded-2xl bg-blue-50 border border-blue-100 group-hover:scale-110 group-hover:bg-[#0077cc] group-hover:shadow-[0_10px_20px_rgba(0,119,204,0.3)] group-hover:rotate-6">
+                {/* Icon Section */}
+                <div className="relative inline-flex items-center justify-center p-3 md:p-4 mb-4 md:mb-8 transition-all duration-500 rounded-2xl bg-blue-50 border border-blue-100 group-hover:scale-110 group-hover:bg-[#0077cc] group-hover:shadow-[0_10px_20px_rgba(0,119,204,0.3)] group-hover:rotate-6">
                   <div className="transition-colors duration-500 text-[#0077cc] group-hover:text-white">
-                    {/* Fixed the React.cloneElement using the features array from your state */}
                     {React.cloneElement(feature.icon, {
-                      className: "size-7 transition-colors duration-500",
+                      className: "size-6 md:size-7 transition-colors duration-500",
                     })}
                   </div>
                 </div>
 
                 {/* Text Content */}
-                <h3 className="mb-3 text-xl font-bold tracking-tight text-[#1a2e52] transition-colors duration-300 group-hover:text-[#0077cc]">
+                <h3 className="mb-2 md:mb-3 text-lg md:text-xl font-bold tracking-tight text-[#1a2e52] transition-colors duration-300 group-hover:text-[#0077cc]">
                   {feature.title}
                 </h3>
 
-                <p className="mb-6 text-sm leading-relaxed text-gray-600 group-hover:text-gray-700">
+                <p className="mb-4 md:mb-6 text-sm leading-relaxed text-gray-600 group-hover:text-gray-700">
                   {feature.description}
                 </p>
 
@@ -731,12 +544,11 @@ function LandingPage() {
                   <span className="tracking-wide cursor-pointer">
                     Explore Feature
                   </span>
-                  <div className="p-1 transition-all duration-300 bg-blue-100 rounded-full ">
+                  <div className="p-1 transition-all duration-300 bg-blue-100 rounded-full">
                     <ArrowRight className="size-3" />
                   </div>
                 </div>
 
-                {/* Light Spotlight Shine Effect */}
                 <div
                   className="absolute inset-0 transition-opacity duration-500 opacity-0 pointer-events-none rounded-3xl"
                   style={{
