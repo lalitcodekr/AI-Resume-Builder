@@ -123,6 +123,16 @@
   display: none;
 }
 
+/* Hide scrollbar for form content area */
+.cv-form-content-scrollable {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.cv-form-content-scrollable::-webkit-scrollbar {
+  display: none;
+}
+
 .cv-form-container h2 {
   font-size: 1.4rem;
   color: var(--text-main);

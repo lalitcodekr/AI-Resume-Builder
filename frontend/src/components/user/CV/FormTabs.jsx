@@ -11,18 +11,18 @@ import { useRef } from "react";
 
   const tabs = [
     { id: 'personal', label: 'Personal', icon: User },
-    { id: 'work', label: 'Work', icon: Briefcase },
     { id: 'education', label: 'Education', icon: GraduationCap },
-    { id: 'skills', label: 'Skills', icon: Zap },
+    { id: 'work', label: 'Work', icon: Briefcase },
     { id: 'projects', label: 'Projects', icon: FolderKanban },
-    { id: 'certifications', label: 'Certifications', icon: Award }
+    { id: 'certs', label: 'Certifications', icon: Award },
+    { id: 'skills', label: 'Skills', icon: Zap }
   ];
 
   export default function FormTabs({ activeSection, setActiveSection }) {
     const tabsRef = useRef(null);
     const currentIdx = tabs.findIndex((tab) => tab.id === activeSection);
     return (
-      <div className="flex items-center justify-center bg-white rounded-xl px-3 py-2">
+      <div className="flex items-center justify-center bg-white rounded-xl py-2 pr-10">
         {/* TABS */}
         <div className="flex-1 overflow-hidden">
           <div
@@ -38,7 +38,7 @@ import { useRef } from "react";
                     onClick={() => setActiveSection(id)}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all text-black select-none"
                   >
-                    <Icon size={16} />
+                    {Icon && <Icon size={16} />}
                     {label}
                   </div>
                 )
