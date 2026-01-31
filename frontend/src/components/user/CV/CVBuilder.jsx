@@ -11,7 +11,7 @@ import {
   Zap,
   FolderKanban,
   Award,
-   AlertTriangle,
+ 
 } from "lucide-react";
 
 
