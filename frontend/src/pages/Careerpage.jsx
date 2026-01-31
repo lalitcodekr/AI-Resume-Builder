@@ -1,119 +1,90 @@
 import React, { useState } from 'react';
-import { MapPin, Briefcase, Clock, Users, Heart, Zap, Target, Rocket, Award, TrendingUp } from 'lucide-react';
+import { 
+  MapPin, 
+  Briefcase, 
+  Clock, 
+  Heart, 
+  Sparkles, 
+  ArrowRight, 
+  Brain, 
+  Target, 
+  Code2, 
+  Cpu, 
+  Home, 
+  LineChart, 
+  GraduationCap, 
+  BatteryCharging, 
+  Focus, 
+  CheckCircle2
+} from 'lucide-react';
 import NavBar from '../components/NavBar';
 import Footer from "./Footer";
+import career from "../assets/career.jpeg"
 
 const CareersPage = () => {
   const [activeFilter, setActiveFilter] = useState('All Roles');
 
-  const filters = ['All Roles', 'Engineering', 'Product & Design', 'Marketing', 'Operations'];
+  const filters = ['All Roles', 'AI & Engineering', 'Product', 'Growth', 'Support'];
 
   const values = [
     {
-      icon: <Rocket className="w-12 h-12" />,
-      title: 'Innovation First',
-      description: 'We constantly push boundaries and challenge the status quo. Every team member is empowered to bring bold ideas that transform how job seekers succeed.',
-      color: 'from-indigo-500 to-purple-500'
-    },
-    {
-      icon: <Users className="w-12 h-12" />,
-      title: 'Collaborative Spirit',
-      description: 'We believe the best solutions emerge from diverse perspectives. Our culture celebrates teamwork, open communication, and mutual support.',
-      color: 'from-purple-500 to-pink-500'
+      icon: <Brain className="w-12 h-12" />,
+      title: 'AI with Empathy',
+      description: "We don't just build algorithms; we build tools that understand the human struggle of job hunting.",
+      color: 'bg-blue-50 text-[#0077cc]'
     },
     {
       icon: <Target className="w-12 h-12" />,
-      title: 'User-Centric',
-      description: 'Every decision starts with our users. We obsess over creating experiences that genuinely help people achieve their career goals.',
-      color: 'from-pink-500 to-rose-500'
+      title: 'ATS Mastery',
+      description: 'We stay obsessed with how Applicant Tracking Systems work to ensure our users stay ahead.',
+      color: 'bg-orange-50 text-[#e65100]'
     },
     {
-      icon: <TrendingUp className="w-12 h-12" />,
-      title: 'Continuous Growth',
-      description: 'We invest in our people through learning opportunities, mentorship programs, and career development paths that help you reach your potential.',
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      icon: <Zap className="w-12 h-12" />,
-      title: 'Move Fast',
-      description: "We're a startup at heart. We value speed, agility, and the ability to pivot quickly while maintaining quality and thoughtful execution.",
-      color: 'from-yellow-500 to-orange-500'
-    },
-    {
-      icon: <Award className="w-12 h-12" />,
-      title: 'Impact Driven',
-      description: 'We measure success by the real-world impact we create for job seekers. Making a meaningful difference is what motivates us every day.',
-      color: 'from-green-500 to-emerald-500'
+      icon: <Code2 className="w-12 h-12" />,
+      title: 'Agile Innovation',
+      description: 'The AI landscape changes weekly. We move fast, experiment constantly, and ship daily.',
+      color: 'bg-blue-50 text-[#0077cc]'
     }
   ];
 
   const perks = [
-    { icon: '🏥', title: 'Comprehensive Health Coverage', description: 'Medical, dental, and vision insurance for you and your family with premium coverage options' },
-    { icon: '🏖️', title: 'Unlimited PTO', description: 'Take the time you need to recharge. We trust you to manage your time and prioritize your wellbeing' },
-    { icon: '💰', title: 'Competitive Salary', description: 'Top-tier compensation packages with equity options so you share in our success' },
-    { icon: '🏠', title: 'Remote Flexibility', description: 'Work from anywhere or join us in our offices. We support whatever works best for you' },
-    { icon: '📚', title: 'Learning Budget', description: 'Annual budget for courses, conferences, and professional development opportunities' },
-    { icon: '⚖️', title: 'Work-Life Balance', description: 'Flexible hours and no-meeting Fridays to help you maintain a healthy balance' }
-  ];
-
-  const jobs = [
-    {
-      id: 1,
-      title: 'Senior Full Stack Engineer',
-      department: 'Engineering',
-      location: 'Remote / San Francisco',
-      type: 'Full-time',
-      description: 'Build scalable AI-powered features that help millions of job seekers. Work with React, Node.js, and cutting-edge ML technologies.'
+    { 
+      icon: Cpu, 
+      title: 'AI Stipend', 
+      description: 'Monthly budget for ChatGPT, Claude, or any AI tool that helps you work smarter.' 
     },
-    {
-      id: 2,
-      title: 'Product Designer',
-      department: 'Product & Design',
-      location: 'Remote',
-      type: 'Full-time',
-      description: 'Shape the future of career tools through thoughtful design. Create beautiful, intuitive experiences that delight users.'
+    { 
+      icon: Home, 
+      title: 'Fully Remote', 
+      description: 'Our team is global because talent is everywhere. Work from wherever you are happiest.' 
     },
-    {
-      id: 3,
-      title: 'Machine Learning Engineer',
-      department: 'Engineering',
-      location: 'San Francisco / Remote',
-      type: 'Full-time',
-      description: 'Develop and optimize AI models that power our resume optimization engine. Work on NLP, recommendation systems, and more.'
+    { 
+      icon: LineChart, 
+      title: 'Growth Equity', 
+      description: 'Ownership in a fast-growing AI startup. We want you to win when we win.' 
     },
-    {
-      id: 4,
-      title: 'Content Marketing Manager',
-      department: 'Marketing',
-      location: 'Remote',
-      type: 'Full-time',
-      description: 'Lead our content strategy and create compelling stories about career development, AI technology, and the future of work.'
+    { 
+      icon: GraduationCap, 
+      title: 'Career Coaching', 
+      description: 'Free access to professional resume reviews and career coaching for your own path.' 
     },
-    {
-      id: 5,
-      title: 'Customer Success Lead',
-      department: 'Operations',
-      location: 'Remote / New York',
-      type: 'Full-time',
-      description: 'Build and scale our customer success program. Help users achieve their career goals while gathering insights to improve our product.'
+    { 
+      icon: BatteryCharging, 
+      title: 'Recharge Time', 
+      description: 'Unlimited PTO with a 2-week mandatory minimum. We prevent burnout proactively.' 
     },
-    {
-      id: 6,
-      title: 'Product Manager',
-      department: 'Product & Design',
-      location: 'San Francisco',
-      type: 'Full-time',
-      description: 'Drive product strategy and roadmap for our core resume building platform. Work closely with engineering and design to launch features that matter.'
+    { 
+      icon: Focus, 
+      title: 'Deep Work Hours', 
+      description: 'No-meeting Wednesdays and Thursdays to allow for flow state and deep focus.' 
     }
   ];
 
-  const team = [
-    { name: 'Alex Chen', role: 'Co-Founder & CEO', emoji: '👨‍💼', color: 'from-indigo-500 to-purple-500' },
-    { name: 'Sarah Johnson', role: 'CTO & Co-Founder', emoji: '👩‍💻', color: 'from-purple-500 to-pink-500' },
-    { name: 'Michael Park', role: 'Head of Design', emoji: '👨‍🎨', color: 'from-pink-500 to-rose-500' },
-    { name: 'Emily Rodriguez', role: 'Lead ML Engineer', emoji: '👩‍🔬', color: 'from-blue-500 to-cyan-500' },
-    { name: 'David Kim', role: 'Head of Product', emoji: '👨‍💼', color: 'from-green-500 to-emerald-500' },
-    { name: 'Lisa Thompson', role: 'VP of Marketing', emoji: '👩‍💼', color: 'from-yellow-500 to-orange-500' }
+  const jobs = [
+    { id: 1, title: 'Senior AI Engineer (LLMs)', department: 'AI & Engineering', location: 'Remote', type: 'Full-time', description: 'Fine-tune models to generate recruiter-ready bullet points and optimize context retrieval.' },
+    { id: 2, title: 'Full Stack Developer', department: 'AI & Engineering', location: 'Remote', type: 'Full-time', description: 'Build intuitive, drag-and-drop resume editors and real-time ATS scoring dashboards.' },
+    { id: 3, title: 'Product Manager (Growth)', department: 'Product', location: 'Remote', type: 'Full-time', description: 'Own the conversion funnel from landing page to first resume download.' },
+    { id: 4, title: 'HRTech Content Strategist', department: 'Growth', location: 'Remote', type: 'Full-time', description: 'Create viral career advice and deep-dives into the AI hiring landscape.' }
   ];
 
   const filteredJobs = activeFilter === 'All Roles' 
@@ -121,220 +92,189 @@ const CareersPage = () => {
     : jobs.filter(job => job.department === activeFilter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-white font-['Outfit'] text-[#1a2e52] overflow-x-hidden select-none">
       <NavBar />
 
-      {/* Hero Section */}
-      <div className="pt-32 pb-24 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-pink-600/10"></div>
-        <div className="absolute top-20 right-0 w-96 h-96 bg-purple-400/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      {/* --- HERO SECTION --- */}
+<section className="relative px-8 pt-32 pb-24 overflow-hidden bg-white">
+  {/* Soft Background Decorative Blurs */}
+  <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
+  <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
+  
+  <div className="relative z-10 mx-auto max-w-7xl">
+    <div className="flex flex-col items-center gap-12 lg:flex-row lg:text-left">
+      
+      {/* LEFT CONTENT: Text & CTA */}
+      <div className="flex-1 text-center lg:text-left">
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-blue-50">
+          <Sparkles size={16} className="text-[#0077cc]" />
+          <span className="text-xs font-black tracking-widest text-[#0077cc] uppercase">
+            Building the Future of Hiring
+          </span>
+        </div>
         
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-block px-6 py-2 bg-white rounded-full shadow-lg mb-6">
-            <span className="text-indigo-600 font-bold select-none">We're Hiring! 🚀</span>
-          </div>
-          
-          <h1 className="text-6xl md:text-8xl font-black text-gray-900 mb-6 leading-tight select-none">
-            Join Our
-            <span className="block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Mission
-            </span>
-          </h1>
-          
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Help us revolutionize how people build their careers. We're looking for passionate individuals who want to make a real impact.
-          </p>
-          
-          <button 
-            onClick={() => document.getElementById('openings').scrollIntoView({ behavior: 'smooth' })}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-10 py-5 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-3 select-none"
-          >
-            View Open Positions <Briefcase className="w-5 h-5" />
-          </button>
+        <h1 className="mb-6 text-5xl font-[1000] tracking-tighter leading-[1.1] md:text-7xl font-jakarta text-[#1a2e52]">
+          Join the <span className="text-[#0077cc]">AI Career</span> Revolution.
+        </h1>
+        
+        <p className="max-w-xl mx-auto mb-10 text-xl font-medium leading-relaxed text-gray-500 lg:mx-0">
+          At UptoSkills, we're building the most advanced AI resume engine on the planet. Help us bridge the gap between talent and opportunity.
+        </p>
+        
+        <button 
+          onClick={() => document.getElementById('openings').scrollIntoView({ behavior: 'smooth' })}
+          className="group inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_10px_25px_rgba(230,81,0,0.3)] hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)] hover:-translate-y-1 active:scale-95"
+        >
+          See Open Roles 
+          <ArrowRight size={22} className="transition-transform duration-300 group-hover:translate-x-1" />
+        </button>
+      </div>
+
+      {/* RIGHT CONTENT: Career Image */}
+      <div className="relative flex-1 w-full max-w-[600px] group">
+        {/* Decorative element behind image */}
+        <div className="absolute -inset-4 bg-blue-100/30 rounded-[3rem] blur-2xl" />
+        
+        <div className="relative overflow-hidden rounded-[2.5rem] border-[8px] border-white shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+          <img 
+            src={career} 
+            alt="UptoSkills Career" 
+            className="object-cover w-full h-auto"
+          />
+        </div>
+        
+        {/* Small floating badge on image */}
+        <div className="absolute flex items-center gap-3 p-4 bg-white shadow-xl -bottom-6 -left-6 rounded-2xl animate-bounce">
+           <div className="flex items-center justify-center w-10 h-10 text-green-600 bg-green-100 rounded-full">
+              <CheckCircle2 size={20} />
+           </div>
+           <div>
+              <p className="text-[10px] font-black uppercase text-gray-400">Hiring status</p>
+              <p className="text-sm font-bold text-[#1a2e52]">Actively Recruiting</p>
+           </div>
         </div>
       </div>
 
-      {/* Values Section */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-16 select-none">
-          <h2 className="text-5xl font-black text-gray-900 mb-4">Our Values</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            These principles guide everything we do and shape how we work together
-          </p>
-        </div>
+    </div>
+  </div>
+</section>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* --- VALUES SECTION --- */}
+      <section className="px-6 py-12 mx-auto max-w-7xl">
+        <div className="grid gap-8 md:grid-cols-3">
           {values.map((value, index) => (
-            <div
-              key={index}
-              className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group"
-              style={{
-                animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
-              }}
-            >
-              <div className={`inline-block p-4 bg-gradient-to-r ${value.color} rounded-2xl text-white mb-6 group-hover:scale-110 transition-transform select-none`}>
+            <div key={index} className="p-10 transition-all duration-300 bg-white border border-gray-100 rounded-[2.5rem] hover:shadow-xl group">
+              <div className={`inline-block p-5 ${value.color} rounded-2xl mb-6 group-hover:scale-110 transition-transform`}>
                 {value.icon}
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">{value.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{value.description}</p>
+              <h3 className="mb-4 text-2xl font-bold text-[#1a2e52] font-jakarta">{value.title}</h3>
+              <p className="text-sm font-medium leading-relaxed text-gray-400">{value.description}</p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Perks Section */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 py-20 px-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16 select-none">
-            <h2 className="text-5xl font-black text-white mb-4">Why Work With Us</h2>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              We believe in taking care of our team with meaningful benefits and perks
+      {/* --- UPDATED PERKS SECTION: White BG + Blue Text/Icon Hover --- */}
+      <section className="relative px-6 py-24 overflow-hidden bg-white">
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-[1000] tracking-tighter text-[#1a2e52] font-jakarta md:text-5xl">
+              Perks of Being an <span className="text-[#0077cc]">Explorer</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-lg font-medium text-gray-500">
+              We provide the tools and freedom you need to do your best work and push the boundaries of AI.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {perks.map((perk, index) => (
-              <div
-                key={index}
-                className="bg-white/10 backdrop-blur-xl p-8 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105"
+              <div 
+                key={index} 
+                className="group p-10 bg-white rounded-[2.5rem] border border-gray-100 transition-all duration-300 hover:border-[#0077cc]/30 hover:shadow-2xl hover:shadow-blue-500/5 hover:-translate-y-2"
               >
-                <div className="text-5xl mb-4 select-none">{perk.icon}</div>
-                <h4 className="text-xl font-bold text-white mb-3">{perk.title}</h4>
-                <p className="text-white/80 leading-relaxed">{perk.description}</p>
+                <div className="inline-block mb-6 transition-transform duration-300 group-hover:scale-110">
+                  <perk.icon 
+                    size={40} 
+                    className="text-black transition-colors duration-300 group-hover:text-[#0077cc]" 
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                <h4 className="mb-3 text-2xl font-bold text-[#1a2e52] transition-colors duration-300 group-hover:text-[#0077cc] font-jakarta">
+                  {perk.title}
+                </h4>
+                
+                <p className="text-sm font-medium leading-relaxed text-gray-400 transition-colors duration-300 group-hover:text-gray-600">
+                  {perk.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Job Openings */}
-      <div id="openings" className="max-w-6xl mx-auto px-6 py-20">
-        <div className="text-center mb-12 select-none">
-          <h2 className="text-5xl font-black text-gray-900 mb-4">Open Positions</h2>
-          <p className="text-xl text-gray-600">Find your next opportunity and join our growing team</p>
+      {/* --- OPEN POSITIONS --- */}
+      <section id="openings" className="max-w-6xl px-6 py-24 mx-auto">
+        <div className="mb-12 text-center">
+          <h2 className="mb-4 text-4xl font-black text-[#1a2e52] font-jakarta tracking-tight">Join the Team</h2>
+          <div className="flex flex-wrap justify-center gap-3 mt-8">
+            {filters.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`px-6 py-3 rounded-xl font-bold transition-all ${
+                  activeFilter === filter
+                    ? 'bg-[#1a2e52] text-white shadow-lg scale-105'
+                    : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 select-none ${
-                activeFilter === filter
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-
-        {/* Job Cards */}
         <div className="space-y-6">
-          {filteredJobs.map((job, index) => (
-            <div
-              key={job.id}
-              className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:translate-x-2 group"
-              style={{
-                animation: `slideIn 0.5s ease-out ${index * 0.1}s both`
-              }}
-            >
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
-                    {job.title}
-                  </h3>
-                  
-                  <div className="flex flex-wrap gap-4 mb-4">
-                    <span className="flex items-center gap-2 text-gray-600">
-                      <MapPin className="w-4 h-4" />
-                      {job.location}
-                    </span>
-                    <span className="flex items-center gap-2 text-gray-600">
-                      <Briefcase className="w-4 h-4" />
-                      {job.type}
-                    </span>
-                    <span className="flex items-center gap-2 text-gray-600">
-                      <Clock className="w-4 h-4" />
-                      {job.department}
-                    </span>
+          {filteredJobs.map((job) => (
+            <div key={job.id} className="p-10 bg-white border border-gray-100 shadow-sm rounded-[2.5rem] hover:shadow-2xl hover:translate-x-2 transition-all group">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <h3 className="mb-4 text-2xl font-black text-[#1a2e52] group-hover:text-[#0077cc] transition-colors font-jakarta tracking-tight">{job.title}</h3>
+                  <div className="flex flex-wrap gap-6 mb-6 text-xs font-bold tracking-widest text-gray-400 uppercase">
+                    <span className="flex items-center gap-2"><MapPin size={14} className="text-[#0077cc]" /> {job.location}</span>
+                    <span className="flex items-center gap-2"><Briefcase size={14} className="text-[#0077cc]" /> {job.type}</span>
+                    <span className="flex items-center gap-2"><Clock size={14} className="text-[#0077cc]" /> {job.department}</span>
                   </div>
-                  
-                  <p className="text-gray-600 leading-relaxed">
-                    {job.description}
-                  </p>
+                  <p className="max-w-2xl text-sm font-medium text-gray-400">{job.description}</p>
                 </div>
-                
-                <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full font-bold hover:shadow-xl hover:scale-105 transition-all whitespace-nowrap select-none">
+                <button className="px-8 py-4 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-xl font-bold transition-all shadow-[0_10px_20px_rgba(230,81,0,0.2)] hover:scale-105">
                   Apply Now
                 </button>
               </div>
             </div>
           ))}
         </div>
+      </section>
 
-        {filteredJobs.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No positions found</h3>
-            <p className="text-gray-600">Try selecting a different department filter</p>
-          </div>
-        )}
-      </div>
-
-      
-
-      {/* CTA Section */}
-      <div className="max-w-5xl mx-auto px-6 py-20 select-none">
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-12 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl"></div>
-          
+      {/* --- FINAL CTA --- */}
+      <section className="max-w-5xl px-6 py-24 mx-auto">
+        <div className="relative p-12 overflow-hidden text-center bg-[#1a2e52] rounded-[3rem]">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#0077cc]/20 blur-3xl" />
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              Don't See the Perfect Role?
+            <h2 className="mb-6 text-4xl font-black tracking-tighter text-white font-jakarta md:text-5xl">
+              Want to Build Something Big?
             </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              We're always looking for exceptional talent. Send us your resume and let's talk about how you can contribute.
+            <p className="max-w-2xl mx-auto mb-10 text-xl font-medium leading-relaxed text-blue-100/60">
+              If you don't see a role that fits but you're a wizard at AI, design, or engineering, reach out anyway.
             </p>
-            <button className="bg-white text-gray-900 px-10 py-5 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-3">
-              Get In Touch <Heart className="w-5 h-5 text-red-500" />
+            <button className="inline-flex items-center gap-3 px-10 py-5 bg-white text-[#1a2e52] rounded-xl font-black text-lg transition-all hover:scale-105 shadow-2xl">
+              Send a General Application <ArrowRight size={20} className="text-red-500 fill-red-500" />
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
       <Footer />
-      
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };

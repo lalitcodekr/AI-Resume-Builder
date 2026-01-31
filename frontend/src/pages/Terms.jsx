@@ -8,9 +8,9 @@ import {
   ChevronRight,
   AlertCircle,
 } from "lucide-react";
-import UpToSkillsImg from "../assets/UptoSkills.webp"; // Ensure path is correct
+import UpToSkillsImg from "../assets/UptoSkills.webp";
 import NavBar from "../components/NavBar";
-import Footer from "./Footer";
+import Footer from "./Footer"
 
 const TermsAndConditions = () => {
   const navigate = useNavigate();
@@ -21,8 +21,7 @@ const TermsAndConditions = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-jakarta text-[#1a2e52] select-none">
-      
-       <NavBar />
+      <NavBar />
 
       {/* Header Section */}
       <header className="px-8 py-20 bg-white border-b border-gray-200">

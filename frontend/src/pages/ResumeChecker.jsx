@@ -21,10 +21,7 @@ import {
 } from "lucide-react";
 import UpToSkillsImg from "../assets/UptoSkills.webp";
 import NavBar from "../components/NavBar";
-import Footer from "./Footer";
-
-
-
+import Footer from "./Footer"
 
 const AIResumeChecker = () => {
   const navigate = useNavigate();

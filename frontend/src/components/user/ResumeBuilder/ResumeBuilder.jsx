@@ -28,6 +28,7 @@ import CertificationsForm from "./forms/CertificationsForm";
 import LivePreview from "../Preview/LivePreview";
 import FullPreview from "../Preview/FullPreview";
 import TemplatesPage from "../Templates/TemplatesDashboardPage";
+import { TEMPLATES } from "../Templates/TemplateRegistry";
 
 import { getCompletionStatus } from "./completion";
 
@@ -43,7 +44,7 @@ const sections = [
   "certs",
 ];
 
-const ResumeBuilder = ({ setActivePage = () => {} }) => {
+const ResumeBuilder = ({ setActivePage = () => { } }) => {
   /* -------------------- CORE STATE -------------------- */
   const [formData, setFormData] = useState({
     fullname: "",
@@ -100,8 +101,8 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
     ],
   });
   const navigate = useNavigate();
-  const [templates, setTemplates] = useState([]);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [templates, setTemplates] = useState(TEMPLATES);
+  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES[0]?.id || "jessica-claire");
 
   // const [resumeMode, setResumeMode] = useState(null);
   // const [uploadedResume, setUploadedResume] = useState(null);
@@ -199,7 +200,7 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
   const renderMainContent = () => {
     if (activeTab === "templates") {
       return (
-        <TemplatesPage />
+        <TemplatesPage onSelectTemplate={handleSelectTemplate} isEmbedded={true} />
       );
     }
 

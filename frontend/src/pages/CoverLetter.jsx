@@ -1,5 +1,4 @@
 import React from 'react';
-import NavBar from "../components/NavBar";
 import { 
   Sparkles, 
   FileCheck, 
@@ -14,6 +13,7 @@ import {
   MousePointer2,
   ArrowLeft
 } from 'lucide-react';
+import NavBar from "../components/NavBar";
 import Footer from "./Footer"
 import { useNavigate } from "react-router-dom";
 import cover from "../assets/cover1.png";
@@ -27,9 +27,7 @@ const SimpleCoverLetterPage = () => {
   return (
 
     <div className="min-h-screen bg-white font-['Outfit'] text-[#1a2e52] selection:bg-blue-100 overflow-x-hidden">
-      
       <NavBar />
-
       {/* --- 1. HERO SECTION --- */}
       <section className="relative px-8 pt-4 pb-12 overflow-hidden bg-white">
         {/* Brand Decorative Blurs */}

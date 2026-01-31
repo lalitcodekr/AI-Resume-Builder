@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ArrowRight, Calendar, Tag } from 'lucide-react';
+import { Search, ArrowRight, Calendar, Sparkles } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import Footer from "./Footer";
 
@@ -81,51 +81,51 @@ const BlogPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 select-none">
+    <div className="min-h-screen select-none bg-white font-['Outfit'] text-[#1a2e52] overflow-x-hidden">
       <NavBar />
 
       {/* Hero Section */}
-      <div className="pt-32 pb-20 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-pink-600/10"></div>
-        <div className="absolute top-20 right-20 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl"></div>
+      <div className="relative px-6 pt-32 pb-20 overflow-hidden bg-white">
+        {/* Brand Blurs */}
+        <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
         
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <h1 className="text-6xl md:text-7xl font-black text-gray-900 mb-6 leading-tight">
+        <div className="relative z-10 max-w-5xl mx-auto text-center">
+          <h1 className="mb-6 text-6xl font-black tracking-tighter leading-tight text-[#1a2e52] md:text-7xl font-jakarta">
             Career Insights
-            <span className="block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="block text-[#0077cc]">
               & Expert Tips
             </span>
           </h1>
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            Master the art of job hunting with actionable advice from industry experts and career coaches
+          <p className="max-w-2xl mx-auto mb-10 text-xl font-medium text-gray-500">
+            Master the art of job hunting with actionable advice from industry experts and career coaches.
           </p>
           
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto relative">
-            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <div className="relative max-w-2xl mx-auto">
+            <Search className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-6 top-1/2" />
             <input
               type="text"
               placeholder="Search articles, guides, and resources..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-6 py-5 rounded-2xl bg-white shadow-xl border-2 border-transparent focus:border-indigo-400 focus:outline-none text-lg transition-all"
+              className="w-full py-5 pr-6 text-lg transition-all bg-white border border-gray-100 shadow-2xl pl-14 rounded-2xl focus:border-[#0077cc] focus:outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* Category Pills */}
-      <div className="max-w-7xl mx-auto px-6 mb-16">
+      <div className="px-6 mx-auto mb-16 max-w-7xl">
         <div className="flex flex-wrap items-center justify-center gap-3">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+              className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${
                 activeCategory === category
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 hover:shadow-md'
+                  ? 'bg-[#1a2e52] text-white shadow-lg scale-105'
+                  : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50 hover:shadow-md'
               }`}
             >
               {category}
@@ -135,31 +135,31 @@ const BlogPage = () => {
       </div>
 
       {/* Featured Post */}
-      <div className="max-w-7xl mx-auto px-6 mb-20">
-        <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl overflow-hidden shadow-2xl">
-          <div className="grid md:grid-cols-2 gap-8 items-center p-10 md:p-16">
+      <div className="px-6 mx-auto mb-20 max-w-7xl">
+        <div className="overflow-hidden shadow-2xl bg-gradient-to-br from-[#1a2e52] to-[#0077cc] rounded-[2.5rem]">
+          <div className="grid items-center gap-8 p-10 md:grid-cols-2 md:p-16">
             <div className="text-white">
-              <div className="inline-block px-4 py-1 bg-white/20 rounded-full text-sm font-semibold mb-4">
-                ⭐ Featured Article
+              <div className="inline-flex items-center gap-2 px-4 py-1 mb-4 text-xs font-black tracking-widest uppercase rounded-full bg-white/10 backdrop-blur-md">
+                <Sparkles size={14} className="text-orange-400" /> Featured Article
               </div>
-              <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+              <h2 className="mb-6 text-4xl font-black leading-tight tracking-tighter md:text-5xl font-jakarta">
                 The Future of Resume Writing is Here
               </h2>
-              <p className="text-lg text-white/90 mb-8 leading-relaxed">
-                Discover how AI is transforming the job application process and helping candidates stand out in competitive markets. Learn the strategies top performers use.
+              <p className="mb-8 text-lg font-medium leading-relaxed text-blue-100/80">
+                Discover how AI is transforming the job application process and helping candidates stand out in competitive markets.
               </p>
-              <button className="bg-white text-indigo-600 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-all hover:scale-105 inline-flex items-center gap-2">
-                Read Full Article <ArrowRight className="w-5 h-5" />
+              <button className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-xl font-bold transition-all hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)] hover:-translate-y-1">
+                Read Full Article <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
             <div className="relative">
               <img
                 src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop"
                 alt="Featured"
-                className="rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300"
+                className="transition-transform duration-500 transform shadow-2xl rounded-3xl hover:scale-105"
               />
-              <div className="absolute -bottom-4 -right-4 bg-yellow-400 text-gray-900 px-6 py-3 rounded-full font-bold shadow-xl">
-                Must Read! 🔥
+              <div className="absolute px-6 py-3 font-black text-[#1a2e52] bg-white rounded-2xl shadow-xl -bottom-4 -right-4 text-sm uppercase tracking-widest">
+                Must Read 🔥
               </div>
             </div>
           </div>
@@ -167,48 +167,45 @@ const BlogPage = () => {
       </div>
 
       {/* Blog Grid */}
-      <div className="max-w-7xl mx-auto px-6 pb-20">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="px-6 pb-20 mx-auto max-w-7xl">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {filteredPosts.map((post, index) => (
             <article
               key={post.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group cursor-pointer"
-              style={{
-                animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
-              }}
+              className="overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-sm cursor-pointer rounded-[2rem] hover:shadow-2xl hover:-translate-y-2 group"
             >
-              <div className="relative overflow-hidden">
+              <div className="relative h-56 overflow-hidden">
                 <img
                   src={post.image}
                   alt={post.title}
-                  className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute top-4 left-4">
-                  <span className="px-4 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold rounded-full">
+                  <span className="px-4 py-1.5 bg-white text-[#0077cc] text-xs font-black uppercase tracking-widest rounded-lg shadow-lg">
                     {post.category}
                   </span>
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+              <div className="p-8">
+                <div className="flex items-center gap-4 mb-4 text-xs font-bold tracking-widest text-gray-400 uppercase">
                   <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
+                    <Calendar className="w-3.5 h-3.5" />
                     {post.date}
                   </span>
                   <span>•</span>
                   <span>{post.readTime}</span>
                 </div>
                 
-                <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight group-hover:text-indigo-600 transition-colors">
+                <h3 className="mb-4 text-xl font-black leading-tight text-[#1a2e52] transition-colors group-hover:text-[#0077cc] font-jakarta">
                   {post.title}
                 </h3>
                 
-                <p className="text-gray-600 mb-4 leading-relaxed">
+                <p className="mb-6 text-sm font-medium leading-relaxed text-gray-400 line-clamp-3">
                   {post.excerpt}
                 </p>
                 
-                <button className="text-indigo-600 font-semibold inline-flex items-center gap-2 group-hover:gap-4 transition-all">
+                <button className="inline-flex items-center gap-2 font-bold text-[#0077cc] transition-all group-hover:gap-4">
                   Read More <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -217,32 +214,32 @@ const BlogPage = () => {
         </div>
 
         {filteredPosts.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No articles found</h3>
-            <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+          <div className="py-20 text-center">
+            <div className="mb-4 text-6xl">🔍</div>
+            <h3 className="mb-2 text-2xl font-black text-[#1a2e52]">No articles found</h3>
+            <p className="font-medium text-gray-500">Try adjusting your search or filter criteria</p>
           </div>
         )}
       </div>
 
       {/* Newsletter Section */}
-      <div className="max-w-7xl mx-auto px-6 pb-20">
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-12 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl"></div>
+      <div className="px-6 pb-24 mx-auto max-w-7xl">
+        <div className="relative p-12 overflow-hidden text-center bg-[#1a2e52] rounded-[2.5rem]">
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-[#0077cc]/10 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-orange-400/5 blur-3xl"></div>
           
           <div className="relative z-10">
-            <h2 className="text-4xl font-black text-white mb-4">Stay Updated</h2>
-            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-              Get the latest career tips, industry insights, and resume strategies delivered to your inbox
+            <h2 className="mb-4 text-4xl font-black tracking-tighter text-white font-jakarta">Stay Updated</h2>
+            <p className="max-w-xl mx-auto mb-10 text-lg font-medium text-blue-100/60">
+              Get the latest career tips, industry insights, and resume strategies delivered to your inbox.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+            <div className="flex flex-col max-w-lg gap-4 mx-auto sm:flex-row">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-6 py-4 rounded-full focus:outline-none focus:ring-4 focus:ring-indigo-400"
+                className="flex-1 px-6 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0077cc] text-[#1a2e52] font-medium"
               />
-              <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full font-bold hover:shadow-xl hover:scale-105 transition-all whitespace-nowrap">
+              <button className="px-8 py-4 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-xl font-black transition-all hover:shadow-xl hover:scale-105 whitespace-nowrap">
                 Subscribe Now
               </button>
             </div>
@@ -251,19 +248,6 @@ const BlogPage = () => {
       </div>
 
       <Footer />
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };

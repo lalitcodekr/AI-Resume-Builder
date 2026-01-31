@@ -27,7 +27,7 @@ const AboutUs = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-[#fcfcfd] font-['Outfit'] text-[#1a2e52] overflow-x-hidden">
       <NavBar />
 
       <main className="bg-[#f8fafc] text-slate-800 overflow-x-hidden">
@@ -431,9 +431,15 @@ const AboutUs = () => {
           </motion.div>
         </section>
 
+
         <Footer />
       </main>
-    </>
+
+      <style>{`
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        .animate-float { animation: float 5s ease-in-out infinite; }
+      `}</style>
+    </div>
   );
 };
 

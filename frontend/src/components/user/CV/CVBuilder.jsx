@@ -1,9 +1,9 @@
 import React, { useState, useEffect ,useRef} from "react";
+import FormTabs from "./FormTabs";
 import UserNavBar from "../UserNavBar/UserNavBar";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { Upload, FileText } from "lucide-react";
-
+import { Save, Upload, FileText, AlertTriangle, ArrowLeft, ArrowRight, PenTool, Download } from "lucide-react";
 import {
   User,
   Briefcase,
@@ -13,7 +13,8 @@ import {
   Award,
 } from "lucide-react";
 
-// Forms
+
+// Import existing Forms
 import PersonalInfoForm from "./forms/PersonalInfoForm";
 import ExperienceForm from "./forms/ExperienceForm";
 import EducationForm from "./forms/EducationForm";
@@ -25,36 +26,18 @@ import "./CVBuilder.css";
 
 const sections = [
   "personal",
-  "work",
   "education",
-  "skills",
+  "work",
   "projects",
-  "certifications",
+  "certs",
+  "skills",
 ];
-
-const sectionIcon = {
-  personal: <User size={16} />,
-  work: <Briefcase size={16} />,
-  education: <GraduationCap size={16} />,
-  skills: <Zap size={16} />,
-  projects: <FolderKanban size={16} />,
-  certifications: <Award size={16} />,
-};
 
 const CVBuilder = () => {
   /* -------------------- STATE -------------------- */
+  const formContainerRef = useRef(null);
   const [activeSection, setActiveSection] = useState("personal");
-  const formTopRef=useRef(null);
-  useEffect(()=>{
-    if(formTopRef.current){
-      formTopRef.current.scrollIntoView({behaviour:"smooth",
-        block:"start"
-      })
-    }
-  },[activeSection])
-    const [resumeId, setResumeId] = useState(null);
-  const [isPreviewMaximized, setIsPreviewMaximized] = useState(false);
-
+  const [activeTab, setActiveTab] = useState("builder");
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -66,7 +49,7 @@ const CVBuilder = () => {
     summary: "",
     experience: [
       {
-        id: Date.now(),
+        id: 1,
         title: "",
         company: "",
         location: "",
@@ -77,7 +60,7 @@ const CVBuilder = () => {
     ],
     education: [
       {
-        id: Date.now() + 1,
+        id: 2,
         school: "",
         degree: "",
         location: "",
@@ -88,7 +71,7 @@ const CVBuilder = () => {
     skills: { technical: [], soft: [] },
     projects: [
       {
-        id: Date.now() + 2,
+        id: 3,
         name: "",
         description: "",
         technologies: "",
@@ -97,7 +80,7 @@ const CVBuilder = () => {
     ],
     certifications: [
       {
-        id: Date.now() + 3,
+        id: 4,
         name: "",
         issuer: "",
         date: "",
@@ -106,26 +89,44 @@ const CVBuilder = () => {
     ],
   });
 
+  const [isPreviewMaximized, setIsPreviewMaximized] = useState(false);
+  const [isPreviewHidden, setIsPreviewHidden] = useState(false);
+
   /* -------------------- LOAD DATA -------------------- */
   useEffect(() => {
     const fetchResume = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/resume",
-          { withCredentials: true }
-        );
-        if (res.data?.length) {
-          setResumeId(res.data[0]._id);
-          setFormData((prev) => ({ ...prev, ...res.data[0].data }));
+        const res = await axios.get("http://localhost:5000/api/resume", {
+          withCredentials: true,
+        });
+        if (res.data && res.data?.length > 0) {
+          const latestResume = res.data[0];
+          if (latestResume.data) {
+            setFormData((prev) => ({ ...prev, ...latestResume.data }));
+          }
+          toast.success("CV loaded successfully");
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error("Error loading CV:", error);
       }
     };
     fetchResume();
   }, []);
+  useEffect(() => {
+  if (formContainerRef.current) {
+    formContainerRef.current.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+}, [activeSection]);
 
   /* -------------------- HELPERS -------------------- */
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  /* ---------- STEP NAVIGATION ---------- */
   const currentIndex = sections.indexOf(activeSection);
 
   const goNext = () => {
@@ -138,10 +139,6 @@ const CVBuilder = () => {
     if (currentIndex > 0) {
       setActiveSection(sections[currentIndex - 1]);
     }
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   /* -------------------- RENDER FORM -------------------- */
@@ -162,119 +159,125 @@ const CVBuilder = () => {
         return <SkillsForm formData={formData} setFormData={setFormData} />;
       case "projects":
         return <ProjectsForm formData={formData} setFormData={setFormData} />;
-      case "certifications":
+      case "certs":
         return (
-          <CertificationsForm
-            formData={formData}
-            setFormData={setFormData}
-          />
+          <CertificationsForm formData={formData} setFormData={setFormData} />
         );
       default:
         return null;
     }
   };
 
-  const sectionLabel = {
-    personal: "Personal",
-    work: "Work",
-    education: "Education",
-    skills: "Skills",
-    projects: "Projects",
-    certifications: "Certifications",
-  };
-
+  // --------
   return (
-    <div className="h-screen bg-slate-50 overflow-hidden">
+    <>
       <UserNavBar />
-
-      <div className="cv-builder-container w-full px-4 pb-4 pt-6">
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">
-            Craft Your CV
-          </h1>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-lg">
-              <Upload size={16} /> Upload
+      <div className="p-2.5 mt-4">
+        {/* main-header */}
+        <div className="flex justify-between items-start mb-5 p-2">
+          <h1 className="text-2xl font-['Outfit']">Create CV</h1>
+          <div className="flex gap-2">
+            {/* upload-btn &  export-btn */}
+            <button className="flex gap-2 py-2.5 px-5 text-white cursor-pointer bg-gradient-to-br from-blue-600 to-blue-700 border-0 rounded-lg text-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800">
+              <Upload size={18} />
+              Upload
             </button>
-            <button className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-lg">
-              <FileText size={16} /> Export
+            <button className="flex gap-2 py-2.5 px-5 text-white cursor-pointer bg-gradient-to-br from-blue-600 to-blue-700 border-0 rounded-lg text-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800">
+              <Download size={18} /> Export
             </button>
           </div>
         </div>
+        {/* main-tabs */}
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1.5 mb-4 w-fit">
+          <button
+            className={`py-1 px-2.5 rounded-lg mr-1 ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""}`}
+            onClick={() => setActiveTab("builder")}
+          >
+            Builder
+          </button>
+          <button
+            className={`py-1 px-2.5 rounded-lg ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""}`}
+            onClick={() => setActiveTab("templates")}
+          >
+            Templates
+          </button>
+        </div>
 
-        <div className="cv-builder-content">
-          {/* LEFT PANEL */}
-          {!isPreviewMaximized && (
-            <div className="cv-form-section">
-              <div className="cv-form-container">
-                <div className="max-w-2xl mx-auto" ref={formTopRef}>
+        {/* ALERT */}
+        {activeTab === "builder" && (
+          <div className="flex items-center w-full gap-3 p-4 bg-amber-50 border border-amber-200 rounded-[10px] mb-5">
+            <AlertTriangle size={20} />
+            <div>
+              <strong className="block text-sm text-amber-800 mb-0.5">
+                Complete Your CV
+              </strong>
+              <p className="text-sm text-yellow-700 m-0">
+                Fill in all sections to create a professional CV
+              </p>
+            </div>
+            <div className="flex gap-2 ml-auto flex-wrap">
+              <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800">
+                Personal Info
+              </span>
+              <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800">
+                Experience
+              </span>
+              <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">
+                Skills
+              </span>
+            </div>
+          </div>
+        )}
 
-                  {/* 🔥 SECTION TITLE + PROGRESS (EXACT IMAGE STYLE) */}
-                   <div className="flex items-center justify-between mb-6">
-                    {/* <div className="font-medium text-slate-700">
-                      {sectionLabel[activeSection]}
-                    </div>  */}
-                    <div className="flex items-center gap-2 text-slate-700 font-medium">
-  {sectionIcon[activeSection]}
-  {sectionLabel[activeSection]}
-</div>
-
-                    <div className="flex flex-col items-center gap-1">
-                      <p className="text-xs text-slate-500 font-medium">
-                        Step {currentIndex + 1} of {sections.length}
-                      </p>
-                      <div className="h-2.5 w-28 bg-slate-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-blue-500 rounded-full transition-all"
-                          style={{
-                            width: `${
-                              ((currentIndex + 1) / sections.length) * 100
-                            }%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* FORM */}
-                  {renderFormContent()}
-
-                  {/* NAV BUTTONS */}
-                  <div className="flex justify-between mt-10">
-                    <button
-                      onClick={goPrevious}
-                      disabled={currentIndex === 0}
-                      className="px-5 py-2 rounded-lg bg-slate-200 text-slate-700 disabled:opacity-40"
-                    >
-                      ← Previous
-                    </button>
-
-                    <button
-                      onClick={goNext}
-                      disabled={currentIndex === sections.length - 1}
-                      className="px-5 py-2 rounded-lg bg-black text-white disabled:opacity-40"
-                    >
-                      Next →
-                    </button>
-                  </div>
-
-                </div>
+        {/* BUILDER + PREVIEW */}
+        {activeTab === "builder" && (
+          <div
+            className={`grid grid-cols-[32%_68%] gap-14 p-1.5 ml-2 mr-2 ${isPreviewMaximized ? "grid-cols-[0_100%]" : ""}`}
+          >
+            {/* builder-section */}
+            <div className="bg-white rounded-xl h-full overflow-y-auto pl-0.5 overflow-hidden flex-1">
+              <FormTabs
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
+              {/* form-content */}
+              <div className="w-full h-[72%] mt-5 overflow-auto cv-form-content-scrollable">
+                {renderFormContent()}
+              </div>
+              {/* Previous & Next */}
+              <div className="w-full flex items-center justify-between mt-10">
+                <button
+                  onClick={goPrevious}
+                  disabled={currentIndex === 0}
+                  className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  <ArrowLeft size={18} />
+                  <span>Previous</span>
+                </button>
+                <button
+                  onClick={goNext}
+                  disabled={currentIndex === sections.length - 1}
+                  className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  <span>Next</span>
+                  <ArrowRight size={18} />
+                </button>
               </div>
             </div>
-          )}
 
-          {/* RIGHT PANEL */}
-          <CVPreview
-            formData={formData}
-            isMaximized={isPreviewMaximized}
-            onToggleMaximize={() =>
-              setIsPreviewMaximized(!isPreviewMaximized)
-            }
-          />
-        </div>
+            {!isPreviewHidden && (
+              <CVPreview
+                formData={formData}
+                isMaximized={isPreviewMaximized}
+                onToggleMaximize={() => setIsPreviewMaximized(!isPreviewMaximized)}
+                onMinimize={() => setIsPreviewHidden(true)}
+              />
+            )}
+          </div>
+        )}
+        <div className="w-full h-4"></div>
       </div>
-    </div>
+    </>
   );
 };
 

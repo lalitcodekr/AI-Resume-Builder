@@ -1,33 +1,19 @@
 
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { Search, Plus, Upload, Filter, Eye, X, Check } from "lucide-react";
+import { useMemo, useState, useEffect } from 'react';
+import { Search, Filter, Eye, X, Check } from "lucide-react";
 import UserNavBar from '../UserNavBar/UserNavBar';
-import axios from 'axios';
-import { renderAsync } from "docx-preview";
-import html2canvas from "html2canvas";
+import { TEMPLATES } from './TemplateRegistry';
+import { getTemplateStatus } from '../../../utils/templateVisibility';
 
-const TemplatesDashboardPage = ({ onSelectTemplate }) => {
+const TemplatesDashboardPage = ({ onSelectTemplate, isEmbedded = false }) => {
   const [search, setSearch] = useState('');
   const [fetchedTemplates, setFetchedTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Upload Modal State
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [uploadFormData, setUploadFormData] = useState({
-    name: '',
-    category: 'Modern',
-    description: ''
-  });
-  const [templateFile, setTemplateFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState({ type: '', text: '' });
-
   // Preview Modal State
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
-
-  const previewContainerRef = useRef(null);
 
   useEffect(() => {
     fetchTemplates();
@@ -35,21 +21,23 @@ const TemplatesDashboardPage = ({ onSelectTemplate }) => {
 
   const fetchTemplates = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/template?status=approved');
-      const rawData = response.data || [];
-      const mappedData = rawData.map(item => ({
-        id: item._id,
+      // Filter out inactive templates
+      const activeTemplates = TEMPLATES.filter(t => getTemplateStatus(t.id));
+
+      // Map registry templates to dashboard format
+      const mappedData = activeTemplates.map(item => ({
+        id: item.id,
         name: item.name,
         category: item.category,
-        file: item.fileUrl,
-        img: item.imageUrl,
-        description: item.description
+        img: item.thumbnail,
+        description: item.description,
+        isDynamic: true
       }));
+
       setFetchedTemplates(mappedData);
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching templates:", err.response?.data || err.message);
-      setError(err.response?.data?.msg || "Failed to load templates.");
+      console.error("Error loading templates:", err);
       setLoading(false);
     }
   };
@@ -60,13 +48,11 @@ const TemplatesDashboardPage = ({ onSelectTemplate }) => {
     );
   }, [fetchedTemplates, search]);
 
-  // Grouping similar to Admin, or just sections
+  // Grouping
   const modern = filteredTemplates.filter(t => ['modern', 'Modern', 'Modern Templates'].includes(t.category));
   const creative = filteredTemplates.filter(t => ['creative', 'Creative', 'Creative Templates'].includes(t.category));
   const professional = filteredTemplates.filter(t => ['professional', 'Professional', 'Professional Templates'].includes(t.category));
 
-  // Determine if we have any categorized templates, otherwise show all in one grid if convenient, 
-  // but to match Admin UI exactly, we'll keep the section approach if data supports it.
 
   const handlePreview = (imageUrl) => {
     setPreviewImage(imageUrl);
@@ -77,77 +63,8 @@ const TemplatesDashboardPage = ({ onSelectTemplate }) => {
     if (onSelectTemplate) {
       onSelectTemplate(templateId);
     } else {
-      // Fallback or navigation if not embedded
       console.log("Selected template:", templateId);
-      // You might want to navigate to builder here if strictly used as a page
-      // window.location.href = '/user/resume-builder?template=' + templateId; 
-    }
-  };
-
-  /* --- Upload Logic (Preserved) --- */
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUploadFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = async (e) => {
-    const { name, files } = e.target;
-    if (name === 'templateFile') {
-      const file = files[0];
-      setTemplateFile(file);
-      if (file && previewContainerRef.current) {
-        try {
-          previewContainerRef.current.innerHTML = '';
-          await renderAsync(file, previewContainerRef.current);
-        } catch (error) {
-          console.error("Error rendering DOCX:", error);
-          setUploadMessage({ type: 'error', text: 'Failed to preview.' });
-        }
-      }
-    }
-  };
-
-  const handleUploadSubmit = async (e) => {
-    e.preventDefault();
-    if (!templateFile) return;
-
-    setUploading(true);
-    setUploadMessage({ type: '', text: 'Processing...' });
-
-    try {
-      if (!previewContainerRef.current) throw new Error("Preview container missing");
-      const canvas = await html2canvas(previewContainerRef.current, { scale: 0.5, useCORS: true });
-
-      canvas.toBlob(async (blob) => {
-        if (!blob) throw new Error("Thumbnail failed");
-
-        const formData = new FormData();
-        formData.append('name', uploadFormData.name);
-        formData.append('category', uploadFormData.category);
-        formData.append('description', uploadFormData.description);
-        formData.append('templateFile', templateFile);
-        formData.append('thumbnail', blob, "thumbnail.png");
-
-        try {
-          await axios.post('http://localhost:5000/api/template/upload', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
-          setUploadMessage({ type: 'success', text: 'Uploaded! Pending approval.' });
-          setUploadFormData({ name: '', category: 'Modern', description: '' });
-          setTemplateFile(null);
-          if (previewContainerRef.current) previewContainerRef.current.innerHTML = '';
-          setTimeout(() => { setIsUploadModalOpen(false); setUploadMessage({ type: '', text: '' }); }, 2000);
-          fetchTemplates(); // Refresh list to see if (logic allows) pending ones? User usually only sees approved.
-        } catch (err) {
-          setUploadMessage({ type: 'error', text: err.response?.data?.msg || 'Upload failed.' });
-        } finally {
-          setUploading(false);
-        }
-      }, 'image/png');
-    } catch (err) {
-      console.error(err);
-      setUploadMessage({ type: 'error', text: 'Failed to process.' });
-      setUploading(false);
+      // Fallback navigation could go here
     }
   };
 
@@ -221,11 +138,12 @@ const TemplatesDashboardPage = ({ onSelectTemplate }) => {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
-      {/* Navbar Placeholder - Adjust per your app structure */}
-      {/* If UserNavBar is fixed, add top padding to container. If sticky, ensure proper nesting. */}
-      <div className='sticky top-0 z-40 bg-white shadow-sm'>
-        <UserNavBar />
-      </div>
+      {/* Navbar Placeholder */}
+      {!isEmbedded && (
+        <div className='sticky top-0 z-40 bg-white shadow-sm'>
+          <UserNavBar />
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-8">
 
@@ -248,14 +166,6 @@ const TemplatesDashboardPage = ({ onSelectTemplate }) => {
                 className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-64"
               />
             </div>
-
-            <button
-              onClick={() => setIsUploadModalOpen(true)}
-              className="flex items-center gap-2 bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm"
-            >
-              <Upload size={16} />
-              <span className="hidden sm:inline">Upload</span>
-            </button>
           </div>
         </div>
 
@@ -266,130 +176,18 @@ const TemplatesDashboardPage = ({ onSelectTemplate }) => {
           </div>
         ) : (
           <div>
-            {/* If we have clear categories, render sections. Else fallback to grid. */}
             {(modern.length > 0 || creative.length > 0 || professional.length > 0) ? (
               <>
                 {renderSection('Modern Templates', modern)}
                 {renderSection('Creative Templates', creative)}
                 {renderSection('Professional Templates', professional)}
-                {/* Render 'Other' if any leftover?
-                {renderSection('Other Templates', filteredTemplates.filter(t => !['modern', 'creative', 'professional'].some(c => t.category?.toLowerCase() === c)))} */}
               </>
             ) : (
-              // Fallback if categories don't match exactly
               renderSection('All Templates', filteredTemplates)
             )}
           </div>
         )}
       </div>
-
-      {/* Upload Modal */}
-      {isUploadModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-fadeIn">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <h3 className="text-lg font-bold text-slate-800">Upload New Template</h3>
-              <button
-                onClick={() => setIsUploadModalOpen(false)}
-                className="p-1 hover:bg-slate-200 rounded-full transition-colors text-slate-500"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto custom-scrollbar space-y-5">
-              {uploadMessage.text && (
-                <div className={`p-3 rounded-lg text-sm border ${uploadMessage.type === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-                  {uploadMessage.text}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                    <input
-                      name="name"
-                      value={uploadFormData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                      placeholder="e.g. Minimalist Blue"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                    <select
-                      name="category"
-                      value={uploadFormData.category}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                    >
-                      <option value="Modern">Modern</option>
-                      <option value="Creative">Creative</option>
-                      <option value="Professional">Professional</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                    <textarea
-                      name="description"
-                      rows={3}
-                      value={uploadFormData.description}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none transition-all"
-                      placeholder="Briefly describe the style..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">File (.docx)</label>
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 hover:border-blue-400 transition-all">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="w-8 h-8 mb-3 text-slate-400" />
-                        <p className="text-xs text-slate-500"><span className="font-semibold">Click to upload</span></p>
-                        <p className="text-xs text-slate-400">DOCX only</p>
-                      </div>
-                      <input name="templateFile" type="file" accept=".docx" className="hidden" onChange={handleFileChange} />
-                    </label>
-                    {templateFile && <p className="text-xs text-blue-600 mt-2 truncate">Selected: {templateFile.name}</p>}
-                  </div>
-                </div>
-
-                {/* Preview Box */}
-                <div className="space-y-1">
-                  <label className="block text-sm font-medium text-slate-700">Preview</label>
-                  <div className="border border-slate-200 bg-slate-100 rounded-lg h-full min-h-[300px] flex items-center justify-center overflow-hidden relative">
-                    {!templateFile && <span className="text-xs text-slate-400">No file selected</span>}
-                    <div
-                      ref={previewContainerRef}
-                      className="bg-white shadow-sm origin-top scale-50" // Scale down for modal view
-                      style={{ width: '794px', display: templateFile ? 'block' : 'none' }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
-              <button
-                onClick={() => setIsUploadModalOpen(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUploadSubmit}
-                disabled={uploading || !templateFile}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
-              >
-                {uploading ? 'Uploading...' : 'Upload Template'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Full Image Preview Modal */}
       {isPreviewModalOpen && (

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
-import Footer from "./Footer";
+import Footer from "./Footer"
 
 function TemplatesPage() {
   const navigate = useNavigate();
@@ -41,11 +41,11 @@ function TemplatesPage() {
 
       {/* MAIN CONTENT */}
       <section className="px-8 py-12">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl">
           {/* HEADER */}
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-gray-900 mb-4">Choose Your Template</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Select a professionally designed template to get started</p>
+          <div className="mb-12 text-center">
+            <h1 className="mb-4 text-5xl font-bold text-gray-900">Choose Your Template</h1>
+            <p className="max-w-2xl mx-auto text-lg text-gray-600">Select a professionally designed template to get started</p>
           </div>
 
           {/* CATEGORY FILTER */}
@@ -64,14 +64,14 @@ function TemplatesPage() {
           </div>
 
           {/* TEMPLATES GRID */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {filteredTemplates.map((template) => (
               <div
                 key={template.id}
                 onMouseEnter={() => setHoveredTemplate(template.id)}
                 onMouseLeave={() => setHoveredTemplate(null)}
                 onClick={() => handleCreateResume(template)}
-                className="group relative cursor-pointer"
+                className="relative cursor-pointer group"
               >
                 <div
                   className={`bg-white rounded-xl shadow-lg border-2 overflow-hidden transition-all duration-300 ${
@@ -82,7 +82,7 @@ function TemplatesPage() {
                     <img
                       src={template.image}
                       alt={template.name}
-                      className="w-full h-full object-cover object-top"
+                      className="object-cover object-top w-full h-full"
                       loading="lazy"
                       onError={(e) => {
                         e.target.style.display = "none";
@@ -113,7 +113,7 @@ function TemplatesPage() {
                   </div>
 
                   <div className="p-4 bg-white border-t border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900 text-center">{template.name}</h3>
+                    <h3 className="text-lg font-bold text-center text-gray-900">{template.name}</h3>
                   </div>
                 </div>
               </div>

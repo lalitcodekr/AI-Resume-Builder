@@ -10,6 +10,12 @@ import {
   Shield,
   ArrowLeft,
   CheckCircle2,
+  BarChart3,
+  Lightbulb,
+  SearchCheck,
+  Layers,
+  FileEdit,
+  Rocket,
 } from "lucide-react";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
@@ -227,34 +233,34 @@ const AIBuilderFeature = () => {
             What Our AI Resume Builder Does
           </h2>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              { icon: "✨", title: "Content Enhancement", desc: "Transforms basic descriptions into achievement-focused bullet points" },
-              { icon: "🎯", title: "Keyword Optimization", desc: "Identifies and adds relevant keywords to pass ATS filters" },
-              { icon: "📊", title: "Achievement Quantification", desc: "Helps you add metrics and numbers to demonstrate impact" },
-              { icon: "💡", title: "Smart Suggestions", desc: "Provides real-time suggestions based on your industry" },
-              { icon: "🔍", title: "Grammar & Clarity", desc: "Ensures your resume is error-free and easy to read" },
-              { icon: "🎨", title: "Format Optimization", desc: "Applies professional formatting for AI readability" },
-              { icon: "📝", title: "Section Guidance", desc: "Recommends which sections to include based on experience" },
-              { icon: "⚡", title: "Action Verb Selection", desc: "Suggests powerful verbs to make experience stand out" },
-              { icon: "🚀", title: "Impact Maximization", desc: "Helps you highlight impressive achievements first" },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="p-8 text-center transition-all duration-300 border border-gray-100 bg-white rounded-2xl hover:border-[#0077cc]/30 hover:shadow-lg"
-              >
-                <div className="mb-4 text-4xl transition-transform duration-300 group-hover:scale-110">
-                  {item.icon}
-                </div>
-                <h3 className="mb-2 text-lg font-bold text-[#1a2e52]">
-                  {item.title}
-                </h3>
-                <p className="text-xs leading-relaxed text-gray-500">{item.desc}</p>
-              </div>
-            ))}
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {[
+        { icon: <Sparkles size={32} />, title: "Content Enhancement", desc: "Transforms basic descriptions into achievement-focused bullet points" },
+        { icon: <Target size={32} />, title: "Keyword Optimization", desc: "Identifies and adds relevant keywords to pass ATS filters" },
+        { icon: <BarChart3 size={32} />, title: "Achievement Quantification", desc: "Helps you add metrics and numbers to demonstrate impact" },
+        { icon: <Lightbulb size={32} />, title: "Smart Suggestions", desc: "Provides real-time suggestions based on your industry" },
+        { icon: <SearchCheck size={32} />, title: "Grammar & Clarity", desc: "Ensures your resume is error-free and easy to read" },
+        { icon: <Layers size={32} />, title: "Format Optimization", desc: "Applies professional formatting for AI readability" },
+        { icon: <FileEdit size={32} />, title: "Section Guidance", desc: "Recommends which sections to include based on experience" },
+        { icon: <Zap size={32} />, title: "Action Verb Selection", desc: "Suggests powerful verbs to make experience stand out" },
+        { icon: <Rocket size={32} />, title: "Impact Maximization", desc: "Helps you highlight impressive achievements first" },
+      ].map((item, i) => (
+        <div
+          key={i}
+          className="group p-8 text-center transition-all duration-300 border border-gray-100 bg-white rounded-[2rem] hover:border-[#0077cc]/30 hover:shadow-xl hover:-translate-y-1"
+        >
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-[#0077cc] transition-all duration-300 group-hover:bg-[#0077cc] group-hover:text-white">
+            {item.icon}
           </div>
+          <h3 className="mb-2 text-lg font-bold text-[#1a2e52]">
+            {item.title}
+          </h3>
+          <p className="text-sm leading-relaxed text-gray-500">{item.desc}</p>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* HOW IT WORKS */}
       <section ref={howRef} className="px-6 py-14 bg-gray-50/50">

@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import axiosInstance from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
+import { Eye, EyeOff, Lock, Mail, CheckCircle } from 'lucide-react';
 import images from "../assets";
 
 export default function Login() {
   const [emailtext, setEmailText] = useState("");
   const [passwordtext, setPasswordText] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -54,121 +56,136 @@ export default function Login() {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
-
-      <div className="fixed inset-0 pt-20 flex items-center justify-center bg-gradient-to-br from-blue-950 to-slate-900 px-4 select-none overflow-hidden">
-        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl bg-white max-h-[85vh]">
-          <div className="hidden md:block">
-            <Link to="/">
-              <img
-                src={images.login || "/login.jpg"}
-                alt="Login"
-                className="w-full h-full object-cover"
-              />
-            </Link>
+      
+      <div className="min-h-screen flex">
+        {/* Left Side - Illustration */}
+        <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-blue-50 to-orange-50 p-12 flex-col justify-center items-center">
+          <img
+            src= {images.resumeexample || "/resumeexample.jpg"}
+            alt="Resume Building Illustration"
+            className="w-full max-w-lg"
+          />
+          <div className="mt-12 text-center max-w-md">
+            <h2 className="text-3xl font-bold text-gray-800 mb-3">Build Your Future</h2>
+            <p className="text-lg text-gray-600">Create professional resumes with AI-powered tools</p>
           </div>
+        </div>
 
-          <div className="flex flex-col justify-center px-6 md:px-10 py-4 overflow-y-auto">
-            <div className="text-center mb-2">
+        {/* Right Side - Login Form */}
+        <div className="w-full md:w-1/2 bg-white p-8 md:p-12 flex flex-col justify-center overflow-y-auto">
+          <div className="max-w-md mx-auto w-full">
+            <div className="mb-8 text-center">
               <h1 className="text-xl font-semibold text-gray-800">
-                Welcome to{" "}
-                <span className="font-bold text-blue-600">
-                  AI Resume Builder
-                </span>
+                Welcome to{' '}
+                <span className="font-bold text-blue-600">AI Resume Builder</span>
               </h1>
-              <p className="text-xs text-gray-500 mt-0.5">by</p>
-              <Link to="/">
+              <p className="text-xs text-gray-500 mt-1">by</p>
+              <Link to="/" className="inline-block">
                 <img
                   src={images.logo || "/logo.png"}
-                  alt="Logo"
-                  className="w-24 mx-auto mt-1"
+                  alt="UptoSkills Logo"
+                  className="w-28 mx-auto mt-2 mb-4"
                 />
               </Link>
+              <h2 className="text-lg font-semibold text-gray-800 mt-2">
+                Login to your account
+              </h2>
             </div>
 
-            <h2 className="text-lg font-semibold text-center text-gray-800 mb-2">
-              Login to your account
-            </h2>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleLogin();
-              }}
-              className="space-y-2"
-            >
+            <div className="space-y-5">
+              {/* Email Input */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-0.5">
-                  Email
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
                 </label>
-                <input
-                  type="email"
-                  placeholder="Enter your e-mail"
-                  value={emailtext}
-                  onChange={(e) => setEmailText(e.target.value)}
-                  autoComplete="email"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={emailtext}
+                    onChange={(e) => setEmailText(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    autoComplete="email"
+                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  />
+                </div>
               </div>
 
+              {/* Password Input */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-0.5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
-                <input
-                  type="password"
-                  placeholder="Enter your Password"
-                  value={passwordtext}
-                  onChange={(e) => setPasswordText(e.target.value)}
-                  autoComplete="current-password"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    value={passwordtext}
+                    onChange={(e) => setPasswordText(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    autoComplete="current-password"
+                    className="w-full pl-11 pr-11 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
 
-              <div className="text-right">
-                <Link
-                  to="/forgot-password"
-                  className="text-xs text-blue-600 hover:underline"
-                >
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center">
+                  <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                  <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                </label>
+                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   Forgot password?
                 </Link>
               </div>
 
+              {/* Submit Button */}
               <button
-                type="submit"
+                onClick={handleLogin}
                 disabled={loading}
-                className={`w-full py-2 rounded-lg text-white text-sm font-medium transition mt-3 ${
+                className={`w-full py-3 rounded-lg text-white font-semibold transition transform ${
                   loading
-                    ? "bg-blue-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    ? 'bg-blue-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:scale-105'
                 }`}
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Signing in...
+                  </span>
+                ) : (
+                  'Sign In'
+                )}
               </button>
-            </form>
-
-            <div className="flex items-center my-2">
-              <div className="flex-grow h-px bg-gray-300" />
-              <span className="px-2 text-xs text-gray-400 uppercase">or</span>
-              <div className="flex-grow h-px bg-gray-300" />
             </div>
 
-            <button className="flex items-center justify-center gap-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
-              <img
-                src={images.google || "/google.png"}
-                alt="Google"
-                className="w-4 h-4"
-              />
-              <span className="text-xs font-medium text-gray-700">
-                Sign in with Google
-              </span>
-            </button>
-
-            <p className="text-center text-xs text-gray-600 mt-2">
-              Don't have an account?{" "}
-              <Link to="/register" className="text-blue-600 hover:underline">
+            {/* Sign Up Link */}
+            <p className="text-center text-sm text-gray-600 mt-6">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
                 Sign up
               </Link>
             </p>
