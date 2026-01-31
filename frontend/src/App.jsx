@@ -48,18 +48,11 @@ import AdminTemplates from "./components/admin/AdminCreateTemplates/Template";
 import ResumeEditor from "./components/admin/ResumeEditor/ResumeEditor";
 // User routes
 import UserRoutes from "./pages/UserRoutes";
-import ATSCheckerPage from "./pages/ATSChecker";
-import AIBuilderPage from "./pages/AIBuilder";
-import AIContentEnhancementPage from "./pages/AIContentEnhance";
-import ScoreChecker from "./pages/ScoreChecker";
-import ResumeHubPage from "./pages/ResumeHub";
-import GrowthInsightsPage from "./pages/GrowthInsights";
-import AICoverLetterPage from "./pages/CoverLetter";
-import CVFormattingPage from "./pages/CV";
-import TemplatesFeature from "./pages/TemplatesFeature";
 import ResumeExample from "./pages/ResumeExample";
-import CoverLetterTemplates from "./pages/CoverLetterTemplates";
 import ResumeGuide from "./pages/ResumeGuide";
+import ResumeExamplesPage from "./pages/ResumeExample";
+import CoverLetterTemplates from "./pages/CoverLetterTemplates";
+import Faq from "./pages/Faq";
 
 function App() {
   return (
@@ -89,7 +82,11 @@ function App() {
           <Route path="/resume-hub" element={<ResumeHubPage />}/>
           <Route path="/growths" element={<GrowthInsightsPage />}/>
           <Route path="/careers" element={<CareersPage />} />
-
+          <Route path="/resume-examples" element={<ResumeExamplesPage />}/>
+          <Route path="/how-to-write-a-resume" element={<ResumeGuide />} />
+          <Route path="/cover-letter-templates" element={<CoverLetterTemplates />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="/resume-checker" element={<ResumeChecker />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/help-center" element={<HelpCenter />} />

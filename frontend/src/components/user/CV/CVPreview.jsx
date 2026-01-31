@@ -1,193 +1,389 @@
 import React from 'react';
-import { Eye, Maximize2, Minimize2, FileText, Download, Upload } from 'lucide-react';
-import '../Preview/LivePreview.css'; // Reuse existing styles for the resume content
-const CVPreview = ({ formData, isMaximized, onToggleMaximize }) => {
-    return (
-        <div className={`cv-preview-section ${isMaximized ? 'maximized py-4' : ''}`}>
-            {/* Centered container wrapper for the whole UI when maximized */}
-            <div className={`flex flex-col h-full ${isMaximized ? 'max-w-4xl mx-auto w-full shadow-2xl rounded-2xl overflow-hidden' : ''}`}>
-                {/* Header with Actions */}
-                <div className="cv-preview-header">
-                    <div className="cv-preview-title">
-                        <Eye size={18} className="text-slate-500" />
-                        <span className="text-sm font-semibold">Live Preview</span>
-                    </div>
-                    <div className="cv-preview-actions flex items-center gap-3">
-                        {/* Only show Upload/Export when maximized */}
-                        {isMaximized && (
-                            <div className="flex items-center gap-2 mr-2">
-                                <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                                    <Upload size={16} />
-                                    Upload
-                                </button>
-                                <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                                    <FileText size={16} />
-                                    Export
-                                </button>
+import { FileText, Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import '../Preview/LivePreview.css';
+
+const CVPreview = ({ formData = {}, isMaximized, onToggleMaximize, onMinimize }) => {
+    const [zoom, setZoom] = React.useState(1);
+
+    const zoomIn = () => setZoom((z) => Math.min(z + 0.1, 2));
+    const zoomOut = () => setZoom((z) => Math.max(z - 0.1, 0.5));
+    const resetZoom = () => setZoom(1);
+
+    const {
+        fullName,
+        email,
+        phone,
+        location,
+        linkedin,
+        website,
+        summary,
+        experience = [],
+        education = [],
+        skills = {},
+        projects = [],
+        certifications = [],
+    } = formData;
+
+    function formatMonthYear(value) {
+        if (!value) return "";
+        const [year, month] = value.split("-");
+        const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        ];
+        return `${months[Number(month) - 1]}-${year}`;
+    }
+
+    function Section({ title, children }) {
+        return (
+            <section className="mb-6">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-blue-800 border-b mb-2">
+                    {title}
+                </h2>
+                <div className="text-slate-600 text-xs">{children}</div>
+            </section>
+        );
+    }
+
+    const CVContent = () => {
+        return (
+            <div className="mt-10 mb-4 w-[90%]">
+                <div
+                    className="bg-white p-8 lg:p-12 text-slate-800 text-sm leading-relaxed relative shadow-lg"
+                    style={{
+                        transform: `scale(${zoom})`,
+                    }}
+                >
+                    <div className="w-[90%] max-w-[694px] min-h-screen">
+                        <div className="pb-6">
+                            {fullName && (
+                                <h1 className="text-3xl font-semibold text-gray-900 mb-1 tracking-tight">
+                                    {fullName}
+                                </h1>
+                            )}
+                            <div className="text-slate-500 flex flex-wrap gap-3 text-xs mt-2 break-all">
+                                {location && (
+                                    <span className="flex gap-1 items-center">
+                                        <MapPin size={14} /> {location}
+                                    </span>
+                                )}
+                                {email && (
+                                    <span className="flex gap-1 items-center break-all">
+                                        <Mail size={14} /> {email}
+                                    </span>
+                                )}
+                                {phone && (
+                                    <span className="flex gap-1 items-center">
+                                        <Phone size={14} /> {phone}
+                                    </span>
+                                )}
+                                {linkedin && (
+                                    <span className="flex gap-1 items-center break-all">
+                                        {linkedin}
+                                    </span>
+                                )}
+                                {website && (
+                                    <span className="flex gap-1 items-center break-all">
+                                        <Globe size={14} /> {website}
+                                    </span>
+                                )}
                             </div>
+
+                            {(fullName ||
+                                email ||
+                                phone ||
+                                location ||
+                                linkedin ||
+                                website) && <hr className="text-slate-200 mt-4" />}
+                        </div>
+
+                        {summary && (
+                            <Section title="Professional Summary">
+                                <p className="break-words overflow-wrap-anywhere">{summary}</p>
+                            </Section>
                         )}
-                        <button
-                            className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors border border-slate-200 rounded-lg hover:bg-slate-50"
-                            onClick={onToggleMaximize}
-                            title={isMaximized ? "Minimize" : "Maximize"}
-                        >
-                            {isMaximized ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-                        </button>
-                        <button
-                            className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors border border-slate-200 rounded-lg hover:bg-slate-50"
-                            title="Download PDF"
-                        >
-                            <Download size={18} />
-                        </button>
+
+                        {education?.some(
+                            (edu) =>
+                                edu.school ||
+                                edu.degree ||
+                                edu.gpa ||
+                                edu.startDate ||
+                                edu.graduationDate ||
+                                edu.location,
+                        ) && (
+                            <Section title="Education">
+                                {education.map(
+                                    (edu) =>
+                                        (edu?.degree ||
+                                            edu?.startDate ||
+                                            edu?.graduationDate ||
+                                            edu?.school ||
+                                            edu?.gpa) && (
+                                            <div
+                                                key={edu?.id}
+                                                className="border-l-2 border-slate-200 pl-4 mb-2"
+                                            >
+                                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                                    <h3 className="font-medium text-slate-900">
+                                                        {edu?.degree}
+                                                    </h3>
+                                                    {edu?.startDate && edu?.graduationDate && (
+                                                        <span className="text-sm text-slate-500">
+                                                            {formatMonthYear(edu?.startDate)} -{" "}
+                                                            {formatMonthYear(edu?.graduationDate)}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <p className="text-sm text-slate-600">{edu?.school}</p>
+
+                                                {edu?.gpa && (
+                                                    <p className="text-sm text-slate-500">
+                                                        GPA: {edu?.gpa} / 10.0
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ),
+                                )}
+                            </Section>
+                        )}
+
+                        {experience?.some(
+                            (exp) =>
+                                exp.title ||
+                                exp.company ||
+                                exp.description ||
+                                exp.startDate ||
+                                exp.endDate ||
+                                exp.location,
+                        ) && (
+                            <Section title="Experience">
+                                {experience.map(
+                                    (exp) =>
+                                        (exp?.title ||
+                                            exp?.company ||
+                                            exp?.description ||
+                                            exp?.startDate ||
+                                            exp?.endDate) && (
+                                            <div
+                                                key={exp?.id}
+                                                className="border-l-2 border-slate-200 pl-4 mb-4"
+                                            >
+                                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                                    <div>
+                                                        <h3 className="font-medium text-slate-900">
+                                                            {exp?.title}
+                                                        </h3>
+                                                        <p className="text-sm text-slate-600">
+                                                            {exp?.company}
+                                                        </p>
+                                                    </div>
+                                                    {exp?.startDate && exp?.endDate && (
+                                                        <span className="text-sm text-slate-500 whitespace-nowrap">
+                                                            {formatMonthYear(exp?.startDate)} -{" "}
+                                                            {formatMonthYear(exp?.endDate)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {exp?.location && (
+                                                    <p className="text-sm text-slate-500">{exp?.location}</p>
+                                                )}
+                                                {exp?.description && (
+                                                    <p className="text-sm text-slate-600 mt-2 whitespace-pre-line break-words">
+                                                        {exp?.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ),
+                                )}
+                            </Section>
+                        )}
+
+                        {projects?.some(
+                            (project) =>
+                                project.name ||
+                                project.description ||
+                                project.technologies ||
+                                project.link,
+                        ) && (
+                            <Section title="Projects">
+                                {projects.map(
+                                    (project) =>
+                                        (project?.name ||
+                                            project?.description ||
+                                            project?.technologies) && (
+                                            <div
+                                                key={project?.id}
+                                                className="border-l-2 border-slate-200 pl-4 mb-4"
+                                            >
+                                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                                    <h3 className="font-medium text-slate-900">
+                                                        {project?.name}
+                                                    </h3>
+                                                    {project?.link && (
+                                                        <a
+                                                            href={project?.link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
+                                                        >
+                                                            Link
+                                                        </a>
+                                                    )}
+                                                </div>
+                                                {project?.technologies && (
+                                                    <p className="text-sm text-slate-600">
+                                                        {project?.technologies}
+                                                    </p>
+                                                )}
+                                                {project?.description && (
+                                                    <p className="text-sm text-slate-600 mt-2 whitespace-pre-line break-words">
+                                                        {project?.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ),
+                                )}
+                            </Section>
+                        )}
+
+                        {certifications?.some(
+                            (cert) => cert.name || cert.issuer || cert.date || cert.link,
+                        ) && (
+                            <Section title="Certifications">
+                                <section className="space-y-4">
+                                    {certifications.map((cert) => (
+                                        <div
+                                            key={cert.id}
+                                            className="flex items-start justify-between gap-4"
+                                        >
+                                            <div>
+                                                <h3 className="text-sm font-medium text-slate-900">
+                                                    {cert.name}
+                                                </h3>
+
+                                                <p className="text-sm text-slate-600">{cert.issuer}</p>
+
+                                                <p className="text-sm text-slate-500">{cert.date}</p>
+                                            </div>
+
+                                            {cert.link && (
+                                                <a
+                                                    href={cert.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
+                                                >
+                                                    Credential
+                                                </a>
+                                            )}
+                                        </div>
+                                    ))}
+                                </section>
+                            </Section>
+                        )}
+
+                        {(skills?.technical?.length !== 0 || skills?.soft?.length !== 0) && (
+                            <Section title="Skills">
+                                <div className="flex flex-wrap gap-2 items-center">
+                                    <span className="font-bold text-sm">Technical Skills:</span>
+                                    <div className="flex gap-2">
+                                        {skills?.technical?.length !== 0 &&
+                                            skills?.technical?.map((skill) => (
+                                                <span
+                                                    key={skill}
+                                                    className="px-2 py-1 bg-slate-100 rounded text-xs"
+                                                >
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                    </div>
+                                </div>
+                                <div className="flex flex-nowrap gap-2 items-start mt-2">
+                                    <span className="font-bold text-sm whitespace-nowrap">
+                                        Soft Skills:
+                                    </span>
+                                    <div className="flex gap-2 flex-wrap w-[85%]">
+                                        {skills?.soft?.length !== 0 &&
+                                            skills?.soft?.map((skill) => (
+                                                <span
+                                                    key={skill}
+                                                    className="px-2 py-1 bg-slate-100 rounded text-xs"
+                                                >
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                    </div>
+                                </div>
+                            </Section>
+                        )}
                     </div>
                 </div>
-                {/* Contrasting Background Area - Symmetric margins */}
-                <div className={`w-full h-full overflow-y-auto cv-preview-scroll-container relative ${isMaximized ? 'p-3 lg:p-4 bg-slate-300' : 'p-5 lg:p-8 bg-slate-200'}`}>
-                    <div className="flex flex-col items-center w-full">
-                        {/* Highlighted White Resume Paper */}
-                        <div className={`bg-white w-full shadow-2xl border border-slate-300 p-12 lg:p-20 min-h-[1400px] max-w-[820px]`} style={{ fontFamily: '"Times New Roman", Times, serif', fontFeatureSettings: '"lnum" 1' }}>
-                            {/* Header - Only show if there's any personal info */}
-                            {(formData.fullName || formData.firstName || formData.lastName || formData.email || formData.phone || formData.location || formData.address || formData.city || formData.country || formData.linkedin || formData.github || formData.website) && (
-                                <div className="text-center mb-10">
-                                    {(formData.fullName || formData.firstName || formData.lastName) && (
-                                        <h1 className="text-3xl font-bold text-slate-900 uppercase tracking-widest mb-1">
-                                            {formData.fullName || `${formData.firstName || ''} ${formData.lastName || ''}`.trim()}
-                                        </h1>
-                                    )}
-                                    <div className="text-sm text-slate-600 flex flex-wrap justify-center gap-2 items-center">
-                                        {[
-                                            formData.address,
-                                            formData.location || `${formData.city || ''}${formData.city && formData.country ? ', ' : ''}${formData.country || ''}`,
-                                            formData.email,
-                                            formData.phone,
-                                            formData.linkedin,
-                                            formData.github,
-                                            formData.website
-                                        ].filter(Boolean).map((item, index, arr) => (
-                                            <span key={index} className="flex items-center text-[11px]">
-                                                {item}
-                                                {index < arr.length - 1 && <span className="mx-2 text-slate-400">|</span>}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            {/* EDUCATION - Only show if there's actual data */}
-                            {formData.education && formData.education.some(edu => edu.school || edu.degree || edu.location || edu.graduationDate || edu.gpa) && (
-                                <div className="mb-10">
-                                    <h2 className="text-sm font-bold text-slate-900 uppercase border-b border-black mb-4 pb-0.5">
-                                        EDUCATION
-                                    </h2>
-                                    {formData.education.filter(edu => edu.school || edu.degree || edu.location || edu.graduationDate || edu.gpa).map((edu, idx) => (
-                                        <div key={idx} className="mb-5 last:mb-0">
-                                            <div className="flex justify-between items-baseline">
-                                                {edu.school && <h3 className="font-bold text-slate-900 text-base">{edu.school}</h3>}
-                                                {edu.location && <span className="text-sm text-slate-900">{edu.location}</span>}
-                                            </div>
-                                            <div className="flex justify-between items-baseline mb-1">
-                                                {edu.degree && <div className="italic text-slate-800 text-sm">{edu.degree}</div>}
-                                                {edu.graduationDate && <span className="italic text-slate-800 text-sm">{edu.graduationDate}</span>}
-                                            </div>
-                                            {edu.gpa && <div className="text-sm text-slate-700">GPA: {edu.gpa}</div>}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            {/* EXPERIENCE - Only show if there's actual data */}
-                            {formData.experience && formData.experience.some(exp => exp.company || exp.title || exp.location || exp.startDate || exp.endDate || exp.description) && (
-                                <div className="mb-10">
-                                    <h2 className="text-sm font-bold text-slate-900 uppercase border-b border-black mb-4 pb-0.5">
-                                        EXPERIENCE
-                                    </h2>
-                                    {formData.experience.filter(exp => exp.company || exp.title || exp.location || exp.startDate || exp.endDate || exp.description).map((exp, idx) => (
-                                        <div key={idx} className="mb-5 last:mb-0">
-                                            <div className="flex justify-between items-baseline">
-                                                {exp.company && <h3 className="font-bold text-slate-900 text-base">{exp.company}</h3>}
-                                                {exp.location && <span className="text-sm text-slate-900">{exp.location}</span>}
-                                            </div>
-                                            <div className="flex justify-between items-baseline mb-1">
-                                                {exp.title && <div className="italic text-slate-800 text-sm">{exp.title}</div>}
-                                                {(exp.startDate || exp.endDate) && (
-                                                    <span className="italic text-slate-800 text-sm">{exp.startDate} – {exp.endDate}</span>
-                                                )}
-                                            </div>
-                                            {exp.description && (
-                                                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                                                    {exp.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            {/* PROJECTS - Only show if there's actual data */}
-                            {formData.projects && formData.projects.some(project => project.name || project.description || project.technologies || project.link) && (
-                                <div className="mb-10">
-                                    <h2 className="text-sm font-bold text-slate-900 uppercase border-b border-black mb-4 pb-0.5">
-                                        PROJECTS
-                                    </h2>
-                                    {formData.projects.filter(project => project.name || project.description || project.technologies || project.link).map((project, idx) => (
-                                        <div key={idx} className="mb-5 last:mb-0">
-                                            <div className="flex justify-between items-baseline">
-                                                {project.name && <h3 className="font-bold text-slate-900 text-base">{project.name}</h3>}
-                                                {project.link && (
-                                                    <span className="text-sm text-slate-600">{project.link}</span>
-                                                )}
-                                            </div>
-                                            {project.technologies && <div className="text-sm italic text-slate-700 mb-1">{project.technologies}</div>}
-                                            {project.description && (
-                                                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                                                    {project.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            {/* SKILLS - Only show if there's actual data */}
-                            {formData.skills && (formData.skills.technical?.length > 0 || formData.skills.soft?.length > 0) && (
-                                <div className="mb-10">
-                                    <h2 className="text-sm font-bold text-slate-900 uppercase border-b border-black mb-4 pb-0.5">
-                                        SKILLS & INTERESTS
-                                    </h2>
-                                    <div className="text-sm text-slate-900">
-                                        {formData.skills.technical?.length > 0 && (
-                                            <div className="mb-2">
-                                                <span className="font-bold">Technical: </span>
-                                                {formData.skills.technical.join(', ')}
-                                            </div>
-                                        )}
-                                        {formData.skills.soft?.length > 0 && (
-                                            <div>
-                                                <span className="font-bold">Soft Skills: </span>
-                                                {formData.skills.soft.join(', ')}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                            {/* CERTIFICATIONS - Only show if there's actual data */}
-                            {formData.certifications && formData.certifications.some(cert => cert.name || cert.issuer || cert.date) && (
-                                <div className="mb-10">
-                                    <h2 className="text-sm font-bold text-slate-900 uppercase border-b border-black mb-4 pb-0.5">
-                                        CERTIFICATIONS
-                                    </h2>
-                                    {formData.certifications.filter(cert => cert.name || cert.issuer || cert.date).map((cert, idx) => (
-                                        <div key={idx} className="mb-3 last:mb-0">
-                                            <div className="flex justify-between items-baseline">
-                                                {cert.name && <h3 className="font-bold text-slate-900 text-sm">{cert.name}</h3>}
-                                                {cert.date && <span className="italic text-slate-800 text-sm">{cert.date}</span>}
-                                            </div>
-                                            {cert.issuer && <div className="text-sm text-slate-700">{cert.issuer}</div>}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+            </div>
+        );
+    };
+
+    /* FULLSCREEN MODE */
+    if (isMaximized) {
+        return (
+            <div className="fixed inset-0 z-[99] bg-black/40 flex items-center justify-center">
+                <div className="bg-slate-200 w-full h-full max-w-[80%] max-h-[95vh] rounded-xl shadow-lg flex flex-col">
+                    <div className="bg-white rounded-t-xl flex items-center justify-between px-4 py-4 border-b">
+                        <h3 className="flex items-center gap-2 text-sm font-semibold">
+                            <FileText size={16} /> Live Preview
+                        </h3>
+
+                        <div className="flex items-center gap-2">
+                            <button onClick={zoomOut}>
+                                <ZoomOut size={16} />
+                            </button>
+                            <span className="text-sm font-medium">
+                                {Math.round(zoom * 100)}%
+                            </span>
+                            <button onClick={zoomIn}>
+                                <ZoomIn size={16} />
+                            </button>
+                            <button onClick={resetZoom}>
+                                <RotateCcw size={16} />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    onToggleMaximize();
+                                    setZoom(1);
+                                }}
+                            >
+                                <Minimize2 size={16} />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-auto">
+                        <div className="w-full max-w-[694px] mx-auto pb-6">
+                            <CVContent />
                         </div>
                     </div>
                 </div>
             </div>
+        );
+    }
+
+    /* NORMAL MODE */
+    return (
+        <div className="w-[90%] border rounded-xl shadow-sm mr-4 m-2">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+                <h3 className="flex items-center gap-2 text-sm font-semibold">
+                    <FileText size={16} /> Live Preview
+                </h3>
+                <button onClick={onToggleMaximize}>
+                    <Maximize2 size={16} />
+                </button>
+            </div>
+
+            <div className="overflow-auto flex justify-center p-4 rounded-b-xl bg-slate-200">
+                <CVContent />
+            </div>
         </div>
     );
 };
+
 export default CVPreview;

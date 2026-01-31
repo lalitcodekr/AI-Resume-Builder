@@ -171,11 +171,11 @@ const Downloads = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-12">
+    <>
       <UserNavBar />
-
-      <div className="max-w-[1100px] mx-auto px-4 lg:px-8 py-8">
-
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 font-outfit">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8 max-w-7xl">
+        
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
@@ -316,6 +316,7 @@ const Downloads = () => {
         </footer>
       </div>
     </div>
+    </>
   );
 };
 

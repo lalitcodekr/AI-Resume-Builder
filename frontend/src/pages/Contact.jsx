@@ -4,7 +4,7 @@ import UpToSkillsImg from '../assets/UptoSkills.webp';
 import Footer from "./Footer"
 // Add MapPin and Mail to your existing lucide-react import
 import { Mail, Phone, LifeBuoy, Users, MessageSquare, ChevronRight, Zap, MapPin } from 'lucide-react';
-import BlurCircle from '../components/BlurCircle';
+import BlurCircle from './BlurCircle';
 import { motion } from 'framer-motion';
 
 function Contact() {

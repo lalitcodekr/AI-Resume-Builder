@@ -3,7 +3,7 @@ import FormTabs from "./FormTabs";
 import UserNavBar from "../UserNavBar/UserNavBar";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { Save, Upload, FileText } from "lucide-react";
+import { Save, Upload, FileText, AlertTriangle, ArrowLeft, ArrowRight, PenTool, Download } from "lucide-react";
 import {
   User,
   Briefcase,
@@ -26,26 +26,18 @@ import "./CVBuilder.css";
 
 const sections = [
   "personal",
-  "work",
   "education",
-  "skills",
+  "work",
   "projects",
-  "certifications",
+  "certs",
+  "skills",
 ];
-const stepMeta = {
-  personal: { label: "Personal", icon: User },
-  work: { label: "Experience", icon: Briefcase },
-  education: { label: "Education", icon: GraduationCap },
-  skills: { label: "Skills", icon: Zap },
-  projects: { label: "Projects", icon: FolderKanban },
-  certifications: { label: "Certifications", icon: Award },
-};
-
 
 const CVBuilder = () => {
   /* -------------------- STATE -------------------- */
   const formContainerRef = useRef(null);
   const [activeSection, setActiveSection] = useState("personal");
+  const [activeTab, setActiveTab] = useState("builder");
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -57,7 +49,7 @@ const CVBuilder = () => {
     summary: "",
     experience: [
       {
-        id: Date.now(),
+        id: 1,
         title: "",
         company: "",
         location: "",
@@ -68,7 +60,7 @@ const CVBuilder = () => {
     ],
     education: [
       {
-        id: Date.now() + 1,
+        id: 2,
         school: "",
         degree: "",
         location: "",
@@ -79,7 +71,7 @@ const CVBuilder = () => {
     skills: { technical: [], soft: [] },
     projects: [
       {
-        id: Date.now() + 2,
+        id: 3,
         name: "",
         description: "",
         technologies: "",
@@ -88,7 +80,7 @@ const CVBuilder = () => {
     ],
     certifications: [
       {
-        id: Date.now() + 3,
+        id: 4,
         name: "",
         issuer: "",
         date: "",
@@ -97,9 +89,8 @@ const CVBuilder = () => {
     ],
   });
 
-  const [resumeId, setResumeId] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
   const [isPreviewMaximized, setIsPreviewMaximized] = useState(false);
+  const [isPreviewHidden, setIsPreviewHidden] = useState(false);
 
   /* -------------------- LOAD DATA -------------------- */
   useEffect(() => {
@@ -110,14 +101,13 @@ const CVBuilder = () => {
         });
         if (res.data && res.data?.length > 0) {
           const latestResume = res.data[0];
-          setResumeId(latestResume._id);
           if (latestResume.data) {
             setFormData((prev) => ({ ...prev, ...latestResume.data }));
           }
-          toast.success("Resume loaded successfully");
+          toast.success("CV loaded successfully");
         }
       } catch (error) {
-        console.error("Error loading resume:", error);
+        console.error("Error loading CV:", error);
       }
     };
     fetchResume();
@@ -131,41 +121,6 @@ const CVBuilder = () => {
   }
 }, [activeSection]);
 
-
-  /* -------------------- SAVE DATA -------------------- */
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const payload = {
-        title: formData.fullName
-          ? `${formData.fullName}'s Resume`
-          : "My Resume",
-        templateId: "professional",
-        data: formData,
-      };
-
-      let res;
-      if (resumeId) {
-        await axios.put(
-          `http://localhost:5000/api/resume/${resumeId}`,
-          payload,
-          { withCredentials: true },
-        );
-      } else {
-        res = await axios.post("http://localhost:5000/api/resume", payload, {
-          withCredentials: true,
-        });
-        setResumeId(res.data?._id);
-      }
-      toast.success("Resume saved successfully!");
-    } catch (error) {
-      console.error("Error saving resume:", error);
-      toast.error("Failed to save resume");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   /* -------------------- HELPERS -------------------- */
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -173,8 +128,6 @@ const CVBuilder = () => {
 
   /* ---------- STEP NAVIGATION ---------- */
   const currentIndex = sections.indexOf(activeSection);
-
-  const progressPercent = ((currentIndex + 1) / sections.length) * 100;
 
   const goNext = () => {
     if (currentIndex < sections.length - 1) {
@@ -206,7 +159,7 @@ const CVBuilder = () => {
         return <SkillsForm formData={formData} setFormData={setFormData} />;
       case "projects":
         return <ProjectsForm formData={formData} setFormData={setFormData} />;
-      case "certifications":
+      case "certs":
         return (
           <CertificationsForm formData={formData} setFormData={setFormData} />
         );
@@ -217,100 +170,114 @@ const CVBuilder = () => {
 
   // --------
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
       <UserNavBar />
-
-      <div className="cv-builder-container w-full px-4 pb-4 pt-6">
-        {/* Main Header - Aligned with Panels */}
-        <div className="flex gap-6 mb-6 h-10">
-          <div className="flex-[0.33] flex items-center">
-            <h1 className="text-2xl font-['Outfit']">
-              Craft Your CV
-            </h1>
-          </div>
-          <div className="flex-[0.67] flex items-center justify-end">
-            <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                <Upload size={18} />
-                Upload
-              </button>
-              <button className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                <FileText size={18} />
-                Export
-              </button>
-            </div>
+      <div className="p-2.5 mt-4">
+        {/* main-header */}
+        <div className="flex justify-between items-start mb-5 p-2">
+          <h1 className="text-2xl font-['Outfit']">Create CV</h1>
+          <div className="flex gap-2">
+            {/* upload-btn &  export-btn */}
+            <button className="flex gap-2 py-2.5 px-5 text-white cursor-pointer bg-gradient-to-br from-blue-600 to-blue-700 border-0 rounded-lg text-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800">
+              <Upload size={18} />
+              Upload
+            </button>
+            <button className="flex gap-2 py-2.5 px-5 text-white cursor-pointer bg-gradient-to-br from-blue-600 to-blue-700 border-0 rounded-lg text-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800">
+              <Download size={18} /> Export
+            </button>
           </div>
         </div>
-        <div className="cv-builder-content">
-          {/* LEFT PANEL: EDITOR */}
-          {!isPreviewMaximized && (
-            <div className="cv-form-section ">
-              {/* Sticky Toolbar */}
-              <div className="cv-form-header">
-                {/* STEP HEADER */}
-                <div className=" h-full overflow-y-auto pl-0.5 overflow-hidden flex-1">
-                  <FormTabs
-                    activeSection={activeSection}
-                    setActiveSection={setActiveSection}
-                  />
-                </div>
+        {/* main-tabs */}
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1.5 mb-4 w-fit">
+          <button
+            className={`py-1 px-2.5 rounded-lg mr-1 ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""}`}
+            onClick={() => setActiveTab("builder")}
+          >
+            Builder
+          </button>
+          <button
+            className={`py-1 px-2.5 rounded-lg ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""}`}
+            onClick={() => setActiveTab("templates")}
+          >
+            Templates
+          </button>
+        </div>
+
+        {/* ALERT */}
+        {activeTab === "builder" && (
+          <div className="flex items-center w-full gap-3 p-4 bg-amber-50 border border-amber-200 rounded-[10px] mb-5">
+            <AlertTriangle size={20} />
+            <div>
+              <strong className="block text-sm text-amber-800 mb-0.5">
+                Complete Your CV
+              </strong>
+              <p className="text-sm text-yellow-700 m-0">
+                Fill in all sections to create a professional CV
+              </p>
+            </div>
+            <div className="flex gap-2 ml-auto flex-wrap">
+              <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800">
+                Personal Info
+              </span>
+              <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800">
+                Experience
+              </span>
+              <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">
+                Skills
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* BUILDER + PREVIEW */}
+        {activeTab === "builder" && (
+          <div
+            className={`grid grid-cols-[32%_68%] gap-14 p-1.5 ml-2 mr-2 ${isPreviewMaximized ? "grid-cols-[0_100%]" : ""}`}
+          >
+            {/* builder-section */}
+            <div className="bg-white rounded-xl h-full overflow-y-auto pl-0.5 overflow-hidden flex-1">
+              <FormTabs
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
+              {/* form-content */}
+              <div className="w-full h-[72%] mt-5 overflow-auto cv-form-content-scrollable">
+                {renderFormContent()}
               </div>
-
-              {/* Scrollable Form Area */}
-              <div className="cv-form-container" ref={formContainerRef}>
-                <div className="max-w-2xl mx-auto">
-                  {/* <h2 className="text-2xl font-bold text-slate-800 mb-1">
-                    {activeSection === "personal"
-                      ? "Personal Information"
-                      : activeSection === "work"
-                        ? "Work Experience"
-                        : activeSection === "education"
-                          ? "Education"
-                          : activeSection === "skills"
-                            ? "Skills & Interests"
-                            : activeSection === "projects"
-                              ? "Projects"
-                              : activeSection === "certifications"
-                                ? "Certifications"
-                                : activeSection.charAt(0).toUpperCase() +
-                                  activeSection.slice(1)}
-                  </h2> */}
-                  
-
-                  {renderFormContent()}
-                   <div className="flex justify-between mt-6 px-6 pb-6">
+              {/* Previous & Next */}
+              <div className="w-full flex items-center justify-between mt-10">
                 <button
                   onClick={goPrevious}
                   disabled={currentIndex === 0}
-                  className="px-5 py-2 rounded-lg bg-slate-200 text-slate-700 disabled:opacity-40"
+                  className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
-                  ← Previous
+                  <ArrowLeft size={18} />
+                  <span>Previous</span>
                 </button>
-
                 <button
                   onClick={goNext}
                   disabled={currentIndex === sections.length - 1}
-                  className="px-5 py-2 rounded-lg bg-black text-white disabled:opacity-40"
+                  className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
-                  Next →
+                  <span>Next</span>
+                  <ArrowRight size={18} />
                 </button>
               </div>
-                </div>
-              </div>
-              {/* Previous / Next Buttons */}
-
-             
             </div>
-          )}
-          {/* RIGHT PANEL: PREVIEW */}
-          <CVPreview
-            formData={formData}
-            isMaximized={isPreviewMaximized}
-            onToggleMaximize={() => setIsPreviewMaximized(!isPreviewMaximized)}
-          />
-        </div>
+
+            {!isPreviewHidden && (
+              <CVPreview
+                formData={formData}
+                isMaximized={isPreviewMaximized}
+                onToggleMaximize={() => setIsPreviewMaximized(!isPreviewMaximized)}
+                onMinimize={() => setIsPreviewHidden(true)}
+              />
+            )}
+          </div>
+        )}
+        <div className="w-full h-4"></div>
       </div>
-    </div>
+    </>
   );
 };
 
