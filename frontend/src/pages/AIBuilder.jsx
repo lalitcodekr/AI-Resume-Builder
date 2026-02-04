@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
+import AiBuilder from "../assets/AiBuilder.png";
 
 // ✅ Scroll animation hook
 const useInView = (threshold = 0.15) => {
@@ -69,7 +70,7 @@ const AIBuilderFeature = () => {
       {/* HERO */}
       <section
         ref={heroRef}
-        className="relative px-6 pt-10 pb-20 overflow-hidden bg-white"
+        className="relative px-6 pt-10 pb-12 overflow-hidden bg-white"
       >
         {/* Brand Theme Blurs */}
         <div className="absolute rounded-full -top-24 -left-24 w-72 h-72 bg-blue-50 blur-3xl opacity-60" />
@@ -126,41 +127,23 @@ const AIBuilderFeature = () => {
             </button>
           </div>
 
-          <div
-            className={`relative transition-all duration-700 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-          >
-            <div className="p-8 bg-white border border-gray-100 shadow-2xl rounded-[2.5rem]">
-              <div className="mb-6">
-                <div className="mb-2 text-xs font-black tracking-widest text-gray-400 uppercase">Before AI:</div>
-                <div className="p-4 font-medium text-gray-500 rounded-xl bg-gray-50">
-                  "Managed team projects"
-                </div>
-              </div>
+            <div
+              className={`relative transition-all duration-700 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+            >
+              <img
+                src={AiBuilder}
+                alt="ATS Score Analysis"
+                className="w-full h-auto object-contain drop-shadow-2xl"
+              />
 
-              <div className="flex justify-center mb-6">
-                <div className="p-3 rounded-full bg-blue-50">
-                   <Sparkles size={32} className="text-[#0077cc]" />
-                </div>
-              </div>
-
-              <div>
-                <div className="mb-2 text-xs font-black text-[#0077cc] uppercase tracking-widest">
-                  After AI Enhancement:
-                </div>
-                <div className="p-4 text-[#1a2e52] border border-blue-100 rounded-xl bg-[#f0f7ff] font-bold leading-relaxed">
-                  "Led cross-functional team of 8 members to deliver 5 high-impact projects,
-                  resulting in <span className="text-[#0077cc]">30% efficiency improvement</span> and $200K cost savings"
-                </div>
-              </div>
             </div>
-          </div>
 
         </div>
       </section>
 
       {/* WHAT IS AI BUILDER */}
-      <section ref={whatRef} className="px-6 py-20 bg-white">
+      <section ref={whatRef} className="px-6 py-12 bg-white">
         <div
           className={`max-w-5xl mx-auto transition-all duration-700 ${whatVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
@@ -186,7 +169,7 @@ const AIBuilderFeature = () => {
       </section>
 
       {/* WHY USE AI BUILDER */}
-      <section ref={whyRef} className="px-6 py-20 bg-gray-50/50">
+      <section ref={whyRef} className="px-6 py-12 bg-gray-50/50">
         <div
           className={`max-w-6xl mx-auto transition-all duration-700 ${whyVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
@@ -239,16 +222,16 @@ const AIBuilderFeature = () => {
       </section>
 
       {/* WHAT AI DOES */}
-<section ref={whatAiRef} className="px-6 py-20 bg-white">
-  <div
-    className={`max-w-6xl mx-auto transition-all duration-700 ${whatAiVisible
-      ? "opacity-100 translate-y-0"
-      : "opacity-0 translate-y-8"
-      }`}
-  >
-    <h2 className="mb-16 text-4xl font-black text-center text-[#1a2e52] font-jakarta">
-      What Our AI Resume Builder Does
-    </h2>
+      <section ref={whatAiRef} className="px-6 py-12 bg-white">
+        <div
+          className={`max-w-6xl mx-auto transition-all duration-700 ${whatAiVisible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-8"
+            }`}
+        >
+          <h2 className="mb-16 text-4xl font-black text-center text-[#1a2e52] font-jakarta">
+            What Our AI Resume Builder Does
+          </h2>
 
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {[

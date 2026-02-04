@@ -14,13 +14,13 @@ export default function UserNavbar() {
   ];
 
   return (
-    <header className="flex items-center justify-between px-6 h-16 bg-white border-b border-gray-200">
+    <header className="fixed top-0 left-0 right-0 flex items-center justify-between px-6 h-16 bg-white border-b border-gray-200 md:z-50">
       {/* Logo */}
       <img
         src={UptoSkillsLogo}
         alt="UptoSkills"
         onClick={() => navigate("/")}
-        className="w-40 h-10 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+        className="w-40 h-10 ml-8 object-contain cursor-pointer hover:opacity-90 transition-opacity"
       />
 
       {/* Right actions */}

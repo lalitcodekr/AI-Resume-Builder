@@ -1,18 +1,15 @@
-import React, { useState } from "react";
-import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   FileText,
   FileUser,
   FilePen,
   CheckCircle,
-  FileStack,
   Files,
   Download,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   Menu,
   X,
 } from "lucide-react";
@@ -21,19 +18,71 @@ import "./UserSidebar.css";
 export default function UserSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    setIsCollapsed(!isMobile);
+  }, [isMobile]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Run once on mount
+    handleResize();
+
+    // Listen for resize
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const menuItems = [
-    { id: "dashboard", icon: LayoutDashboard, label: "Dashboard", path: "/user/dashboard" },
-    { id: "resume", icon: FileText, label: "AI Resume Builder", path: "/user/resume-builder" },
+    {
+      id: "dashboard",
+      icon: LayoutDashboard,
+      label: "Dashboard",
+      path: "/user/dashboard",
+    },
+    {
+      id: "resume",
+      icon: FileText,
+      label: "AI Resume Builder",
+      path: "/user/resume-builder",
+    },
     { id: "cv", icon: FileUser, label: "CV", path: "/user/cv" },
-    { id: "coverletter", icon: FilePen, label: "Cover Letter", path: "/user/cover-letter" },
-    { id: "ats", icon: CheckCircle, label: "ATS Score Checker", path: "/user/ats-checker" },
+    {
+      id: "coverletter",
+      icon: FilePen,
+      label: "Cover Letter",
+      path: "/user/cover-letter",
+    },
+    {
+      id: "ats",
+      icon: CheckCircle,
+      label: "ATS Score Checker",
+      path: "/user/ats-checker",
+    },
 
-    { id: "myresumes", icon: Files, label: "My Resumes", path: "/user/my-resumes" },
-    { id: "downloads", icon: Download, label: "Downloads", path: "/user/downloads" },
+    {
+      id: "myresumes",
+      icon: Files,
+      label: "My Resumes",
+      path: "/user/my-resumes",
+    },
+    {
+      id: "downloads",
+      icon: Download,
+      label: "Downloads",
+      path: "/user/downloads",
+    },
   ];
 
   const handleNavigate = (path) => {
@@ -43,7 +92,7 @@ export default function UserSidebar() {
 
   const handleLogout = () => {
     // Clear all authentication data
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     localStorage.clear(); // Clear all localStorage to ensure clean logout
     setIsMobileOpen(false);
     // Navigate after ensuring localStorage is cleared
@@ -56,22 +105,27 @@ export default function UserSidebar() {
   return (
     <>
       {/* Toggle Buttons */}
-      <div className="fixed top-4 left-4 z-[60] flex gap-2">
-        <button onClick={() => setIsMobileOpen(!isMobileOpen)} className="md:hidden">
+      <div className="fixed md:top-4 top-5 md:left-4 left-2 z-[60] flex gap-2">
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="md:hidden"
+        >
           {isMobileOpen ? <X /> : <Menu />}
         </button>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:flex nav-item toggle"
+          className="fixed top-6 left-7 hidden md:flex"
         >
-          <div className="lines">
-            <span className="line"></span>
-            <span className="line"></span>
-            <span className="line"></span>
-          </div>
+          <Menu />
         </button>
       </div>
-
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 z-30 bg-black bg-opacity-50 transition-opacity duration-300 ${
+          isMobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setIsMobileOpen(false)}
+      ></div>
       {/* Sidebar */}
       <motion.aside
         className="fixed top-0 left-0 z-40 bg-white border-r border-slate-200 flex flex-col"
@@ -88,7 +142,10 @@ export default function UserSidebar() {
                 : location.pathname.startsWith(item.path);
 
             return (
-              <div key={item.id} className={`relative group ${index !== 0 ? "mt-[45px]" : ""}`}>
+              <div
+                key={item.id}
+                className={`relative group ${index !== 0 ? "mt-[45px]" : ""}`}
+              >
                 <button
                   onClick={() => handleNavigate(item.path)}
                   onMouseEnter={() => isCollapsed && setHoveredItem(item.id)}
@@ -98,13 +155,13 @@ export default function UserSidebar() {
                     ${active ? "bg-blue-50 text-blue-600 font-semibold" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
                 >
                   <Icon size={22} />
-                  {!isCollapsed && <span className="whitespace-nowrap">{item.label}</span>}
+                  {!isCollapsed && (
+                    <span className="whitespace-nowrap">{item.label}</span>
+                  )}
                 </button>
                 {/* Tooltip for collapsed state */}
                 {isCollapsed && hoveredItem === item.id && (
-                  <div className="tooltip">
-                    {item.label}
-                  </div>
+                  <div className="tooltip">{item.label}</div>
                 )}
               </div>
             );
@@ -125,15 +182,15 @@ export default function UserSidebar() {
           </button>
           {/* Tooltip for logout in collapsed state */}
           {isCollapsed && hoveredItem === "logout" && (
-            <div className="tooltip">
-              Logout
-            </div>
+            <div className="tooltip">Logout</div>
           )}
         </div>
       </motion.aside>
 
       {/* Right Panel (Navbar + Content) */}
-      <div className="transition-all duration-300" style={{ marginLeft: isCollapsed ? 80 : 256 }}>
+      <div
+        className={`transition-all duration-300 mt-16 ${isCollapsed ? "md:ml-[80px]" : "md:ml-[256px]"}`}
+      >
         <Outlet />
       </div>
     </>

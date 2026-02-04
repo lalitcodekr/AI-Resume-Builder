@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import hub from "../assets/resume-hub.png";
+import hub from "../assets/resume-hub1.png";
 
 const ResumeHubPage = () => {
   const navigate = useNavigate();
@@ -43,14 +43,14 @@ const ResumeHubPage = () => {
       <NavBar />
       
       {/* --- 1. HERO SECTION --- */}
-      <section className="relative pt-16 pb-20 overflow-hidden bg-white">
+<section className="relative pb-8 overflow-hidden bg-white">
         {/* Brand Decorative Blurs */}
         <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
 
         <div className="relative z-10 px-8 mx-auto max-w-7xl">
           {/* Back To Home Button */}
-          <div className="mb-10">
+          <div className="pt-10">
             <button
               onClick={handleBackHome}
               className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200"
@@ -60,7 +60,7 @@ const ResumeHubPage = () => {
             </button>
           </div>
 
-          <div className="flex flex-col items-center gap-16 lg:flex-row lg:text-left">
+          <div className="flex flex-col items-center gap-4 lg:flex-row lg:text-left -mt-12">
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full shadow-sm bg-blue-50">
                 <LayoutDashboard size={14} className="text-[#0077cc]" />
@@ -82,23 +82,25 @@ const ResumeHubPage = () => {
               </button>
             </div>
 
-            <div className="relative flex-1 w-full max-w-[550px] lg:max-w-[520px]">
-                <div className="relative p-2 bg-white border border-gray-100 shadow-2xl rounded-[40px]">
-                    <div className="overflow-hidden rounded-[32px] bg-slate-50">
-                        <img src={hub} alt="Hub" className="w-full h-auto" />
-                    </div>
-                    {/* Floating Badge */}
-                    <div className="absolute hidden p-4 bg-white border border-gray-100 shadow-xl -bottom-6 -right-6 rounded-2xl md:block animate-bounce" style={{ animationDuration: '5s' }}>
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-green-50"><BarChart3 className="text-green-600" size={20} /></div>
-                            <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase">Avg. AI Score</p>
-                                <p className="text-lg font-black text-[#1a2e52]">92%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div className="relative flex-1 flex justify-center lg:justify-end w-full">
+  <img
+    src={hub}
+    alt="Hub"
+    className="w-full max-w-[720px] lg:max-w-[850px] xl:max-w-[950px] h-auto drop-shadow-2xl"
+  />
+
+  {/* Floating Badge */}
+  <div className="absolute hidden md:flex items-center gap-3 p-4 bg-white border border-gray-100 shadow-xl rounded-2xl bottom-10 right-10 animate-bounce" style={{ animationDuration: '5s' }}>
+    <div className="p-2 rounded-lg bg-green-50">
+      <BarChart3 className="text-green-600" size={20} />
+    </div>
+    <div>
+      <p className="text-[10px] font-black text-gray-400 uppercase">Avg. AI Score</p>
+      <p className="text-lg font-black text-[#1a2e52]">92%</p>
+    </div>
+  </div>
+</div>
+
           </div>
         </div>
       </section>

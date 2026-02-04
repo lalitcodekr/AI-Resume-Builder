@@ -36,7 +36,7 @@ export default function FormTabs({ activeSection, setActiveSection }) {
                 <div
                   key={id}
                   onClick={() => setActiveSection(id)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all text-black select-none"
+                  className="flex items-center gap-2 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all text-black select-none md:px-4 px-2"
                 >
                   <Icon size={16} />
                   {label}
@@ -45,11 +45,11 @@ export default function FormTabs({ activeSection, setActiveSection }) {
             );
           })}
           {/* step progress */}
-          <div className="flex flex-col gap-2 items-center text-xs flex-wrap">
+          <div className="flex flex-col items-center text-xs flex-wrap md:gap-2 gap-1 md:ml-4 ml-2 md:mr-0 mr-2 w-24">
             {/* Steps */}
-            <div className="">step {currentIdx + 1} of step 6</div>
+            <div className="text-[0.67rem] md:text-xs">step {currentIdx + 1} of step 6</div>
             {/* Progress Bar */}
-            <div className="w-28 h-2 bg-slate-200 rounded-lg">
+            <div className="w-full h-2 bg-slate-200 rounded-lg">
               <div
                 className="h-full bg-blue-400 rounded-lg transition-all duration-200"
                 style={{ width: `${(currentIdx + 1) * 16.67}%` }}

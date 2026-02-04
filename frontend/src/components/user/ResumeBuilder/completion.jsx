@@ -1,46 +1,95 @@
-  // ResumeBuilder/completion.js
-
 export const getCompletionStatus = (formData) => {
   const missing = [];
 
   /* ---------- PERSONAL INFO ---------- */
-  if (
-    !formData?.fullname?.trim() ||
-    !formData?.email?.trim() ||
-    !formData?.phone?.trim()
-  ) {
-    missing.push("Personal Info");
-  }
+  const hasPersonalInfo =
+    formData?.fullName?.trim() &&
+    formData?.email?.trim() &&
+    formData?.linkedin?.trim() &&
+    formData?.location?.trim() &&
+    formData?.phone?.trim() &&
+    formData?.website?.trim() &&
+    formData?.summary?.trim();
+
+  if (!hasPersonalInfo) missing.push("Personal");
 
   /* ---------- EXPERIENCE ---------- */
   const hasValidExperience =
     Array.isArray(formData?.experience) &&
-    formData.experience.some(
-      (exp) => exp.title?.trim() && exp.company?.trim()
+    formData.experience.length > 0 &&
+    formData.experience.every(
+      (exp) =>
+        exp.title?.trim() &&
+        exp.company?.trim() &&
+        exp.description?.trim() &&
+        exp.startDate.trim() &&
+        exp.endDate.trim(),
     );
 
-  /* ---------- EDUCATION ---------- */
+  if (!hasValidExperience) {
+    missing.push("Work");
+  }
+
+  /* ----------  EDUCATION ---------- */
   const hasValidEducation =
     Array.isArray(formData?.education) &&
-    formData.education.some(
-      (edu) => edu.school?.trim() && edu.degree?.trim()
+    formData.education.length > 0 &&
+    formData.education.every(
+      (edu) =>
+        edu.school?.trim() &&
+        edu.degree?.trim() &&
+        edu.gpa?.trim() &&
+        edu.startDate?.trim() &&
+        edu.graduationDate?.trim(),
     );
 
-  if (!hasValidExperience && !hasValidEducation) {
-    missing.push("Experience / Education");
+  if (!hasValidEducation) {
+    missing.push("Education");
+  }
+
+  /* ---------- Project INFO ---------- */
+  const hasValidProject =
+    Array.isArray(formData?.projects) &&
+    formData.projects.length > 0 &&
+    formData.projects.every(
+      (project) =>
+        project.name?.trim() &&
+        project.description?.trim() &&
+        project.technologies?.trim() &&
+        (project.link?.github?.trim() ||
+          project.link?.liveLink?.trim() ||
+          project.link?.other?.trim()),
+    );
+
+  if (!hasValidProject) {
+    missing.push("Projects");
+  }
+
+  /* ---------- Certification INFO ---------- */
+  const hasValidCertificationInfo =
+    Array.isArray(formData?.certifications) &&
+    formData.certifications.length > 0 &&
+    formData.certifications.every(
+      (cert) =>
+        cert.name?.trim() &&
+        cert.issuer?.trim() &&
+        cert.date?.trim() &&
+        cert.link?.trim(),
+    );
+
+  if (!hasValidCertificationInfo) {
+    missing.push("Certifications");
   }
 
   /* ---------- SKILLS ---------- */
   const hasSkills =
-    Array.isArray(formData?.skills?.technical) &&
-    formData.skills.technical.length > 0;
+    (formData?.skills?.technical?.length ?? 0) > 0 ||
+    (formData?.skills?.soft?.length ?? 0) > 0;
 
-  if (!hasSkills) {
-    missing.push("Skills");
-  }
+  if (!hasSkills) missing.push("Skills");
 
   return {
     isComplete: missing.length === 0,
-    missingSections: missing,
+    missingSections: missing || [],
   };
 };

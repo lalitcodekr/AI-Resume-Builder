@@ -16,7 +16,7 @@ import {
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import scoreImg from "../assets/score.png";
+import score from "../assets/score1.png"; 
 
 const ScoreChecker = () => {
   const navigate = useNavigate();

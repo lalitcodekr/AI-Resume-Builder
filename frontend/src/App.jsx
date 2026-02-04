@@ -71,7 +71,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
           <Route path="/contact" element={<Contact />} />
-          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/HelpCenter" element={<HelpCenter />} />
           <Route path="/about" element={<About />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/blog" element={<BlogPage />} />
@@ -100,6 +100,7 @@ function App() {
           <Route path="/cover-letter" element={<AICoverLetterPage  />}/>
           <Route path="/cover-letter-examples" element={<CoverLetterExamples />} />
           <Route path="/cv" element={<CVFormattingPage  />}/>
+          <Route path="/WritingCoverLetter" element={<WritingCoverLetter />}/>
 
           {/* ================= USER DASHBOARD ROUTES ================= */}
           <Route path="/user/*" element={<RequireAuth><UserRoutes /></RequireAuth>} />

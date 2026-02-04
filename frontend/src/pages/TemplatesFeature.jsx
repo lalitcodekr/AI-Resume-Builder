@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle, Palette, Download } from "lucide-react";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import image from "../assets/TemplateFeature.jpeg";
+import image from "../assets/TemplateFeature2.png";
 
 // ✅ Scroll animation helper
 const useInView = (threshold = 0.15) => {
@@ -46,78 +46,76 @@ const TemplatesFeature = () => {
 
       {/* HERO */}
       <section
-        ref={heroRef}
-        className="relative px-6 pb-6 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50"
+  ref={heroRef}
+  className="relative px-6 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50"
+>
+  {/* Back To Home Button */}
+  <div className="absolute z-20 top-10 left-6">
+    <button
+      onClick={handleBackHome}
+      className="inline-flex items-center gap-3 text-sm font-bold text-blue-500 transition-all group hover:text-blue-800"
+    >
+      <i className="transition-transform fas fa-arrow-left group-hover:-translate-x-1"></i>
+      <span className="relative transition-transform duration-300 group-hover:scale-105">
+        Back to home
+      </span>
+    </button>
+  </div>
+
+  {/* Background blobs */}
+  <div className="absolute rounded-full -top-24 -left-24 w-72 h-72 bg-blue-200/30 blur-3xl animate-pulse" />
+  <div className="absolute rounded-full -bottom-24 -right-24 w-72 h-72 bg-indigo-200/30 blur-3xl animate-pulse" />
+
+  <div className="mx-auto max-w-7xl">
+    {/* HERO GRID */}
+    <div className="grid items-center min-h-[85vh] gap-12 pt-20 pb-16 lg:grid-cols-2">
+
+      {/* LEFT CONTENT */}
+      <div
+        className={`transition-all duration-700 ${
+          heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+        }`}
       >
-
-        {/* Back To Home Button (TOP LEFT fixed) */}
-        <div className="absolute z-20 top-10 left-6">
-          <button
-            onClick={handleBackHome}
-            className="inline-flex items-center gap-3 text-sm font-bold text-blue-500 transition-all group hover:text-blue-800"
-          >
-            <i className="transition-transform fas fa-arrow-left group-hover:-translate-x-1"></i>
-            <span className="relative transition-transform duration-300 group-hover:scale-105">
-              Back to home
-            </span>
-          </button>
+        <div className="inline-block px-5 py-2 mb-5 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
+          Professional Resume Templates
         </div>
 
-        {/* blobs */}
-        <div className="absolute rounded-full -top-24 -left-24 w-72 h-72 bg-blue-200/30 blur-3xl animate-pulse" />
-        <div className="absolute rounded-full -bottom-24 -right-24 w-72 h-72 bg-indigo-200/30 blur-3xl animate-pulse" />
+        <h1 className="mb-5 text-4xl font-black leading-tight text-gray-900 md:text-5xl lg:text-6xl">
+          Professional Resume <span className="text-blue-600">Templates</span>
+        </h1>
 
-        <div className="mx-auto max-w-7xl">
-          {/* Reduced top spacing & improved alignment */}
-          <div className="grid items-center gap-10 pt-6 lg:grid-cols-2 lg:pt-2">
+        <p className="max-w-xl mb-6 text-lg leading-relaxed text-gray-600 md:text-xl">
+          Choose from ATS-optimized templates designed by experts. Trusted by
+          100,000+ professionals worldwide.
+        </p>
 
-            {/* LEFT */}
-            <div
-              className={`transition-all duration-700 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-                }`}
-            >
-              <div className="inline-block px-5 py-2 mb-6 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
-                Professional Resume Templates
-              </div>
+        <p className="flex items-center gap-2 text-sm text-gray-500">
+          <CheckCircle size={16} className="text-green-600" />
+          100% free • No credit card required • ATS-optimized
+        </p>
+      </div>
 
-              <h1 className="mb-6 text-5xl font-black leading-tight text-gray-900 md:text-6xl">
-                Professional Resume <span className="text-blue-600">Templates</span>
-              </h1>
+      {/* RIGHT IMAGE */}
+      <div
+        className={`relative flex justify-center lg:justify-end transition-all duration-700 ${
+          heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        }`}
+      >
+        <img
+          src={image}
+          alt="Resume Templates Showcase"
+          className="w-full max-w-[620px] lg:max-w-[680px] drop-shadow-2xl"
+        />
+      </div>
 
-              <p className="max-w-xl mb-8 text-xl leading-relaxed text-gray-600">
-                Choose from ATS-optimized templates designed by experts. Trusted by
-                100,000+ professionals worldwide.
-              </p>
-
-              <p className="flex items-center gap-2 mt-4 text-sm text-gray-500">
-                <CheckCircle size={16} className="text-green-600" />
-                100% free • No credit card required • ATS-optimized
-              </p>
-            </div>
-
-            {/* RIGHT IMAGE */}
-            <div
-              className={`relative transition-all duration-700 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                }`}
-            >
-              <div className="relative flex justify-center lg:justify-end">
-                <img
-                  src={image}
-                  alt="Resume Templates Showcase"
-                  className="w-full max-w-[650px] drop-shadow-2xl"
-                />
-              </div>
-            </div>
-
-
-          </div>
-        </div>
-      </section>
+    </div>
+  </div>
+</section>
 
 
 
       {/* WHAT ARE TEMPLATES */}
-      <section ref={whatRef} className="px-6 py-20 bg-white">
+      <section ref={whatRef} className="px-6 py-12 bg-white">
         <div
           className={`max-w-5xl mx-auto transition-all duration-700 ${whatVisible
             ? "opacity-100 translate-y-0"
@@ -172,7 +170,7 @@ const TemplatesFeature = () => {
       </section>
 
       {/* FEATURES */}
-<section ref={featRef} className="px-6 py-20 bg-white">
+<section ref={featRef} className="px-6 py-8 bg-white">
   <div
     className={`max-w-6xl mx-auto transition-all duration-700 ${
       featVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"

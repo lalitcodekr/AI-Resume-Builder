@@ -1,6 +1,5 @@
 import React from 'react';
 import { FileText, Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, Mail, Phone, MapPin, Globe } from 'lucide-react';
-import '../Preview/LivePreview.css';
 
 const CVPreview = ({ formData = {}, isMaximized, onToggleMaximize, onMinimize }) => {
     const [zoom, setZoom] = React.useState(1);

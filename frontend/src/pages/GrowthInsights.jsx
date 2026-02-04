@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import growth from "../assets/growth.png";
+import growth from "../assets/growth1.png";
 
 const StrategicInsightsPage = () => {
   const navigate = useNavigate();
@@ -38,14 +38,14 @@ const StrategicInsightsPage = () => {
       <NavBar />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative px-8 pt-16 pb-20 overflow-hidden bg-white">
+      <section className="relative px-8 pt-12 pb-12 overflow-hidden bg-white">
         {/* Brand Decorative Blurs */}
         <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
 
         <div className="relative z-10 mx-auto max-w-7xl">
           {/* Back To Home Button */}
-          <div className="mb-10">
+          <div className="mb-8">
             <button
               onClick={handleBackHome}
               className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200"
@@ -55,7 +55,7 @@ const StrategicInsightsPage = () => {
             </button>
           </div>
 
-          <div className="grid items-center gap-16 lg:grid-cols-2">
+<div className="grid items-center gap-2 lg:gap-1 lg:grid-cols-2">
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full shadow-sm bg-blue-50">
                 <Cpu size={16} className="text-[#0077cc]" />
@@ -66,7 +66,7 @@ const StrategicInsightsPage = () => {
                 Know Your <br /><span className="text-[#0077cc]">Job Value.</span>
               </h1>
               
-              <p className="max-w-md mx-auto mb-12 text-xl font-medium text-gray-500 lg:mx-0">
+              <p className="max-w-md mx-auto mb-8 text-xl font-medium text-gray-500 lg:mx-0">
                 Paste your resume and let our AI analyze your profile to find the perfect job roles where you truly belong.
               </p>
 
@@ -80,31 +80,42 @@ const StrategicInsightsPage = () => {
               </button>
             </div>
 
-            <div className="relative w-full max-w-[550px] lg:max-w-[580px]">
-              <div className="relative p-2 bg-white border border-gray-100 shadow-2xl rounded-[2.5rem]">
-                <div className="overflow-hidden rounded-[2rem] bg-slate-50">
-                  <img src={growth} alt="Resume Analysis Dashboard" className="w-full h-auto" />
-                </div>
+<div className="relative w-full flex justify-center lg:justify-end">
+  
+  {/* Image Wrapper (important) */}
+  <div className="relative w-full max-w-[720px] lg:max-w-[850px] xl:max-w-[950px]">
+    <img
+      src={growth}
+      alt="Resume Analysis Dashboard"
+      className="w-full h-auto drop-shadow-2xl"
+    />
 
-                {/* Floating Badge 1 */}
-                <div className="absolute hidden p-4 bg-white border border-gray-100 shadow-xl -top-6 -left-8 rounded-2xl md:flex animate-bounce" style={{ animationDuration: '4s' }}>
-                  <div className="p-2 rounded-lg bg-green-50"><Target size={20} className="text-green-600" /></div>
-                  <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase">Role Match</p>
-                    <p className="text-lg font-black text-[#1a2e52]">High Impact</p>
-                  </div>
-                </div>
+    {/* Floating Badge 1 */}
+    <div className="absolute hidden md:flex items-center gap-3 p-4 bg-white border border-gray-100 shadow-xl rounded-2xl top-6 left-6 animate-bounce" style={{ animationDuration: '4s' }}>
+      <div className="p-2 rounded-lg bg-green-50">
+        <Target size={20} className="text-green-600" />
+      </div>
+      <div>
+        <p className="text-[10px] font-black text-gray-400 uppercase">Role Match</p>
+        <p className="text-lg font-black text-[#1a2e52]">High Impact</p>
+      </div>
+    </div>
 
-                {/* Floating Badge 2 */}
-                <div className="absolute -bottom-4 -right-6 bg-[#1a2e52] p-4 rounded-2xl shadow-2xl hidden md:flex items-center gap-3 hover:scale-105 transition-transform">
-                  <div className="p-2 rounded-lg bg-white/10"><Briefcase size={20} className="text-blue-400" /></div>
-                  <div>
-                    <p className="text-[10px] font-black text-blue-200/50 uppercase">Top Industry</p>
-                    <p className="text-lg font-black text-white">Target Found</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+    {/* Floating Badge 2 */}
+    <div className="absolute hidden md:flex items-center gap-3 bg-[#1a2e52] p-4 rounded-2xl shadow-2xl -bottom-12 -right-6 hover:scale-105 transition-transform">
+      <div className="p-2 rounded-lg bg-white/10">
+        <Briefcase size={20} className="text-blue-400" />
+      </div>
+      <div>
+        <p className="text-[10px] font-black text-blue-200/50 uppercase">Top Industry</p>
+        <p className="text-lg font-black text-white">Target Found</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
           </div>
         </div>
       </section>

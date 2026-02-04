@@ -14,6 +14,7 @@ import {
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
+import AiEnhancement from "../assets/AiEnhancement.png"
 
 const AIEnhancementPage = () => {
   const navigate = useNavigate();
@@ -27,74 +28,68 @@ const AIEnhancementPage = () => {
       <NavBar />
       
       {/* --- 1. HERO SECTION --- */}
-      <section className="relative px-8 pt-16 pb-20 overflow-hidden bg-white">
-        <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
-        
-        <div className="mx-auto max-w-7xl">
-          {/* Back To Home Button */}
-          <div className="mb-10">
-            <button
-              onClick={handleBackHome}
-              className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200"
-            >
-              <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
-              <span>Back to home</span>
-            </button>
-          </div>
+      <section className="relative px-6 overflow-hidden bg-white">
+  {/* Soft background glow */}
+  <div className="absolute top-0 right-0 w-[40%] h-[60%] bg-blue-50 rounded-full blur-[140px] -z-10 opacity-60" />
+  <div className="absolute bottom-0 left-0 w-[40%] h-[60%] bg-orange-50 rounded-full blur-[140px] -z-10 opacity-60" />
 
-          <div className="flex flex-col items-center gap-16 lg:flex-row lg:text-left">
-            <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-blue-50 group">
-                <Cpu size={16} className="text-[#0077cc]" />
-                <span className="text-xs font-bold tracking-widest text-[#0077cc] uppercase">Smart Content Optimization</span>
-              </div>
-              
-              <h1 className="mb-6 text-5xl font-black tracking-tight md:text-7xl lg:leading-[1.1] font-jakarta">
-                Turn Weak Points into <br /> 
-                <span className="text-[#0077cc]">Power Phrases.</span>
-              </h1>
-              
-              <p className="max-w-xl mx-auto mb-10 text-xl font-medium text-gray-500 lg:mx-0">
-                Our AI re-writes your boring job duties into metric-driven achievements that land more interviews instantly.
-              </p>
+  <div className="mx-auto max-w-7xl">
+    {/* Back Button */}
+    <div className="pt-10 mb-8">
+      <button
+        onClick={handleBackHome}
+        className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc]"
+      >
+        <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+        Back to home
+      </button>
+    </div>
 
-              <button 
-                onClick={() => navigate("/register")} 
-                className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-[0_10px_25px_rgba(230,81,0,0.3)] hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)] hover:-translate-y-1 active:scale-95 mx-auto lg:mx-0"
-              >
-                <span>Enhance My Content</span>
-                <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
-              </button>
-            </div>
+    {/* HERO GRID */}
+    <div className="grid items-center min-h-[80vh] gap-4 pb-16 lg:grid-cols-[1fr_1.2fr] xl:grid-cols-[1fr_1.4fr]">
 
-            {/* Right Side Image/Graphic Container */}
-            <div className="relative flex-1 w-full max-w-[500px]">
-               <div className="relative p-8 bg-white border border-gray-100 shadow-2xl rounded-[2.5rem]">
-                  <div className="space-y-6">
-                    <div className="p-4 border-l-4 border-gray-200 bg-gray-50 rounded-xl">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">BEFORE AI</p>
-                      <p className="text-sm font-medium text-gray-500">"I managed a sales team and met targets."</p>
-                    </div>
-                    
-                    <div className="flex justify-center">
-                       <div className="p-3 text-[#0077cc] bg-blue-50 rounded-full animate-pulse">
-                          <Sparkles size={24} />
-                       </div>
-                    </div>
-
-                    <div className="p-4 border-l-4 border-[#0077cc] bg-[#f0f7ff] rounded-xl">
-                      <p className="text-[10px] font-black text-[#0077cc] uppercase tracking-widest mb-1">AFTER AI ENHANCEMENT</p>
-                      <p className="text-sm font-bold text-[#1a2e52] leading-relaxed">
-                        "Led a team of 12 sales reps to exceed quarterly revenue targets by <span className="text-[#0077cc]">35% ($1.2M impact)</span>."
-                      </p>
-                    </div>
-                  </div>
-               </div>
-            </div>
-          </div>
+      {/* LEFT CONTENT */}
+      <div className="text-center lg:text-left">
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full bg-blue-50">
+          <Cpu size={16} className="text-[#0077cc]" />
+          <span className="text-xs font-bold tracking-widest text-[#0077cc] uppercase">
+            Smart Content Optimization
+          </span>
         </div>
-      </section>
+
+        <h1 className="mb-5 text-4xl font-black tracking-tight md:text-6xl lg:text-7xl leading-[1.1] font-jakarta">
+          Turn Weak Points into <br />
+          <span className="text-[#0077cc]">Power Phrases.</span>
+        </h1>
+
+        <p className="max-w-xl mx-auto mb-8 text-lg md:text-xl text-gray-500 lg:mx-0">
+          Our AI re-writes your boring job duties into metric-driven achievements that land more interviews instantly.
+        </p>
+
+        <button
+          onClick={() => navigate("/register")}
+          className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all"
+        >
+          Enhance My Content
+          <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+        </button>
+      </div>
+
+{/* RIGHT IMAGE */}
+<div className="flex justify-center lg:justify-end">
+  <img
+    src={AiEnhancement}
+    alt="AI Resume Content Enhancement"
+    className="w-full max-w-[820px] xl:max-w-[950px] drop-shadow-2xl"
+  />
+</div>
+
+
+
+    </div>
+  </div>
+</section>
+
 
       {/* --- 2. WHAT IS AI ENHANCEMENT (THEME BOX) --- */}
       <section className="px-8 py-20 bg-white font-['Outfit']">

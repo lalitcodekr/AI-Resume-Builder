@@ -153,15 +153,15 @@ const CoverLetterBuilder = ({ onSidebarToggle }) => {
       );
     }
 
-    if (activeTab === "preview") {
-      return (
-        <CoverLetterFullPreview
-          formData={formData}
-          selectedTemplate={selectedTemplate}
-          setActiveTab={setActiveTab}
-        />
-      );
-    }
+    // if (activeTab === "preview") {
+    //   return (
+    //     <CoverLetterFullPreview
+    //       formData={formData}
+    //       selectedTemplate={selectedTemplate}
+    //       setActiveTab={setActiveTab}
+    //     />
+    //   );
+    // }
 
     return (
       <>

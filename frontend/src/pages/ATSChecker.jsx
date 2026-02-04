@@ -15,7 +15,7 @@ import {
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import ATSChecker from "../assets/ATSChecker.jpeg";
+import ATSChecker from "../assets/ATSChecker1.png";
 
 /** ✅ helper: scroll animations */
 const useInView = (threshold = 0.15) => {

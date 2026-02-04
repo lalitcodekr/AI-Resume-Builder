@@ -16,7 +16,7 @@ import {
 import NavBar from "../components/NavBar";
 import Footer from "./Footer"
 import { useNavigate } from "react-router-dom";
-import cover from "../assets/cover.avif";
+import cover from "../assets/cover1.png";
 
 const SimpleCoverLetterPage = () => {
     const navigate = useNavigate();
@@ -29,14 +29,14 @@ const SimpleCoverLetterPage = () => {
     <div className="min-h-screen bg-white font-['Outfit'] text-[#1a2e52] selection:bg-blue-100 overflow-x-hidden">
       <NavBar />
       {/* --- 1. HERO SECTION --- */}
-      <section className="relative px-8 pt-16 pb-20 overflow-hidden bg-white">
+      <section className="relative px-8 pt-4 pb-12 overflow-hidden bg-white">
         {/* Brand Decorative Blurs */}
         <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
 
         <div className="relative z-10 mx-auto max-w-7xl">
           {/* Back To Home Button */}
-          <div className="mb-10">
+          <div className="pt-2 pb-6">
             <button
               onClick={handleBackHome}
               className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200"
@@ -72,9 +72,8 @@ const SimpleCoverLetterPage = () => {
             </div>
 
             <div className="relative flex-1 w-full max-w-[550px]">
-                <div className="relative p-2 bg-white border border-gray-100 rounded-[2.5rem] shadow-2xl overflow-hidden">
                     <img src={cover} alt="AI Cover Letter Preview" className="w-full h-auto rounded-[2rem]" />
-                </div>
+
             </div>
           </div>
         </div>
