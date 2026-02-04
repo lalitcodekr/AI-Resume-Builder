@@ -91,11 +91,15 @@ export const updateUser = async (req, res) => {
     user.username = username || user.username;
     user.email = email || user.email;
     if (typeof isAdmin === "boolean") user.isAdmin = isAdmin;
-    if (typeof isActive === "boolean") user.isActive = isActive;
+    if (typeof isActive === "boolean") {
+      console.log(`Updating user ${user.email} isActive from ${user.isActive} to ${isActive}`);
+      user.isActive = isActive;
+    }
     if (req.body.createdAt) user.createdAt = req.body.createdAt;
     if (req.body.plan) user.plan = req.body.plan;
 
     await user.save();
+    console.log(`User ${user.email} updated - isActive is now: ${user.isActive}`);
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong", error: error.message });
