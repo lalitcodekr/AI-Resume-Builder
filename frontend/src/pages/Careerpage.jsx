@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import Footer from "./Footer";
-import career from "../assets/career.jpeg"
+import career from "../assets/careers.png"
 
 const CareersPage = () => {
   const [activeFilter, setActiveFilter] = useState('All Roles');
@@ -96,7 +96,7 @@ const CareersPage = () => {
       <NavBar />
 
       {/* --- HERO SECTION --- */}
-<section className="relative px-8 pt-32 pb-24 overflow-hidden bg-white">
+<section className="relative px-8 pt-6 pb-24 overflow-hidden bg-white">
   {/* Soft Background Decorative Blurs */}
   <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
   <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
@@ -132,16 +132,12 @@ const CareersPage = () => {
 
       {/* RIGHT CONTENT: Career Image */}
       <div className="relative flex-1 w-full max-w-[600px] group">
-        {/* Decorative element behind image */}
-        <div className="absolute -inset-4 bg-blue-100/30 rounded-[3rem] blur-2xl" />
-        
-        <div className="relative overflow-hidden rounded-[2.5rem] border-[8px] border-white shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+        {/* Decorative element behind image */}        
           <img 
             src={career} 
             alt="UptoSkills Career" 
             className="object-cover w-full h-auto"
           />
-        </div>
         
         {/* Small floating badge on image */}
         <div className="absolute flex items-center gap-3 p-4 bg-white shadow-xl -bottom-6 -left-6 rounded-2xl animate-bounce">

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Lady from "../assets/StepsLady.png"
 import {
   ArrowRight,
   CheckCircle,
@@ -15,7 +16,6 @@ import {
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import ATSChecker from "../assets/ATSChecker1.png";
 
 /** ✅ helper: scroll animations */
 const useInView = (threshold = 0.15) => {
@@ -222,12 +222,27 @@ const ATSCheckerFeature = () => {
               </div>
             </div>
 
-            {/* RIGHT: Chart Card */}
-            <div className={`relative transition-all duration-700 delay-100 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-              <div className="max-w-md mx-auto lg:mr-0">
-                <ATSDonutCard score={82} />
-              </div>
-            </div>
+
+{/* RIGHT: Chart Card + Character */}
+<div
+  className={`relative transition-all duration-700 delay-100 ${
+    heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+  }`}
+>
+  <div className="relative max-w-md mx-auto lg:mr-0">
+
+    {/* Character Placeholder (LEFT of card) */}
+    <img
+      src={Lady}
+      alt="Character pointing to ATS score"
+      className="hidden lg:block absolute left-[-13rem] bottom-0 w-100 xl:w-48 2xl:w-56 object-contain"
+    />
+
+    {/* Score Card */}
+    <ATSDonutCard score={82} />
+  </div>
+</div>
+
           </div>
         </div>
       </section>

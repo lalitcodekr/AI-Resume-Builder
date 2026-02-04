@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Eye, Download, ArrowRight, Sparkles, Briefcase, TrendingUp, ShieldCheck, BarChart3, LayoutTemplate } from 'lucide-react';
 import NavBar from '../components/NavBar';
 import Footer from "./Footer";
-import example from "../assets/resumeExample.jpeg";
+import example from "../assets/resumeExample.png";
 import JessicaClaire from "../assets/template_thumnail/JessicaClaire.png";
 import JessicaClaire1 from "../assets/template_thumnail/JessicaClaire1.png";
 import JessicaClaire2 from "../assets/template_thumnail/JessicaClaire2.png";

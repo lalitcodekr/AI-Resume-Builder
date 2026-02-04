@@ -3,7 +3,7 @@ import { Search, FileText, Star, Sparkles, ChevronRight, PenTool, Eye } from 'lu
 import NavBar from '../components/NavBar';
 import Footer from "./Footer";
 import { Link, useNavigate } from 'react-router-dom';
-import HeroImage from '../assets/HeroImage.jpeg';
+import HeroImage from '../assets/HeroImage.png';
 import id1 from '../assets/id1.webp';
 import id2 from '../assets/id2.jpg';
 import id3 from '../assets/id3.jpg';
@@ -128,14 +128,14 @@ const CoverLetterExamples = () => {
             <NavBar />
 
             {/* ✅ HERO SECTION (Updated to match screenshot) */}
-            <section className="relative pt-40 pb-20 px-6 overflow-hidden bg-white">
+            <section className="relative pt-16 pb-20 px-12 pr-16 overflow-hidden bg-white">
                 {/* subtle background */}
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-50/50 to-transparent rounded-bl-[100px] pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-gradient-to-t from-orange-50/50 to-transparent rounded-tr-[100px] pointer-events-none" />
 
                 <div className="max-w-7xl mx-auto relative z-10">
                     {/* 2-column layout */}
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                    <div className="grid lg:grid-cols-2 gap-10 items-center">
                         {/* LEFT: text */}
                         <div className="text-center lg:text-left">
                             <div className="inline-flex items-center gap-2 px-6 py-2.5 mb-8 rounded-full bg-white border border-blue-100 shadow-sm transition-transform hover:scale-105 cursor-default">
@@ -163,21 +163,15 @@ const CoverLetterExamples = () => {
                         <div className="flex justify-center lg:justify-end">
                             <div className="relative w-full max-w-[450px] float-slow">
 
-                                {/* Outer Card */}
-                                <div className="rounded-[2.5rem] bg-white shadow-[0_35px_80px_rgba(15,35,70,0.18)] border border-gray-100
-                    transition-transform duration-500 ease-out
-                    hover:scale-[1.02] hover:-rotate-1">
-
                                     {/* Inner Frame */}
-                                    <div className="rounded-[2rem] bg-gradient-to-b from-slate-50 to-white border border-gray-100">
                                         <img
                                             src={HeroImage}
                                             alt="Cover Letter Hero"
                                             className="w-full h-auto object-contain rounded-[1.6rem]"
                                             draggable={false}
                                         />
-                                    </div>
-                                </div>
+
+                    
 
                                 {/* Decorative sparkle */}
                                 <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center shadow-sm animate-pulse">

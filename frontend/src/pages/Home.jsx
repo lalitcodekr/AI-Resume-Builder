@@ -2,13 +2,13 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import UpToSkillsImg from "../assets/UptoSkills.webp";
-import featureImage1 from "../assets/ai-assistant.png";
-import featureImage2 from "../assets/tailored-summary.png";
-import featureImage3 from "../assets/tailor-to-job.png";
-import featureImage4 from "../assets/resume-preview.png";
+import featureImage1 from "../assets/rejection.png";
+import featureImage2 from "../assets/advice2.png";
+import featureImage3 from "../assets/solve.png";
+import featureImage4 from "../assets/get.png";
 import quick from "../assets/customize1.png";
 import work2 from "../assets/analysis3.png";
-import work1 from "../assets/goodResume2.png";
+import work1 from "../assets/goodResume.png";
 import work4 from "../assets/oneClick1.png";
 import work5 from "../assets/win4.png";
 import template1 from "../assets/template_thumnail/JessicaClaire1.png";
@@ -289,11 +289,11 @@ function LandingPage() {
       ></div>
 
       {/* HERO SECTION - Reduced mobile padding */}
-      <section className="relative px-4 md:px-8 bg-white ml-2 md:ml-5 min-h-screen flex items-center pt-[100px] md:pt-[120px] lg:pt-0">
+      <section className="relative px-4 md:px-8 bg-white ml-2 md:ml-5 min-h-screen flex items-center pt-[100px] md:pt-[120px] lg:pt-0 -mt-12">
         <div className="absolute top-0 right-0 w-1/3 h-1/4 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
         <div className="absolute bottom-0 left-0 w-1/3 h-1/4 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
 
-        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
+        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-8 md:gap-6 items-center">
           <div className="flex flex-col gap-4 md:gap-8">
             <h1 className="text-3xl md:text-5xl font-bold leading-tight select-none lg:text-6xl font-jakarta">
               <span className="bg-gradient-to-r from-[#e65100] to-[#ff8f00] bg-clip-text text-transparent">
@@ -354,7 +354,7 @@ function LandingPage() {
                     className={`object-contain ${
                       template.name === "Tailored Summary" ||
                       template.name === "Tailor to Job"
-                        ? "w-[70%] h-[70%]"
+                        ? "w-[100%] h-[70%]"
                         : "w-full h-full"
                     }`}
                     onError={(e) => {

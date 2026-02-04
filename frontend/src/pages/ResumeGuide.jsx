@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import TemplateFeature from "../assets/writingResume.jpeg";
+import TemplateFeature from "../assets/LiveQuality.png";
 
 const ResumeGuide = () => {
   const navigate = useNavigate();
@@ -68,13 +68,12 @@ const ResumeGuide = () => {
       <NavBar />
 
       {/* --- 1. HERO SECTION (REDUCED SPACING) --- */}
-<section className="relative px-8 pt-8 pb-20 overflow-hidden bg-white"> {/* Changed pt-24 to pt-8 */}
+<section className="relative px-8 pt-4 pb-20 overflow-hidden bg-white"> {/* Changed pt-24 to pt-8 */}
   <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
   <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
   
   <div className="relative z-10 mx-auto max-w-7xl">
-    {/* Reduced mb-10 to mb-6 to tighten the gap between button and heading */}
-    <div className="mb-6"> 
+    <div className="mb-4"> 
       <button onClick={handleBackHome} className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200">
         <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
         <span>Back to home</span>
@@ -104,11 +103,8 @@ const ResumeGuide = () => {
       </div>
 
       <div className="relative flex-1 w-full max-w-[550px]">
-          <div className="relative p-2 bg-white border border-gray-100 rounded-[2.5rem] shadow-2xl">
-              <div className="overflow-hidden rounded-[2rem] bg-slate-50">
+          
                   <img src={TemplateFeature} alt="Resume Mastery" className="w-full h-auto" />
-              </div>
-          </div>
       </div>
     </div>
   </div>

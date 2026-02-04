@@ -16,7 +16,7 @@ import {
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
-import score from "../assets/score1.png"; 
+import write from "../assets/Live.png"; 
 
 const ScoreChecker = () => {
   const navigate = useNavigate();
@@ -79,27 +79,45 @@ const ScoreChecker = () => {
       <NavBar />
 
       {/* 1) HERO SECTION (Centered, distinct from ATS) */}
-      <section className="relative px-6 pt-16 pb-12 bg-white">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-orange-50 border border-orange-100 rounded-full">
-            <Activity size={14} className="text-[#e65100]" />
-            <span className="text-xs font-bold tracking-widest text-[#e65100] uppercase">
-              Live Quality Scoring
-            </span>
-          </div>
+      <section className="relative px-6 pt-8 pb-16 bg-white overflow-hidden">
+  <div className="mx-auto max-w-7xl">
+    <div className="grid items-center gap-12 lg:grid-cols-2">
 
-          <h1 className="mb-6 text-5xl font-black leading-tight tracking-tight md:text-7xl text-[#1a2e52]">
-            Write Better. <br />
-            <span className="text-transparent bg-gradient-to-r from-[#e65100] to-[#ff8f00] bg-clip-text">
-              Rank Higher.
-            </span>
-          </h1>
-
-          <p className="max-w-2xl mx-auto mb-10 text-xl font-light leading-relaxed text-gray-500">
-            See your resume score update in real-time as you type. Our AI highlights vague wording and suggests impactful improvements instantly.
-          </p>
+      {/* LEFT: TEXT */}
+      <div className="text-center lg:text-left">
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-orange-50 border border-orange-100 rounded-full">
+          <Activity size={14} className="text-[#e65100]" />
+          <span className="text-xs font-bold tracking-widest text-[#e65100] uppercase">
+            Live Quality Scoring
+          </span>
         </div>
-      </section>
+
+       <h1 className="mb-6 text-6xl font-black leading-tight tracking-tight sm:text-7xl md:text-8xl xl:text-[96px] text-[#1a2e52]">
+  Write Better. <br />
+  <span className="text-transparent bg-gradient-to-r from-[#e65100] to-[#ff8f00] bg-clip-text">
+    Rank Higher.
+  </span>
+</h1>
+
+
+        <p className="max-w-xl mx-auto mb-10 text-xl font-light leading-relaxed text-gray-500 lg:mx-0">
+          See your resume score update in real-time as you type. Our AI highlights vague wording and suggests impactful improvements instantly.
+        </p>
+      </div>
+
+      {/* RIGHT: IMAGE */}
+      <div className="relative flex justify-center lg:justify-end">
+        <img
+          src={write}
+          alt="Resume scoring illustration"
+          className="w-full max-w-md lg:max-w-lg xl:max-w-xl object-contain"
+        />
+      </div>
+
+    </div>
+  </div>
+</section>
+
 
       {/* 2) MAIN LIVE DEMO (Split Layout) */}
       <section className="px-6 py-10">
