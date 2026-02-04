@@ -61,7 +61,19 @@ export const login = async (req, res) => {
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
-      const token = genrateToken({ id: "admin-id", isAdmin: true }); // You can use any static ID
+      // Check if admin exists in database and is active
+      const adminUser = await User.findOne({ email: process.env.ADMIN_EMAIL, isAdmin: true });
+      
+      console.log(`Admin login attempt - Admin found: ${!!adminUser}, isActive: ${adminUser?.isActive}`);
+      
+      if (adminUser && adminUser.isActive === false) {
+        console.log(`Admin login blocked - Admin account is inactive`);
+        return res.status(403).json({ 
+          message: "Your admin account has been deactivated. Please contact the super administrator." 
+        });
+      }
+
+      const token = genrateToken({ id: adminUser?._id || "admin-id", isAdmin: true });
 
       // Set cookie for admin
       res.cookie("token", token, {
@@ -74,7 +86,7 @@ export const login = async (req, res) => {
 
       return res.status(200).json({
         token,
-        userID: "admin-id",
+        userID: adminUser?._id || "admin-id",
         isAdmin: true,
         message: "Admin login successful",
       });
@@ -86,9 +98,19 @@ export const login = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log(`Login attempt for user: ${user.email}, isActive: ${user.isActive}`);
+
     const isPassMatch = await bcrypt.compare(password, user.password);
     if (!isPassMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Check if user is active
+    if (user.isActive === false) {
+      console.log(`Login blocked - User ${user.email} is inactive`);
+      return res.status(403).json({ 
+        message: "Your account has been deactivated. Please contact the administrator." 
+      });
     }
 
     const token = genrateToken({ id: user._id, isAdmin: user.isAdmin });

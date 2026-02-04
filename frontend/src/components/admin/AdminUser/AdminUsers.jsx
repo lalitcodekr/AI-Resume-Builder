@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Pencil, Trash2, Check, X, AlertCircle } from "lucide-react";
+import { Pencil, Trash2, Check, X, AlertCircle, Search, Filter, UserCheck, Users, Crown, RefreshCw } from "lucide-react";
 import AdminNavbar from "../AdminNavBar/AdminNavBar";
 import axiosInstance from "../../../api/axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -118,12 +118,12 @@ export default function AdminUsers({ head = "Manage Users" }) {
         { isActive: newStatus }
       );
 
-      toast.success(`User ${newStatus ? 'activated' : 'deactivated'} successfully`);
+      toast.success(`${user.username || user.email} ${newStatus ? 'activated' : 'deactivated'} successfully`);
     } catch (err) {
       console.error(err);
       // Revert optimistic update
       setUsers(prev => prev.map(u => u._id === user._id ? { ...u, isActive: user.isActive } : u));
-      toast.error("Failed to update status");
+      toast.error(`Failed to update ${user.username || user.email}'s status`);
     }
   }
 
@@ -133,14 +133,17 @@ export default function AdminUsers({ head = "Manage Users" }) {
 
   const confirmDelete = async () => {
     if (!deleteConfirmId) return;
+    const userToDelete = users.find(u => u._id === deleteConfirmId);
+    const userName = userToDelete?.username || userToDelete?.email || "User";
+    
     try {
       await axiosInstance.delete(`/api/user/${deleteConfirmId}`);
       setUsers((prev) => prev.filter((u) => u._id !== deleteConfirmId));
       setDeleteConfirmId(null);
-      toast.success("User deleted successfully");
+      toast.success(`${userName} deleted successfully`);
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Failed to delete user");
+      toast.error(err.response?.data?.message || `Failed to delete ${userName}`);
     }
   };
 
@@ -160,80 +163,131 @@ export default function AdminUsers({ head = "Manage Users" }) {
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">{head}</h1>
 
-        {/* Search and Filter Box */}
-        <div className="mb-6 bg-white border rounded-xl shadow-sm p-6">
-          <div className="space-y-4">
-            {/* Filter Options */}
-            <div className="flex flex-wrap items-center gap-4">
-              {/* Role Filter */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-bold text-gray-700">Role</label>
+        {/* Modern Search and Filter Box */}
+        <div className="mb-6">
+          {/* Search Bar and Filters Row */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+            {/* Search Bar */}
+            <div className="flex-1 min-w-0">
+              <div className="relative group">
+                <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 group-hover:text-gray-500 transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 text-sm text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all placeholder:text-gray-400"
+                />
+              </div>
+            </div>
+
+            {/* Filter Pills/Cards */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {/* Role Filter */}
+            <div className="relative group">
+              <label className="absolute -top-2 left-3 px-2 text-xs font-medium text-gray-600 bg-white rounded z-10 group-hover:text-blue-600 transition-colors">
+                Role
+              </label>
+              <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 border-2 border-gray-200 rounded-xl bg-white hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                <UserCheck className="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
                 <select
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-sm"
+                  className="bg-transparent focus:outline-none text-sm font-medium text-gray-700 cursor-pointer pr-1 sm:pr-2"
                 >
-                  <option value="all">All</option>
+                  <option value="all">All Roles</option>
                   <option value="admin">Admin</option>
                   <option value="user">User</option>
                 </select>
               </div>
+            </div>
 
-              {/* Plan Filter */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-bold text-gray-700">Plan</label>
+            {/* Plan Filter */}
+            <div className="relative group">
+              <label className="absolute -top-2 left-3 px-2 text-xs font-medium text-gray-600 bg-white rounded z-10 group-hover:text-purple-600 transition-colors">
+                Plan
+              </label>
+              <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 border-2 border-gray-200 rounded-xl bg-white hover:border-purple-400 hover:bg-purple-50 transition-colors">
+                <Crown className="w-4 h-4 text-gray-500 group-hover:text-purple-600 transition-colors" />
                 <select
                   value={planFilter}
                   onChange={(e) => setPlanFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-sm"
+                  className="bg-transparent focus:outline-none text-sm font-medium text-gray-700 cursor-pointer pr-1 sm:pr-2"
                 >
-                  <option value="all">All</option>
+                  <option value="all">All Plans</option>
                   <option value="free">Free</option>
                   <option value="pro">Pro</option>
                 </select>
               </div>
+            </div>
 
-              {/* Status Filter */}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-bold text-gray-700">Status</label>
+            {/* Status Filter */}
+            <div className="relative group">
+              <label className="absolute -top-2 left-3 px-2 text-xs font-medium text-gray-600 bg-white rounded z-10 group-hover:text-green-600 transition-colors">
+                Status
+              </label>
+              <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 border-2 border-gray-200 rounded-xl bg-white hover:border-green-400 hover:bg-green-50 transition-colors">
+                <Users className="w-4 h-4 text-gray-500 group-hover:text-green-600 transition-colors" />
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-sm"
+                  className="bg-transparent focus:outline-none text-sm font-medium text-gray-700 cursor-pointer pr-1 sm:pr-2"
                 >
-                  <option value="all">All</option>
+                  <option value="all">All Status</option>
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
-
-              {/* Search Bar */}
-              <div className="flex-1 min-w-[250px]">
-                <input
-                  type="text"
-                  placeholder="Search users by name or email..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
-                />
-              </div>
-
-              {/* Clear Filters Button */}
-              {(roleFilter !== "all" || planFilter !== "all" || statusFilter !== "all" || search) && (
-                <button
-                  onClick={() => {
-                    setRoleFilter("all");
-                    setPlanFilter("all");
-                    setStatusFilter("all");
-                    setSearch("");
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
-                >
-                  Clear All
-                </button>
-              )}
             </div>
+
+            {/* Clear Filters Button */}
+            {(roleFilter !== "all" || planFilter !== "all" || statusFilter !== "all" || search) && (
+              <button
+                onClick={() => {
+                  setRoleFilter("all");
+                  setPlanFilter("all");
+                  setStatusFilter("all");
+                  setSearch("");
+                }}
+                className="flex items-center gap-2 px-4 sm:px-5 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span className="hidden sm:inline">Clear All</span>
+                <span className="sm:hidden">Clear</span>
+              </button>
+            )}
           </div>
+          </div>
+
+          {/* Active Filters Summary */}
+          {(roleFilter !== "all" || planFilter !== "all" || statusFilter !== "all" || search) && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-medium text-gray-500">Active filters:</span>
+                {roleFilter !== "all" && (
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                    Role: {roleFilter}
+                  </span>
+                )}
+                {planFilter !== "all" && (
+                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                    Plan: {planFilter}
+                  </span>
+                )}
+                {statusFilter !== "all" && (
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                    Status: {statusFilter}
+                  </span>
+                )}
+                {search && (
+                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium flex items-center gap-1">
+                    <Search className="w-3 h-3" />
+                    "{search}"
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
@@ -450,15 +504,18 @@ export default function AdminUsers({ head = "Manage Users" }) {
       )} */}
 
       {/* DELETE CONFIRMATION MODAL */}
-      {deleteConfirmId && (
+      {deleteConfirmId && (() => {
+        const userToDelete = users.find(u => u._id === deleteConfirmId);
+        const userName = userToDelete?.username || userToDelete?.email || "this user";
+        return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center transform transition-all">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600">
               <AlertCircle size={24} />
             </div>
-            <h2 className="text-xl font-bold mb-2 text-gray-800">Are you sure?</h2>
+            <h2 className="text-xl font-bold mb-2 text-gray-800">Delete {userName}?</h2>
             <p className="text-gray-500 mb-6">
-              Do you really want to delete this user? This process cannot be undone.
+              Are you sure you want to delete <span className="font-semibold text-gray-700">{userName}</span>? This action cannot be undone.
             </p>
             <div className="flex justify-center gap-3">
               <button
@@ -476,7 +533,8 @@ export default function AdminUsers({ head = "Manage Users" }) {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
