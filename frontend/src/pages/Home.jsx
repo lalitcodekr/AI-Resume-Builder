@@ -337,7 +337,8 @@ function LandingPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center">
+          {/* Image carousel - Hidden on mobile, visible on md and up */}
+          <div className="hidden md:flex items-center justify-center">
             <div className="w-full max-w-2xl relative h-[400px] md:h-[600px] lg:h-[700px]">
               {templates.map((template, idx) => (
                 <div
@@ -389,14 +390,11 @@ function LandingPage() {
                 }`}
               >
                 {/* IMAGE BOX */}
-
-
-                    <img
-                      src={step.image}
-                      alt={step.heading}
-                      className="w-1/2 h-full object-contain rounded-3xl transition-transform duration-500 "
-                    />
-
+                <img
+                  src={step.image}
+                  alt={step.heading}
+                  className="w-1/2 h-full object-contain rounded-3xl transition-transform duration-500"
+                />
 
                 {/* TEXT CONTENT */}
                 <div className="w-full space-y-3 md:space-y-6 md:w-1/2">

@@ -2,11 +2,24 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_DB_URL);
-    console.log("MongoDB connected");
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-    process.exit(1); // stop server if DB connection fails
+    // Support both environment variable names
+    const mongoURL =
+      process.env.MONGO_URI || process.env.MONGO_DB_URL;
+
+    if (!mongoURL) {
+      console.error("❌ MongoDB URL is missing in .env file");
+      return;
+    }
+
+    await mongoose.connect(mongoURL);
+    console.log("✅ MongoDB connected");
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message);
+
+    // Comment / uncomment based on your need
+    // process.exit(1); // stop server if DB fails (production)
+
+    console.log("⚠️ Server will continue without database connection");
   }
 };
 

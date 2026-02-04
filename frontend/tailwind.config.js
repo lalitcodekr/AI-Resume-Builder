@@ -21,6 +21,7 @@ export default {
       fontFamily: {
         outfit: ['Outfit', 'sans-serif'],
         space: ['Space Grotesk', 'sans-serif'],
+        sans: ['Inter', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
       },
       animation: {
         'marquee': 'marquee 28s linear infinite',

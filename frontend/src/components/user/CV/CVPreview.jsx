@@ -1,6 +1,5 @@
 import React from 'react';
 import { FileText, Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, Mail, Phone, MapPin, Globe } from 'lucide-react';
-import '../Preview/LivePreview.css';
 
 const CVPreview = ({ formData = {}, isMaximized, onToggleMaximize, onMinimize }) => {
     const [zoom, setZoom] = React.useState(1);
@@ -47,14 +46,14 @@ const CVPreview = ({ formData = {}, isMaximized, onToggleMaximize, onMinimize })
 
     const CVContent = () => {
         return (
-            <div className="mt-10 mb-4 w-[90%]">
+            <div className="w-full flex justify-center">
                 <div
-                    className="bg-white p-8 lg:p-12 text-slate-800 text-sm leading-relaxed relative shadow-lg"
+                    className="bg-white p-8 lg:p-12 text-slate-800 text-sm leading-relaxed relative shadow-lg w-[794px] min-h-[1123px]"
                     style={{
                         transform: `scale(${zoom})`,
                     }}
                 >
-                    <div className="w-[90%] max-w-[694px] min-h-screen">
+                    <div className="w-full">
                         <div className="pb-6">
                             {fullName && (
                                 <h1 className="text-3xl font-semibold text-gray-900 mb-1 tracking-tight">

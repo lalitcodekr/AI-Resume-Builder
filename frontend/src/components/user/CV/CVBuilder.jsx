@@ -11,6 +11,7 @@ import {
   Zap,
   FolderKanban,
   Award,
+ 
 } from "lucide-react";
 
 
@@ -113,13 +114,14 @@ const CVBuilder = () => {
     fetchResume();
   }, []);
   useEffect(() => {
-  if (formContainerRef.current) {
-    formContainerRef.current.scrollTo({
+    window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: "smooth"
     });
-  }
-}, [activeSection]);
+    if (formContainerRef.current) {
+      formContainerRef.current.scrollTop = 0;
+    }
+  }, [activeSection]);
 
   /* -------------------- HELPERS -------------------- */
   const handleInputChange = (field, value) => {
@@ -235,7 +237,7 @@ const CVBuilder = () => {
             className={`grid grid-cols-[32%_68%] gap-14 p-1.5 ml-2 mr-2 ${isPreviewMaximized ? "grid-cols-[0_100%]" : ""}`}
           >
             {/* builder-section */}
-            <div className="bg-white rounded-xl h-full overflow-y-auto pl-0.5 overflow-hidden flex-1">
+            <div className="bg-white rounded-xl h-full overflow-y-auto pl-0.5 overflow-hidden flex-1" ref={formContainerRef}>
               <FormTabs
                 activeSection={activeSection}
                 setActiveSection={setActiveSection}

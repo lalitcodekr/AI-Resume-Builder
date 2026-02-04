@@ -1,26 +1,94 @@
 import mongoose from "mongoose";
-import AtsScans from "../Models/atsScan.js";
-import Resume from "../Models/resume.js";
 
-// ✅ CORRECT: service (singular)
+// Models
+import Resume from "../Models/resume.js";
+import AtsScans from "../Models/atsScan.js";
+
+// AI Service
+import generateResumeAI from "../ai/aiService.js";
+
+// Resume Parsing Services
 import {
   parseResume,
   extractResumeData,
 } from "../service/ResumeParser.service.js";
 
+// ATS Analyzer Services
 import {
   analyzeATSCompatibility,
   generateRecommendations,
   passesATSThreshold,
 } from "../service/AtsAnalyzer.service.js";
 
+// File Storage Services
 import {
-  saveFileMetadata,
+  saveFileMetadata, // (kept for future use)
   deleteFile,
   getFile,
 } from "../service/FileStorage.service.js";
 
-/* ================= UPLOAD & ANALYZE RESUME ================= */
+/* =====================================================
+   SAVE NORMAL RESUME (Manual Save)
+===================================================== */
+export const saveResume = async (req, res) => {
+  try {
+    const resume = new Resume(req.body);
+    await resume.save();
+
+    res.json({
+      success: true,
+      message: "Resume saved to database",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+/* =====================================================
+   GENERATE AI RESUME + OPTIONAL SAVE TO DB
+===================================================== */
+export const generateAIResume = async (req, res) => {
+  try {
+    console.log("📥 AI Resume request received");
+
+    // 1. Generate AI summary
+    const aiText = await generateResumeAI(req.body);
+
+    console.log("✅ AI Summary generated");
+
+    // 2. Save to MongoDB (optional)
+    try {
+      const resume = new Resume({
+        ...req.body,
+        summary: aiText,
+      });
+      await resume.save();
+      console.log("💾 AI Resume saved to DB");
+    } catch (dbError) {
+      console.log("⚠️ DB save skipped (MongoDB not connected)");
+    }
+
+    // 3. Send response
+    res.json({
+      success: true,
+      message: "AI Resume generated successfully",
+      aiResume: aiText,
+    });
+  } catch (error) {
+    console.error("❌ AI ERROR:", error);
+    res.status(500).json({
+      success: false,
+      error: "AI generation failed: " + error.message,
+    });
+  }
+};
+
+/* =====================================================
+   UPLOAD & ANALYZE RESUME (ATS SCAN)
+===================================================== */
 export const uploadAndAnalyzeResume = async (req, res) => {
   try {
     if (!req.file) {
@@ -33,7 +101,7 @@ export const uploadAndAnalyzeResume = async (req, res) => {
     const userId = req.userId;
     const file = req.file;
 
-    // Parse resume - pass file object directly
+    // Parse resume
     const parseResult = await parseResume(file);
 
     if (!parseResult?.success || !parseResult?.text) {
@@ -54,7 +122,7 @@ export const uploadAndAnalyzeResume = async (req, res) => {
     const passes = passesATSThreshold(analysis.overallScore);
     const recommendations = generateRecommendations(analysis);
 
-    // Save scan
+    // Save ATS scan
     const atsScan = new AtsScans({
       userId,
       filename: file.filename,
@@ -91,7 +159,7 @@ export const uploadAndAnalyzeResume = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error uploading resume:", error);
+    console.error("❌ Resume upload error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to upload and analyze resume",
@@ -100,7 +168,9 @@ export const uploadAndAnalyzeResume = async (req, res) => {
   }
 };
 
-/* ================= GET ALL USER SCANS ================= */
+/* =====================================================
+   GET ALL USER SCANS
+===================================================== */
 export const getUserScans = async (req, res) => {
   try {
     const scans = await AtsScans.find({ userId: req.userId })
@@ -123,7 +193,9 @@ export const getUserScans = async (req, res) => {
   }
 };
 
-/* ================= GET SCAN BY ID ================= */
+/* =====================================================
+   GET SCAN BY ID
+===================================================== */
 export const getScanById = async (req, res) => {
   try {
     const scan = await AtsScans.findOne({
@@ -151,7 +223,9 @@ export const getScanById = async (req, res) => {
   }
 };
 
-/* ================= DELETE SCAN ================= */
+/* =====================================================
+   DELETE SCAN
+===================================================== */
 export const deleteScan = async (req, res) => {
   try {
     const scan = await AtsScans.findOne({
@@ -182,7 +256,9 @@ export const deleteScan = async (req, res) => {
   }
 };
 
-/* ================= DOWNLOAD RESUME ================= */
+/* =====================================================
+   DOWNLOAD RESUME FILE
+===================================================== */
 export const downloadResume = async (req, res) => {
   try {
     const scan = await AtsScans.findOne({
@@ -221,7 +297,9 @@ export const downloadResume = async (req, res) => {
   }
 };
 
-/* ================= SCAN STATISTICS ================= */
+/* =====================================================
+   SCAN STATISTICS
+===================================================== */
 export const getScanStatistics = async (req, res) => {
   try {
     const userId = req.userId;

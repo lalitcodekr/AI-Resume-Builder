@@ -9,10 +9,10 @@ import {
   Phone,
   MapPin,
   Globe,
+  Eye,
 } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
-import { useState } from "react";
-import JessicaClaire from "../Templates/JessicaClaire";
+import { useEffect, useState } from "react";
 import { getTemplateComponent } from "../Templates/TemplateRegistry";
 
 function formatMonthYear(value) {
@@ -54,6 +54,27 @@ const LivePreview = ({
   onCollapse,
 }) => {
   const [zoom, setZoom] = useState(1);
+  const [isMobileView, setIsMobileView] = useState(false);
+
+  // This is to handle mobile preview toggle.
+  const [isMobilePreviewHidden, setIsMobilePreviewHidden] = useState(false);
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobileView(window.innerWidth <= 768);
+    };
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
+  useEffect(() => {
+    setIsMobilePreviewHidden(!isMobileView);
+  }, [isMobileView]);
+
+  function clamp() {
+    if (!isMobileView) return;
+    setIsMobilePreviewHidden((prev) => !prev);
+  }
 
   const zoomIn = () => setZoom((z) => Math.min(z + 0.1, 2));
   const zoomOut = () => setZoom((z) => Math.max(z - 0.1, 0.5));
@@ -74,11 +95,10 @@ const LivePreview = ({
     certifications = [],
   } = formData;
 
-
-  // ...
-
   const PreviewContent = () => {
-    const TemplateComponent = getTemplateComponent(currentTemplate?.id || currentTemplate);
+    const TemplateComponent = getTemplateComponent(
+      currentTemplate?.id || currentTemplate,
+    );
 
     if (TemplateComponent) {
       return <TemplateComponent data={formData} />;
@@ -91,6 +111,7 @@ const LivePreview = ({
           className="bg-white p-8 lg:p-12 text-slate-800 text-sm leading-relaxed relative shadow-lg"
           style={{
             transform: `scale(${zoom})`,
+            transformOrigin: "top center",
           }}
         >
           <div className="w-[90%] max-w-[694px] min-h-screen">
@@ -151,42 +172,42 @@ const LivePreview = ({
                 edu.graduationDate ||
                 edu.location,
             ) && (
-                <Section title="Education">
-                  {education.map(
-                    (edu) =>
-                      (edu?.degree ||
-                        edu?.startDate ||
-                        edu?.graduationDate ||
-                        edu?.school ||
-                        edu?.gpa) && (
-                        <div
-                          key={edu?.id}
-                          className="border-l-2 border-slate-200 pl-4 mb-2"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                            <h3 className="font-medium text-slate-900">
-                              {edu?.degree}
-                            </h3>
-                            {edu?.startDate && edu?.startDate && (
-                              <span className="text-sm text-slate-500">
-                                {formatMonthYear(edu?.startDate)} -{" "}
-                                {formatMonthYear(edu?.graduationDate)}
-                              </span>
-                            )}
-                          </div>
-
-                          <p className="text-sm text-slate-600">{edu?.school}</p>
-
-                          {edu?.gpa && (
-                            <p className="text-sm text-slate-500">
-                              GPA: {edu?.gpa} / 10.0
-                            </p>
+              <Section title="Education">
+                {education.map(
+                  (edu) =>
+                    (edu?.degree ||
+                      edu?.startDate ||
+                      edu?.graduationDate ||
+                      edu?.school ||
+                      edu?.gpa) && (
+                      <div
+                        key={edu?.id}
+                        className="border-l-2 border-slate-200 pl-4 mb-2"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                          <h3 className="font-medium text-slate-900">
+                            {edu?.degree}
+                          </h3>
+                          {edu?.startDate && edu?.graduationDate && (
+                            <span className="text-sm text-slate-500">
+                              {formatMonthYear(edu?.startDate)} -{" "}
+                              {formatMonthYear(edu?.graduationDate)}
+                            </span>
                           )}
                         </div>
-                      ),
-                  )}
-                </Section>
-              )}
+
+                        <p className="text-sm text-slate-600">{edu?.school}</p>
+
+                        {edu?.gpa && (
+                          <p className="text-sm text-slate-500">
+                            GPA: {edu?.gpa} / 10.0
+                          </p>
+                        )}
+                      </div>
+                    ),
+                )}
+              </Section>
+            )}
 
             {experience?.some(
               (exp) =>
@@ -197,39 +218,39 @@ const LivePreview = ({
                 exp.endDate ||
                 exp.location,
             ) && (
-                <Section title="Experience">
-                  {experience.map(
-                    (exp) =>
-                      (exp?.title ||
-                        exp?.company ||
-                        exp?.startDate ||
-                        exp?.endDate ||
-                        exp?.description) && (
-                        <div key={exp?.id}>
-                          <div className="mb-6">
-                            <div className="flex justify-between items-start mb-1">
-                              <div>
-                                <h3 className="text-sm font-semibold text-slate-900">
-                                  {exp?.title}
-                                </h3>
-                                <p className="text-xs text-slate-500">
-                                  {exp?.company}
-                                </p>
-                              </div>
-                              <span className="text-xs text-slate-500 whitespace-nowrap">
-                                {formatMonthYear(exp?.startDate)} -{" "}
-                                {!/[a-zA-Z]/.test(exp?.endDate)
-                                  ? formatMonthYear(exp?.endDate)
-                                  : exp?.endDate}
-                              </span>
+              <Section title="Experience">
+                {experience.map(
+                  (exp) =>
+                    (exp?.title ||
+                      exp?.company ||
+                      exp?.startDate ||
+                      exp?.endDate ||
+                      exp?.description) && (
+                      <div key={exp?.id}>
+                        <div className="mb-6">
+                          <div className="flex justify-between items-start mb-1">
+                            <div>
+                              <h3 className="text-sm font-semibold text-slate-900">
+                                {exp?.title}
+                              </h3>
+                              <p className="text-xs text-slate-500">
+                                {exp?.company}
+                              </p>
                             </div>
-                            <p className="mt-2 break-words">{exp.description}</p>
+                            <span className="text-xs text-slate-500 whitespace-nowrap">
+                              {formatMonthYear(exp?.startDate)} -{" "}
+                              {!/[a-zA-Z]/.test(exp?.endDate)
+                                ? formatMonthYear(exp?.endDate)
+                                : exp?.endDate}
+                            </span>
                           </div>
+                          <p className="mt-2 break-words">{exp.description}</p>
                         </div>
-                      ),
-                  )}
-                </Section>
-              )}
+                      </div>
+                    ),
+                )}
+              </Section>
+            )}
 
             {projects?.some(
               (project) =>
@@ -240,106 +261,106 @@ const LivePreview = ({
                 project?.link?.liveLink ||
                 project?.link?.other,
             ) && (
-                <Section title="Projects">
-                  {projects.map(
-                    (prj) =>
-                      (prj?.name ||
-                        prj?.link?.github ||
-                        prj?.link?.liveLink ||
-                        prj?.link?.other ||
-                        prj?.technologies ||
-                        prj?.description) && (
-                        <div key={prj?.id} className="space-y-4">
-                          {/* Project Item */}
-                          <div className="space-y-1">
-                            <div className="flex items-start justify-between gap-4">
-                              <h3 className="font-bold text-slate-900">
-                                {prj?.name}
-                              </h3>
+              <Section title="Projects">
+                {projects.map(
+                  (prj) =>
+                    (prj?.name ||
+                      prj?.link?.github ||
+                      prj?.link?.liveLink ||
+                      prj?.link?.other ||
+                      prj?.technologies ||
+                      prj?.description) && (
+                      <div key={prj?.id} className="space-y-4">
+                        {/* Project Item */}
+                        <div className="space-y-1">
+                          <div className="flex items-start justify-between gap-4">
+                            <h3 className="font-bold text-slate-900">
+                              {prj?.name}
+                            </h3>
 
-                              <div className="flex gap-2">
-                                {prj?.link?.github && (
-                                  <a
-                                    href={prj?.link?.github}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
-                                  >
-                                    GitHub
-                                  </a>
-                                )}
-                                {prj?.link?.liveLink && (
-                                  <a
-                                    href={prj?.link?.liveLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
-                                  >
-                                    Live
-                                  </a>
-                                )}
-                                {prj?.link?.other && (
-                                  <a
-                                    href={prj?.link?.other}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
-                                  >
-                                    Other
-                                  </a>
-                                )}
-                              </div>
+                            <div className="flex gap-2">
+                              {prj?.link?.github && (
+                                <a
+                                  href={prj?.link?.github}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
+                                >
+                                  GitHub
+                                </a>
+                              )}
+                              {prj?.link?.liveLink && (
+                                <a
+                                  href={prj?.link?.liveLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
+                                >
+                                  Live
+                                </a>
+                              )}
+                              {prj?.link?.other && (
+                                <a
+                                  href={prj?.link?.other}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
+                                >
+                                  Other
+                                </a>
+                              )}
                             </div>
-
-                            <p className="text-xs text-slate-600">
-                              {prj?.technologies}
-                            </p>
-
-                            <p className="text-sm text-slate-700 leading-relaxed">
-                              {prj?.description}
-                            </p>
                           </div>
+
+                          <p className="text-xs text-slate-600">
+                            {prj?.technologies}
+                          </p>
+
+                          <p className="text-sm text-slate-700 leading-relaxed">
+                            {prj?.description}
+                          </p>
                         </div>
-                      ),
-                  )}
-                </Section>
-              )}
+                      </div>
+                    ),
+                )}
+              </Section>
+            )}
 
             {certifications?.some(
               (cert) => cert.name || cert.issuer || cert.date || cert.link,
             ) && (
-                <Section title="Certifications">
-                  <section className="space-y-4">
-                    {certifications.map((cert) => (
-                      <div
-                        key={cert.id}
-                        className="flex items-start justify-between gap-4"
-                      >
-                        <div>
-                          <h3 className="text-sm font-medium text-slate-900">
-                            {cert.name}
-                          </h3>
+              <Section title="Certifications">
+                <section className="space-y-4">
+                  {certifications.map((cert) => (
+                    <div
+                      key={cert.id}
+                      className="flex items-start justify-between gap-4"
+                    >
+                      <div>
+                        <h3 className="text-sm font-medium text-slate-900">
+                          {cert.name}
+                        </h3>
 
-                          <p className="text-sm text-slate-600">{cert.issuer}</p>
+                        <p className="text-sm text-slate-600">{cert.issuer}</p>
 
-                          <p className="text-sm text-slate-500">{cert.date}</p>
-                        </div>
-
-                        {cert.link && (
-                          <a
-                            href={cert.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
-                          >
-                            Credential
-                          </a>
-                        )}
+                        <p className="text-sm text-slate-500">{cert.date}</p>
                       </div>
-                    ))}
-                  </section>
-                </Section>
-              )}
+
+                      {cert.link && (
+                        <a
+                          href={cert.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-slate-500 hover:text-slate-900 underline whitespace-nowrap"
+                        >
+                          Credential
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </section>
+              </Section>
+            )}
 
             {(skills?.technical.length !== 0 || skills?.soft.length !== 0) && (
               <Section title="Skills">
@@ -384,13 +405,20 @@ const LivePreview = ({
   /* FULLSCREEN MODE */
   if (isExpanded) {
     return (
-      <div className="fixed inset-0 z-[99] bg-black/40 flex items-center justify-center">
-        <div className="bg-slate-200 w-full h-full max-w-[80%] max-h-[95vh] rounded-xl shadow-lg flex flex-col">
+      <div className="fixed inset-0 z-[99] bg-black/40 backdrop-blur-md flex items-center justify-center">
+        <div className="bg-slate-200 w-full max-w-[90%] md:max-w-[70%] max-h-[95vh] rounded-xl shadow-lg flex flex-col">
           <div className="bg-white rounded-t-xl flex items-center justify-between px-4 py-4 border-b">
-            <h3 className="flex items-center gap-2 text-sm font-semibold">
-              <FileText size={16} /> Live Preview {currentTemplate?.name && <span className="text-slate-500 font-normal">- {currentTemplate.name}</span>}
-            </h3>
-
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <FileText size={16} />{" "}
+              <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 text-left">
+                <span className="font-normal text-xs md:text-sm">Live Preview</span>{" "}
+                {currentTemplate?.name && (
+                  <span className="text-slate-500 font-normal text-xs md:text-sm">
+                    - {currentTemplate.name}
+                  </span>
+                )}
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <button onClick={zoomOut}>
                 <ZoomOut size={16} />
@@ -415,7 +443,13 @@ const LivePreview = ({
             </div>
           </div>
           <div className="flex-1 overflow-auto">
-            <div className="w-full max-w-[694px] mx-auto pb-6">
+            <div
+              className="w-[90%] max-w-[694px] h-[500px] mx-auto m-6"
+              style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: "top center",
+              }}
+            >
               <PreviewContent />
             </div>
           </div>
@@ -427,16 +461,41 @@ const LivePreview = ({
   /* NORMAL MODE */
   return (
     <div className="w-[90%] border rounded-xl shadow-sm mr-4 m-2">
-      <div className="flex items-center justify-between px-4 py-3 border-b">
-        <h3 className="flex items-center gap-2 text-sm font-semibold">
-          <FileText size={16} /> Live Preview {currentTemplate?.name && <span className="text-slate-500 font-normal">- {currentTemplate.name}</span>}
-        </h3>
-        <button onClick={onExpand}>
-          <Maximize2 size={16} />
+      <div
+        className="flex items-center justify-between px-4 py-3 border-b"
+        onClick={clamp}
+      >
+        <div className="flex items-center gap-2 font-semibold md:text-sm text-xs select-none">
+          <FileText size={16} /> 
+          <span className="font-medium">Live Preview</span>
+          {" "}
+          {currentTemplate?.name && (
+            <span className="text-slate-500 font-normal">
+              - {currentTemplate.name}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onExpand();
+          }}
+        >
+          <Eye size={20} className="block md:hidden" />
+          <Maximize2 size={16} className="hidden md:block" />
         </button>
       </div>
 
-      <div className="overflow-auto flex justify-center p-4 rounded-b-xl bg-slate-200">
+      <div
+        className="md:overflow-auto overflow-y-hidden flex justify-center md:p-4 rounded-b-xl bg-slate-200  transition-all duration-300"
+        style={{
+          height: isMobilePreviewHidden
+            ? isMobileView
+              ? "500px"
+              : "auto"
+            : "0",
+        }}
+      >
         <PreviewContent />
       </div>
     </div>
