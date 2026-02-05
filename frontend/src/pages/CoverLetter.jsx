@@ -36,7 +36,7 @@ const SimpleCoverLetterPage = () => {
 
         <div className="relative z-10 mx-auto max-w-7xl">
           {/* Back To Home Button */}
-          <div className="pt-2 pb-6">
+          <div className="pt-20 pb-6">
             <button
               onClick={handleBackHome}
               className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200"

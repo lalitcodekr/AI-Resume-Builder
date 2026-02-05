@@ -79,7 +79,7 @@ const ScoreChecker = () => {
       <NavBar />
 
       {/* 1) HERO SECTION (Centered, distinct from ATS) */}
-      <section className="relative px-6 pt-8 pb-16 bg-white overflow-hidden">
+      <section className="relative px-6 pt-20 pb-16 bg-white overflow-hidden">
   <div className="mx-auto max-w-7xl">
     <div className="grid items-center gap-12 lg:grid-cols-2">
 

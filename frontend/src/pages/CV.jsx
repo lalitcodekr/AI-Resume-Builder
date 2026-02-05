@@ -36,7 +36,7 @@ const CVFormattingPage = () => {
         <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
 
-        <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="relative z-10 pt-10 mx-auto max-w-7xl">
           {/* Back To Home Button */}
           <div className="mb-8">
             <button

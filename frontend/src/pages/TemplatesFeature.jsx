@@ -50,7 +50,7 @@ const TemplatesFeature = () => {
   className="relative px-6 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50"
 >
   {/* Back To Home Button */}
-  <div className="absolute z-20 top-10 left-6">
+  <div className="absolute z-20 pt-4 top-10 left-6">
     <button
       onClick={handleBackHome}
       className="inline-flex items-center gap-3 text-sm font-bold text-blue-500 transition-all group hover:text-blue-800"
@@ -76,7 +76,7 @@ const TemplatesFeature = () => {
           heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        <div className="inline-block px-5 py-2 mb-5 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
+        <div className="inline-block pt-4 px-5 py-2 mb-5 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
           Professional Resume Templates
         </div>
 

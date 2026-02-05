@@ -50,17 +50,17 @@ const ResumeHubPage = () => {
 
         <div className="relative z-10 px-8 mx-auto max-w-7xl">
           {/* Back To Home Button */}
-          <div className="pt-10">
+          
             <button
               onClick={handleBackHome}
-              className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200"
+              className="group inline-flex items-center gap-2 pt-20 text-sm font-bold text-[#0077cc] transition-all duration-200"
             >
               <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
               <span>Back to home</span>
             </button>
-          </div>
+          
 
-          <div className="flex flex-col items-center gap-4 lg:flex-row lg:text-left -mt-12">
+          <div className="flex flex-col items-center gap-4 pt-16 lg:flex-row lg:text-left -mt-12">
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full shadow-sm bg-blue-50">
                 <LayoutDashboard size={14} className="text-[#0077cc]" />

@@ -70,7 +70,7 @@ const AIBuilderFeature = () => {
       {/* HERO */}
       <section
         ref={heroRef}
-        className="relative px-6 pt-10 pb-12 overflow-hidden bg-white"
+        className="relative px-6 pb-12 overflow-hidden bg-white"
       >
         {/* Brand Theme Blurs */}
         <div className="absolute rounded-full -top-24 -left-24 w-72 h-72 bg-blue-50 blur-3xl opacity-60" />
@@ -85,7 +85,7 @@ const AIBuilderFeature = () => {
             <div className="mb-10">
               <button
                 onClick={handleBackHome}
-                className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200 hover:text-[#1a2e52]"
+                className="group inline-flex items-center gap-2 pt-20 text-sm font-bold text-[#0077cc] transition-all duration-200 hover:text-[#1a2e52]"
               >
                 <ArrowLeft
                   size={16}
@@ -95,7 +95,7 @@ const AIBuilderFeature = () => {
               </button>
             </div>
 
-            <div className="inline-block px-4 py-2 bg-blue-50 text-[#0077cc] rounded-full text-sm font-bold mb-6">
+            <div className="inline-block px-4  py-2 bg-blue-50 text-[#0077cc] rounded-full text-sm font-bold mb-6">
               AI-Powered Resume Builder
             </div>
 

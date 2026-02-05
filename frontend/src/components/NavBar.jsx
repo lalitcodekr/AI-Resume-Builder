@@ -107,24 +107,37 @@ export default function NavBar() {
   return (
     <>
       {/* Desktop & Mobile NavBar */}
-      <nav className="sticky top-0 z-50 py-2 sm:py-3 md:py-4 bg-white/95 backdrop-blur-md border-b border-gray-100 select-none">
+      <nav className="fixed top-0 left-0 w-full z-30 py-2 sm:py-3 md:py-4 bg-white/95 backdrop-blur-md border-b border-gray-100 select-none">
         <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 flex items-center justify-between">
           {/* Mobile Menu Toggle - Now on LEFT */}
-          <button className="text-2xl md:hidden p-1 order-1" onClick={toggleMobileMenu}>
-            {mobileMenuOpen ? <X size={24} className="sm:w-7 sm:h-7" /> : <Menu size={24} className="sm:w-7 sm:h-7" />}
+          <button
+            className="text-2xl md:hidden p-1 order-1"
+            onClick={toggleMobileMenu}
+          >
+            {mobileMenuOpen ? (
+              <X size={24} className="sm:w-7 sm:h-7" />
+            ) : (
+              <Menu size={24} className="sm:w-7 sm:h-7" />
+            )}
           </button>
 
           {/* Logo - Now in CENTER on mobile */}
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="flex items-center gap-2 sm:gap-3 focus:outline-none flex-shrink-0 order-2 md:order-1"
             aria-label="Go to home"
           >
-            <img src={UpToSkillsImg} alt="UptoSkills Logo" className="w-24 sm:w-32 md:w-36 lg:w-[140px]" />
+            <img
+              src={UpToSkillsImg}
+              alt="UptoSkills Logo"
+              className="w-24 sm:w-32 md:w-36 lg:w-[140px]"
+            />
           </button>
 
           {/* Desktop Navigation */}
-          <div className={`flex-1 flex justify-center ${isLoggedIn ? "" : "ml-4 lg:ml-24"} hidden md:flex order-2`}>
+          <div
+            className={`flex-1 flex justify-center ${isLoggedIn ? "" : "ml-4 lg:ml-24"} hidden md:flex order-2`}
+          >
             <ul className="flex items-center gap-4 lg:gap-6 xl:gap-8 text-sm lg:text-base">
               <li className="cursor-pointer hover:text-orange-600 transition-colors">
                 <Link to="/about">About us</Link>
@@ -149,12 +162,20 @@ export default function NavBar() {
                       {features.slice(0, 5).map((feature) => {
                         const Icon = feature.icon;
                         return (
-                          <li key={feature.path} className={`px-3 lg:px-4 py-2 lg:py-3 ${feature.hoverClass} transition-colors duration-200`}>
+                          <li
+                            key={feature.path}
+                            className={`px-3 lg:px-4 py-2 lg:py-3 ${feature.hoverClass} transition-colors duration-200`}
+                          >
                             <Link
                               to={feature.path}
-                              className="flex items-center gap-2 lg:gap-3 text-gray-700">
-                              <Icon className={`${feature.colorClass} w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0`} />
-                              <span className="font-medium text-sm lg:text-base">{feature.name}</span>
+                              className="flex items-center gap-2 lg:gap-3 text-gray-700"
+                            >
+                              <Icon
+                                className={`${feature.colorClass} w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0`}
+                              />
+                              <span className="font-medium text-sm lg:text-base">
+                                {feature.name}
+                              </span>
                             </Link>
                           </li>
                         );
@@ -169,12 +190,20 @@ export default function NavBar() {
                       {features.slice(5, 10).map((feature) => {
                         const Icon = feature.icon;
                         return (
-                          <li key={feature.path} className={`px-3 lg:px-4 py-2 lg:py-3 ${feature.hoverClass} transition-colors duration-200`}>
+                          <li
+                            key={feature.path}
+                            className={`px-3 lg:px-4 py-2 lg:py-3 ${feature.hoverClass} transition-colors duration-200`}
+                          >
                             <Link
                               to={feature.path}
-                              className="flex items-center gap-2 lg:gap-3 text-gray-700">
-                              <Icon className={`${feature.colorClass} w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0`} />
-                              <span className="font-medium text-sm lg:text-base">{feature.name}</span>
+                              className="flex items-center gap-2 lg:gap-3 text-gray-700"
+                            >
+                              <Icon
+                                className={`${feature.colorClass} w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0`}
+                              />
+                              <span className="font-medium text-sm lg:text-base">
+                                {feature.name}
+                              </span>
                             </Link>
                           </li>
                         );
@@ -238,7 +267,7 @@ export default function NavBar() {
 
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={closeMobileMenu}
         />
@@ -247,14 +276,21 @@ export default function NavBar() {
       {/* Mobile Sidebar - Now slides from LEFT */}
       <div
         className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <img src={UpToSkillsImg} alt="UptoSkills Logo" className="w-[120px]" />
-            <button onClick={closeMobileMenu} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <img
+              src={UpToSkillsImg}
+              alt="UptoSkills Logo"
+              className="w-[120px]"
+            />
+            <button
+              onClick={closeMobileMenu}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
               <X size={24} />
             </button>
           </div>
@@ -263,13 +299,21 @@ export default function NavBar() {
           <div className="flex-1 overflow-y-auto">
             <ul className="py-4">
               <li className="px-6 py-3 hover:bg-gray-50 transition-colors">
-                <a href="/about" onClick={closeMobileMenu} className="block text-gray-700 font-medium">
+                <a
+                  href="/about"
+                  onClick={closeMobileMenu}
+                  className="block text-gray-700 font-medium"
+                >
                   About us
                 </a>
               </li>
 
               <li className="px-6 py-3 hover:bg-gray-50 transition-colors">
-                <a href="/#free-templates" onClick={closeMobileMenu} className="block text-gray-700 font-medium">
+                <a
+                  href="/#free-templates"
+                  onClick={closeMobileMenu}
+                  className="block text-gray-700 font-medium"
+                >
                   Templates
                 </a>
               </li>
@@ -281,15 +325,22 @@ export default function NavBar() {
                   className="w-full px-6 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
                   <span className="text-gray-700 font-medium">Features</span>
-                  <ChevronRight className={`w-5 h-5 transition-transform duration-200 ${featuresOpen ? 'rotate-90' : ''}`} />
+                  <ChevronRight
+                    className={`w-5 h-5 transition-transform duration-200 ${featuresOpen ? "rotate-90" : ""}`}
+                  />
                 </button>
-                
-                <div className={`overflow-hidden transition-all duration-300 ${featuresOpen ? 'max-h-[1000px]' : 'max-h-0'}`}>
+
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${featuresOpen ? "max-h-[1000px]" : "max-h-0"}`}
+                >
                   <ul className="bg-gray-50">
                     {features.map((feature) => {
                       const Icon = feature.icon;
                       return (
-                        <li key={feature.path} className="px-8 py-3 hover:bg-gray-100 transition-colors">
+                        <li
+                          key={feature.path}
+                          className="px-8 py-3 hover:bg-gray-100 transition-colors"
+                        >
                           <a
                             href={feature.path}
                             onClick={closeMobileMenu}
@@ -307,20 +358,32 @@ export default function NavBar() {
 
               {isLoggedIn && (
                 <li className="px-6 py-3 hover:bg-gray-50 transition-colors">
-                  <a href="/user/dashboard" onClick={closeMobileMenu} className="block text-gray-700 font-medium">
+                  <a
+                    href="/user/dashboard"
+                    onClick={closeMobileMenu}
+                    className="block text-gray-700 font-medium"
+                  >
                     Dashboard
                   </a>
                 </li>
               )}
 
               <li className="px-6 py-3 hover:bg-gray-50 transition-colors">
-                <a href="/pricing" onClick={closeMobileMenu} className="block text-gray-700 font-medium">
+                <a
+                  href="/pricing"
+                  onClick={closeMobileMenu}
+                  className="block text-gray-700 font-medium"
+                >
                   Pricing
                 </a>
               </li>
 
               <li className="px-6 py-3 hover:bg-gray-50 transition-colors">
-                <a href="/contact" onClick={closeMobileMenu} className="block text-gray-700 font-medium">
+                <a
+                  href="/contact"
+                  onClick={closeMobileMenu}
+                  className="block text-gray-700 font-medium"
+                >
                   Contact
                 </a>
               </li>
