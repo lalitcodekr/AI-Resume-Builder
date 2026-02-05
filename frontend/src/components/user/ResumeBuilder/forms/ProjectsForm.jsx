@@ -1,13 +1,13 @@
-import { Check, EditIcon, Trash2 } from "lucide-react";
+import { Check, EditIcon, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 const ProjectsForm = ({ formData, setFormData }) => {
   const [editingId, setEditingId] = useState(
-    formData?.projects?.[0]?.id || null
+    formData?.projects?.[0]?.id || null,
   );
 
   const addProject = () => {
-    const id = Date.now();
+    const id = crypto.randomUUID();
     setFormData((prev) => ({
       ...prev,
       projects: [
@@ -104,14 +104,14 @@ const ProjectsForm = ({ formData, setFormData }) => {
                   <label>Project Name *</label>
                   <input
                     type="text"
-                    placeholder="E-commerce Platform"
-                    value={project.name || ""}
                     className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={project.name || ""}
+                    placeholder="E-commerce Platform"
                     onChange={(e) => {
                       const updated = formData.projects.map((item) =>
                         item.id === project.id
                           ? { ...item, name: e.target.value }
-                          : item
+                          : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -125,14 +125,14 @@ const ProjectsForm = ({ formData, setFormData }) => {
                   <label>Technologies Used</label>
                   <input
                     type="text"
-                    placeholder="React, Node.js, MongoDB"
-                    value={project.technologies || ""}
                     className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={project.technologies || ""}
+                    placeholder="React, Node.js, MongoDB"
                     onChange={(e) => {
                       const updated = formData.projects.map((item) =>
                         item.id === project.id
                           ? { ...item, technologies: e.target.value }
-                          : item
+                          : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -145,14 +145,14 @@ const ProjectsForm = ({ formData, setFormData }) => {
                 <div className="flex flex-col gap-[6px] mb-[10px]">
                   <label>Description</label>
                   <textarea
-                    rows={3}
+                    className="h-28 px-2.5 py-2 border text-sm rounded border-1.5 resize-none focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
                     value={project.description || ""}
-                    className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    maxLength={500}
                     onChange={(e) => {
                       const updated = formData.projects.map((item) =>
                         item.id === project.id
                           ? { ...item, description: e.target.value }
-                          : item
+                          : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -160,14 +160,17 @@ const ProjectsForm = ({ formData, setFormData }) => {
                       }));
                     }}
                   />
+                  <span className="ml-2 text-xs text-slate-500">
+                    {project.description?.length || 0}/500 Characters
+                  </span>
                 </div>
 
                 <div className="flex flex-col gap-[6px] mb-[10px]">
                   <label>GitHub Link</label>
                   <input
                     type="text"
-                    value={project?.link?.github || ""}
                     className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={project?.link?.github || ""}
                     onChange={(e) => {
                       const updated = formData.projects.map((item) =>
                         item.id === project.id
@@ -178,7 +181,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
                                 github: e.target.value,
                               },
                             }
-                          : item
+                          : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -211,8 +214,8 @@ const ProjectsForm = ({ formData, setFormData }) => {
         </div>
       ))}
 
-      <button className="text-left" onClick={addProject}>
-        + Add Project
+      <button className="flex items-center text-left" onClick={addProject}>
+        <Plus size={14} className="mr-1 inline" /> Add Project
       </button>
     </div>
   );

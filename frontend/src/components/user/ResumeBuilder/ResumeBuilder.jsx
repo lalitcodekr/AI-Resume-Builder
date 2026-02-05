@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -35,58 +35,76 @@ import UserNavbar from "../UserNavBar/UserNavBar";
 
 const ResumeBuilder = ({ setActivePage = () => {} }) => {
   /* -------------------- CORE STATE -------------------- */
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    linkedin: "",
-    location: "",
-    phone: "",
-    summary: "",
-    website: "",
-    education: [
-      {
-        id: Date.now(),
-        school: "",
-        degree: "",
-        gpa: "",
-        startDate: "",
-        graduationDate: "",
-      },
-    ],
-    experience: [
-      {
-        id: Date.now(),
-        title: "",
-        company: "",
-        description: "",
-        startDate: "",
-        endDate: "",
-      },
-    ],
-    projects: [
-      {
-        id: Date.now(),
-        name: "",
-        description: "",
-        technologies: "",
-        link: {
-          github: "",
-          liveLink: "",
-          other: "",
+  const createDefaultFormData = () => {
+    return {
+      fullName: "",
+      email: "",
+      linkedin: "",
+      location: "",
+      phone: "",
+      summary: "",
+      website: "",
+      education: [
+        {
+          id: crypto.randomUUID(),
+          school: "",
+          degree: "",
+          gpa: "",
+          startDate: "",
+          graduationDate: "",
         },
-      },
-    ],
-    skills: { technical: [], soft: [] },
-    certifications: [
-      {
-        id: Date.now(),
-        name: "",
-        issuer: "",
-        date: "",
-        link: "",
-      },
-    ],
+      ],
+      experience: [
+        {
+          id: crypto.randomUUID(),
+          title: "",
+          company: "",
+          description: "",
+          startDate: "",
+          endDate: "",
+        },
+      ],
+      projects: [
+        {
+          id: crypto.randomUUID(),
+          name: "",
+          description: "",
+          technologies: "",
+          link: {
+            github: "",
+            liveLink: "",
+            other: "",
+          },
+        },
+      ],
+      skills: { technical: [], soft: [] },
+      certifications: [
+        {
+          id: crypto.randomUUID(),
+          name: "",
+          issuer: "",
+          date: "",
+          link: "",
+        },
+      ],
+    };
+  };
+  const [formData, setFormData] = useState(() => {
+    try {
+      const data = localStorage.getItem("resumeFormData");
+      return data ? JSON.parse(data) : createDefaultFormData();
+    } catch {
+      return createDefaultFormData();
+    }
   });
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.setItem("resumeFormData", JSON.stringify(formData));
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [formData]);
+
   const navigate = useNavigate();
   const [templates, setTemplates] = useState(TEMPLATES);
   const [selectedTemplate, setSelectedTemplate] = useState(
@@ -95,6 +113,18 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
 
   const [activeTab, setActiveTab] = useState("builder");
   const [activeSection, setActiveSection] = useState("personal");
+
+  /*-----------To make the upload input functional-------------*/
+
+  const input_file = useRef(null);
+  const handleButtonClick = () => {
+    input_file.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files;
+    console.log(file);
+  };
 
   /* -------------------- PREVIEW STATE -------------------- */
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
@@ -210,7 +240,10 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
           {!completion.isComplete && (
             <>
               {/* Alert content */}
-              <AlertTriangle className="text-amber-800 md:block hidden" size={30} />
+              <AlertTriangle
+                className="text-amber-800 md:block hidden"
+                size={30}
+              />
               <div className="flex flex-col md:w-auto w-full">
                 <div className="block font-medium text-amber-800 mb-0.5 md:text-sm text-xs">
                   Complete Your Resume
@@ -340,21 +373,50 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
       {/* resume-builder-page */}
       <div className="p-2.5 overflow-hidden font-sans tracking-[0.01em]">
         {/* main-header */}
-        <div className="flex flex-row gap-4 mb-5 p-2 justify-between items-center">
-          <h1 className="font-['Outfit'] text-2xl select-none">Create Resume</h1>
+        <div className="flex flex-row gap-4 mb-5 p-2 justify-between md:items-center items-start">
+          <div className="flex md:flex-row flex-col items-center md:gap-6 gap-2">
+            <h1 className="font-['Outfit'] text-2xl select-none">
+              Create Resume
+            </h1>
+            {/* main-tabs in laptop view */}
+            <div className="bg-gray-100 gap-1 md:flex hidden rounded-2xl p-1 w-fit mx-auto md:mx-0">
+              <button
+                className={`rounded-2xl md:py-1 py-1.5 md:px-3.5 px-4 text-sm ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
+                onClick={() => setActiveTab("builder")}
+              >
+                Builder
+              </button>
+              <button
+                className={`py-1 px-2.5 rounded-2xl text-sm ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
+                onClick={() => setActiveTab("templates")}
+              >
+                Templates
+              </button>
+            </div>
+          </div>
           <div className="flex flex-wrap justify-center md:justify-end items-center gap-2">
             {/* upload-btn &  export-btn */}
             <button
               onClick={() => navigate("/user/cv")}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 font-medium shadow-sm hover:bg-gray-50 hover:shadow-md transition-all select-none hidden md:flex"
+              className="items-center gap-2 px-4 py-2 rounded-lg hidden md:flex border border-gray-300 bg-white text-gray-800 font-medium shadow-sm hover:bg-black hover:text-white transition-all duration-200 select-none"
             >
               <PenTool size={18} />
               CV Designer
             </button>
-            <button className="flex gap-2 text-white cursor-pointer bg-black border-0 rounded-lg text-sm transition-all duration-200 select-none hover:bg-black/50 hover:to-indigo-800 py-2 px-5 md:py-2.5 md:px-5">
+            <button
+              onClick={handleButtonClick}
+              className="flex gap-2 text-white cursor-pointer bg-black border-0 rounded-lg text-sm transition-all duration-200 select-none md:hover:bg-black/70 py-2 px-5 md:py-2.5 md:px-5"
+            >
               <Upload size={18} />
               <span className="hidden md:inline">Upload</span>
             </button>
+            <input
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx"
+              ref={input_file}
+              onChange={handleFileChange}
+            />
             <button
               className="flex gap-2 text-white cursor-pointer bg-indigo-600 border-0 rounded-lg select-none text-sm transition-all duration-200 select-none hover:bg-indigo-700 hover:to-indigo-800 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-gray-100 py-2 px-5 md:py-2.5 md:px-5"
               disabled={!completion.isComplete}
@@ -365,15 +427,15 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
           </div>
         </div>
         {/* main-tabs */}
-        <div className="flex gap-1 bg-gray-100 rounded-lg md:p-1.5 py-2 px-3 mb-4 w-fit mx-auto md:mx-0">
+        <div className="w-full bg-gray-200 md:hidden flex gap-1 rounded-2xl p-1 w-fit my-5 mx-auto md:mx-0">
           <button
-            className={`mr-1 rounded-lg md:py-1 py-2.5 md:px-2.5 px-4 ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
+            className={`flex-1 mr-1 rounded-xl py-1.5 md:px-2.5 px-4 text-sm ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
             onClick={() => setActiveTab("builder")}
           >
             Builder
           </button>
           <button
-            className={`py-1 px-2.5 rounded-lg ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
+            className={`flex-1 py-1 px-2.5 rounded-xl text-sm ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
             onClick={() => setActiveTab("templates")}
           >
             Templates

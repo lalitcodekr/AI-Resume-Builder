@@ -411,7 +411,9 @@ const LivePreview = ({
             <div className="flex items-center gap-2 text-sm font-semibold">
               <FileText size={16} />{" "}
               <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 text-left">
-                <span className="font-normal text-xs md:text-sm">Live Preview</span>{" "}
+                <span className="font-normal text-xs md:text-sm">
+                  Live Preview
+                </span>{" "}
                 {currentTemplate?.name && (
                   <span className="text-slate-500 font-normal text-xs md:text-sm">
                     - {currentTemplate.name}
@@ -444,7 +446,7 @@ const LivePreview = ({
           </div>
           <div className="flex-1 overflow-auto">
             <div
-              className="w-[90%] max-w-[694px] h-[500px] mx-auto m-6"
+              className="w-[90%] max-w-[694px] h-[525px] mx-auto m-6"
               style={{
                 transform: `scale(${zoom})`,
                 transformOrigin: "top center",
@@ -466,9 +468,8 @@ const LivePreview = ({
         onClick={clamp}
       >
         <div className="flex items-center gap-2 font-semibold md:text-sm text-xs select-none">
-          <FileText size={16} /> 
-          <span className="font-medium">Live Preview</span>
-          {" "}
+          <FileText size={16} />
+          <span className="font-medium">Live Preview</span>{" "}
           {currentTemplate?.name && (
             <span className="text-slate-500 font-normal">
               - {currentTemplate.name}
@@ -491,7 +492,7 @@ const LivePreview = ({
         style={{
           height: isMobilePreviewHidden
             ? isMobileView
-              ? "500px"
+              ? "530px"
               : "auto"
             : "0",
         }}

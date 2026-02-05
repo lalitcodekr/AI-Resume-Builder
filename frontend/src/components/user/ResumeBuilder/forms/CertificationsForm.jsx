@@ -1,13 +1,13 @@
-import { Check, EditIcon, Trash2 } from "lucide-react";
+import { Check, EditIcon, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 const CertificationsForm = ({ formData, setFormData }) => {
   const [editingId, setEditingId] = useState(
-    formData?.certifications?.[0]?.id || null
+    formData?.certifications?.[0]?.id || null,
   );
 
   const addCertification = () => {
-    const id = Date.now();
+    const id = crypto.randomUUID();
     setFormData((prev) => ({
       ...prev,
       certifications: [
@@ -27,9 +27,7 @@ const CertificationsForm = ({ formData, setFormData }) => {
   const removeCertification = (id) => {
     setFormData((prev) => ({
       ...prev,
-      certifications: (prev?.certifications ?? []).filter(
-        (c) => c.id !== id
-      ),
+      certifications: (prev?.certifications ?? []).filter((c) => c.id !== id),
     }));
   };
 
@@ -45,9 +43,7 @@ const CertificationsForm = ({ formData, setFormData }) => {
             <div className="rounded-lg p-3 flex flex-col justify-between items-center">
               {/* Header */}
               <div className="w-full flex gap-4 justify-between items-center">
-                <span className="font-medium">
-                  Certification {index + 1}
-                </span>
+                <span className="font-medium">Certification {index + 1}</span>
 
                 <div className="flex gap-4 items-center">
                   <button
@@ -72,16 +68,12 @@ const CertificationsForm = ({ formData, setFormData }) => {
                 </div>
 
                 {cert.issuer && (
-                  <div className="text-sm font-medium">
-                    {cert.issuer}
-                  </div>
+                  <div className="text-sm font-medium">{cert.issuer}</div>
                 )}
 
                 <div className="w-full py-1 flex justify-between items-center">
                   {cert.date && (
-                    <span className="text-xs text-slate-500">
-                      {cert.date}
-                    </span>
+                    <span className="text-xs text-slate-500">{cert.date}</span>
                   )}
 
                   {cert.link && (
@@ -107,15 +99,15 @@ const CertificationsForm = ({ formData, setFormData }) => {
                   <label>Certification Name *</label>
                   <input
                     type="text"
-                    placeholder="AWS Solutions Architect"
-                    value={cert.name || ""}
                     className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={cert.name || ""}
+                    placeholder="AWS Solutions Architect"
                     onChange={(e) => {
                       const updated = (formData?.certifications ?? []).map(
                         (item) =>
                           item.id === cert.id
                             ? { ...item, name: e.target.value }
-                            : item
+                            : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -129,15 +121,15 @@ const CertificationsForm = ({ formData, setFormData }) => {
                   <label>Issuing Organization</label>
                   <input
                     type="text"
-                    placeholder="Amazon Web Services"
-                    value={cert.issuer || ""}
                     className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={cert.issuer || ""}
+                    placeholder="Amazon Web Services"
                     onChange={(e) => {
                       const updated = (formData?.certifications ?? []).map(
                         (item) =>
                           item.id === cert.id
                             ? { ...item, issuer: e.target.value }
-                            : item
+                            : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -151,14 +143,14 @@ const CertificationsForm = ({ formData, setFormData }) => {
                   <label>Date Obtained</label>
                   <input
                     type="month"
-                    value={cert.date || ""}
                     className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={cert.date || ""}
                     onChange={(e) => {
                       const updated = (formData?.certifications ?? []).map(
                         (item) =>
                           item.id === cert.id
                             ? { ...item, date: e.target.value }
-                            : item
+                            : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -172,15 +164,15 @@ const CertificationsForm = ({ formData, setFormData }) => {
                   <label>Credential Link (Optional)</label>
                   <input
                     type="text"
-                    placeholder="https://credential.url"
-                    value={cert.link || ""}
                     className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={cert.link || ""}
+                    placeholder="https://credential.url"
                     onChange={(e) => {
                       const updated = (formData?.certifications ?? []).map(
                         (item) =>
                           item.id === cert.id
                             ? { ...item, link: e.target.value }
-                            : item
+                            : item,
                       );
                       setFormData((prev) => ({
                         ...prev,
@@ -213,8 +205,11 @@ const CertificationsForm = ({ formData, setFormData }) => {
         </div>
       ))}
 
-      <button className="text-left" onClick={addCertification}>
-        + Add Certification
+      <button
+        className="flex items-center text-left"
+        onClick={addCertification}
+      >
+        <Plus size={14} className="mr-1 inline" /> Add Certification
       </button>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Check, EditIcon, Trash2 } from "lucide-react";
+import { Check, EditIcon, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 const ExperienceForm = ({ formData, setFormData }) => {
@@ -6,7 +6,7 @@ const ExperienceForm = ({ formData, setFormData }) => {
     formData?.experience?.[0]?.id || null,
   );
   const addExperience = () => {
-    const id = Date.now();
+    const id = crypto.randomUUID();
     setFormData((prev) => ({
       ...prev,
       experience: [
@@ -126,14 +126,6 @@ const ExperienceForm = ({ formData, setFormData }) => {
                 </div>
               </div>
             )}
-            {/* <div className="flex items-center gap-2 mb-2">
-              <span>Experience {index + 1}</span>
-              {formData.experience.length > 1 && (
-                <button onClick={() => removeExperience(exp.id)}>
-                  <Trash2 size={14} />
-                </button>
-              )}
-            </div> */}
             {editingId === exp.id && (
               <div className="p-2">
                 <div className="pr-0.5">
@@ -141,9 +133,9 @@ const ExperienceForm = ({ formData, setFormData }) => {
                     <label>Job Title *</label>
                     <input
                       type="text"
-                      placeholder="Software Engineer"
-                      value={exp.title || ""}
                       className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                      value={exp.title || ""}
+                      placeholder="Software Engineer"
                       onChange={(e) =>
                         updateExperience(exp.id, "title", e.target.value)
                       }
@@ -153,9 +145,9 @@ const ExperienceForm = ({ formData, setFormData }) => {
                     <label>Company *</label>
                     <input
                       type="text"
-                      placeholder="Tech Company Inc."
-                      value={exp.company || ""}
                       className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                      value={exp.company || ""}
+                      placeholder="Tech Company Inc."
                       onChange={(e) =>
                         updateExperience(exp.id, "company", e.target.value)
                       }
@@ -165,8 +157,8 @@ const ExperienceForm = ({ formData, setFormData }) => {
                     <label>Start Date</label>
                     <input
                       type="month"
-                      value={exp.startDate || ""}
                       className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                      value={exp.startDate || ""}
                       onChange={(e) =>
                         updateExperience(exp.id, "startDate", e.target.value)
                       }
@@ -176,9 +168,9 @@ const ExperienceForm = ({ formData, setFormData }) => {
                     <label>End Date</label>
                     <input
                       type="text"
-                      placeholder="Present or YYYY-MM"
-                      value={exp.endDate || ""}
                       className="px-2.5 py-2 border text-sm rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                      value={exp.endDate || ""}
+                      placeholder="Present or YYYY-MM"
                       onChange={(e) =>
                         updateExperience(exp.id, "endDate", e.target.value)
                       }
@@ -189,13 +181,16 @@ const ExperienceForm = ({ formData, setFormData }) => {
                   <label>Description</label>
                   <textarea
                     placeholder="Describe your responsibilities and achievements..."
-                    rows={3}
-                    value={exp.description || ""}
                     className="h-40 px-2.5 py-2 border text-sm resize-none rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    value={exp.description || ""}
+                    maxLength={500}
                     onChange={(e) =>
                       updateExperience(exp.id, "description", e.target.value)
                     }
                   />
+                  <span className="ml-2 text-xs text-slate-500">
+                    {exp.description?.length || 0}/500 Characters
+                  </span>
                 </div>
                 {/* Done Button */}
                 <div className="flex justify-end items-center gap-2 px-2 py-4">
@@ -218,8 +213,8 @@ const ExperienceForm = ({ formData, setFormData }) => {
             )}
           </div>
         ))}
-        <button className="text-left" onClick={addExperience}>
-          + Add Experience
+        <button className="flex items-center text-left" onClick={addExperience}>
+          <Plus size={14} className="mr-1 inline" /> Add Experience
         </button>
       </div>
     </>
