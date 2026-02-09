@@ -155,16 +155,10 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, notification
                   onClick={() => handleNavigate(item.path)}
                   className={`w-full flex items-center rounded-xl transition-all
                     ${isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-4"} py-3
-<<<<<<< Updated upstream
                     ${
                       active
                         ? "bg-blue-50 text-blue-600 font-semibold"
                         : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-=======
-                    ${active
-                      ? "bg-blue-50 text-blue-600 font-semibold"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
->>>>>>> Stashed changes
                     }
                     ${item.id === 'notifications' && unreadCount > 0 ? 'relative' : ''}`}  // ← Added for badge positioning
                   aria-current={active ? "page" : undefined}
@@ -173,11 +167,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, notification
                   {(!isCollapsed || isMobile) && (
                     <span className="whitespace-nowrap">{item.label}</span>
                   )}
-<<<<<<< Updated upstream
                   
-=======
-
->>>>>>> Stashed changes
                   {/* ← ADDED Notification Badge */}
                   {item.id === 'notifications' && unreadCount > 0 && (
                     <motion.div
