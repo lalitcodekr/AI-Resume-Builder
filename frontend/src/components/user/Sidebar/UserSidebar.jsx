@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  Bell,
 } from "lucide-react";
 import "./UserSidebar.css";
 
@@ -22,10 +23,23 @@ export default function UserSidebar() {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [notifications, setNotifications] = useState([]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     setIsCollapsed(!isMobile);
   }, [isMobile]);
+
+  // Load user notifications from localStorage (simple shared store)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("userNotifications");
+      if (raw) setNotifications(JSON.parse(raw));
+    } catch (e) {
+      setNotifications([]);
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -69,6 +83,14 @@ export default function UserSidebar() {
       icon: CheckCircle,
       label: "ATS Score Checker",
       path: "/user/ats-checker",
+    },
+
+    // Notifications for users
+    {
+      id: "notifications",
+      icon: Bell,
+      label: "Notifications",
+      path: "/user/notifications",
     },
 
     {
@@ -152,11 +174,21 @@ export default function UserSidebar() {
                   onMouseLeave={() => setHoveredItem(null)}
                   className={`w-full flex items-center rounded-xl transition-all
                     ${isCollapsed ? "justify-center px-0" : "gap-3 px-4"} py-3
-                    ${active ? "bg-blue-50 text-blue-600 font-semibold" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
+                    ${active ? "bg-blue-50 text-blue-600 font-semibold" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}
+                    ${item.id === 'notifications' && unreadCount > 0 ? 'relative' : ''}`}
                 >
                   <Icon size={22} />
                   {!isCollapsed && (
                     <span className="whitespace-nowrap">{item.label}</span>
+                  )}
+                  {item.id === 'notifications' && unreadCount > 0 && (
+                    <motion.div
+                      className={`ml-auto w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-lg absolute -top-2 -right-2 transform translate-x-1/2 -translate-y-1/2 ${isCollapsed ? 'right-1 top-1' : ''}`}
+                      animate={{ scale: [1, 1.08, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </motion.div>
                   )}
                 </button>
                 {/* Tooltip for collapsed state */}
