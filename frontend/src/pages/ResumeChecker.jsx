@@ -48,6 +48,12 @@ const AIResumeChecker = () => {
     setSelectedFile(null);
   };
 
+  const [openFAQ, setOpenFAQ] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenFAQ(openFAQ === index ? null : index);
+  };
+
   const handleUpload = (e) => {
     e.preventDefault();
     if (!selectedFile) return;
@@ -464,32 +470,58 @@ const AIResumeChecker = () => {
             </div>
             <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
           </div>
+
           <div className="space-y-4">
             {[
               {
                 q: "Is my resume data safe?",
                 a: "Absolutely. We use bank-level encryption and your data is never sold to third parties.",
+                extra:
+                  "Your resume is encrypted using AES-256 standards and stored securely. We only process it for analysis and never retain it longer than necessary.",
               },
               {
                 q: "What is an ATS score?",
-                a: "It's a measurement of how well your resume matches common applicant tracking system algorithms.",
+                a: "It's a measurement of how well your resume matches applicant tracking systems.",
+                extra:
+                  "Our ATS score evaluates keyword relevance, formatting compatibility, section hierarchy, and recruiter readability to improve shortlisting chances.",
               },
               {
                 q: "How many times can I scan?",
-                a: "Free users get 3 scans per month. Pro users get unlimited access and deep-keyword analysis.",
+                a: "Free users get limited scans. Pro users get unlimited access.",
+                extra:
+                  "Free users receive 10 scans per month. Pro users unlock unlimited scans, deep keyword insights, job-role matching, and priority processing.",
               },
             ].map((faq, i) => (
               <div
                 key={i}
-                className="py-6 border-b border-gray-100 cursor-pointer group"
+                onClick={() => toggleFAQ(i)}
+                className="py-6 border-b border-gray-100 cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <h5 className="font-bold text-lg group-hover:text-[#0077cc] transition-colors">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-semibold text-lg transition-colors hover:text-[#0077cc]">
                     {faq.q}
                   </h5>
-                  <ChevronDown size={18} className="text-gray-400" />
+                  <ChevronDown
+                    size={18}
+                    className={`text-gray-400 transition-transform duration-450 ${
+                      openFAQ === i ? "rotate-180" : ""
+                    }`}
+                  />
                 </div>
-                <p className="text-sm text-gray-500">{faq.a}</p>
+
+                {/* Short answer (always visible) */}
+                <p className="mt-2 text-sm text-gray-500">{faq.a}</p>
+
+                {/* Expandable extra info */}
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openFAQ === i ? "max-h-40 mt-3" : "max-h-0"
+                  }`}
+                >
+                  <p className="text-sm leading-relaxed text-gray-600">
+                    {faq.extra}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
