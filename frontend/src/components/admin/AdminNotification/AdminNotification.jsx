@@ -7,8 +7,10 @@ import {
     Repeat,
     FileText,
     Star,
-    DollarSign
+    DollarSign,
+    X
 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 const AdminNotification = () => {
     const [filter, setFilter] = useState('all');
@@ -87,7 +89,46 @@ const AdminNotification = () => {
     };
 
     const handleClearAll = () => {
-        setNotifications([]);
+        if (notifications.length === 0) return;
+
+        toast((t) => (
+            <div className="flex flex-col gap-2">
+                <div className="flex items-start gap-3">
+                    <div className="bg-red-100 p-2 rounded-full">
+                        <Trash2 className="w-5 h-5 text-red-600" />
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-gray-900">Clear all notifications?</h3>
+                        <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                    </div>
+                </div>
+                <div className="flex gap-2 mt-2 ml-11">
+                    <button
+                        onClick={() => {
+                            setNotifications([]);
+                            toast.dismiss(t.id);
+                            toast.success("All notifications cleared");
+                        }}
+                        className="px-3 py-1.5 bg-red-600 text-white text-xs font-semibold rounded-md hover:bg-red-700 transition"
+                    >
+                        Yes, Clear All
+                    </button>
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-md hover:bg-gray-200 transition"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        ), {
+            duration: 5000,
+            position: 'top-center',
+            style: {
+                minWidth: '300px',
+                padding: '16px',
+            }
+        });
     };
 
     const filteredNotifications = filter === 'all'
@@ -95,7 +136,7 @@ const AdminNotification = () => {
         : notifications.filter(n => n.isUnread);
 
     return (
-        <div className="p-6 max-w-4xl mx-auto">
+        <div className="min-h-screen bg-gray-50 p-6">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -107,12 +148,7 @@ const AdminNotification = () => {
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <button
-                        onClick={handleMarkAllRead}
-                        className="px-4 py-2 text-sm text-blue-600 font-medium hover:bg-blue-50 rounded-lg transition-colors"
-                    >
-                        Mark all read
-                    </button>
+
                     <button
                         onClick={handleClearAll}
                         className="px-4 py-2 text-sm text-red-600 font-medium hover:bg-red-50 rounded-lg transition-colors"
@@ -131,8 +167,8 @@ const AdminNotification = () => {
                         : "text-gray-500 hover:text-gray-700"
                         }`}
                 >
-                    All Notifications
-                    <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+                    All
+                    <span className="ml-2 bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs">
                         {notifications.length}
                     </span>
                 </button>
@@ -147,6 +183,12 @@ const AdminNotification = () => {
                     <span className="ml-2 bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs">
                         {notifications.filter(n => n.isUnread).length}
                     </span>
+                </button>
+                <button
+                    onClick={handleMarkAllRead}
+                    className="mb-3 px-4 py-2 text-sm text-blue-600 font-medium hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                    Mark all read
                 </button>
             </div>
 
@@ -182,28 +224,30 @@ const AdminNotification = () => {
                                                 {notification.description}
                                             </p>
                                         </div>
-                                        <span className="text-xs text-gray-400 whitespace-nowrap ml-4">
-                                            {notification.time}
-                                        </span>
-                                    </div>
-
-                                    <div className="flex items-center gap-4 mt-3">
-                                        {notification.isUnread && (
-                                            <button
-                                                onClick={() => handleMarkRead(notification.id)}
-                                                className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
-                                            >
-                                                <CheckCircle2 size={14} />
-                                                Mark as read
-                                            </button>
-                                        )}
                                         <button
                                             onClick={() => handleDelete(notification.id)}
-                                            className="text-xs font-medium text-red-500 hover:text-red-700 flex items-center gap-1"
+                                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                            title="Delete"
                                         >
-                                            <Trash2 size={14} />
-                                            Delete
+                                            <Trash2 size={18} />
                                         </button>
+                                    </div>
+
+                                    <div className="flex items-center justify-between mt-3">
+                                        <div>
+                                            {notification.isUnread && (
+                                                <button
+                                                    onClick={() => handleMarkRead(notification.id)}
+                                                    className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                                                >
+                                                    <CheckCircle2 size={14} />
+                                                    Mark as read
+                                                </button>
+                                            )}
+                                        </div>
+                                        <span className="text-xs text-gray-400 whitespace-nowrap">
+                                            {notification.time}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -211,6 +255,7 @@ const AdminNotification = () => {
                     })
                 )}
             </div>
+            <Toaster />
         </div>
     );
 };
