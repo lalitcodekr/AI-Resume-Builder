@@ -1,18 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect ,useRef} from "react";
 import FormTabs from "./FormTabs";
+
+import html2pdf from "html2pdf.js";
+
+
 import UserNavBar from "../UserNavBar/UserNavBar";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import {
-  Save,
-  Upload,
-  FileText,
-  AlertTriangle,
-  ArrowLeft,
-  ArrowRight,
-  PenTool,
-  Download,
-} from "lucide-react";
+import { Save, Upload, FileText, AlertTriangle, ArrowLeft, ArrowRight, PenTool, Download } from "lucide-react";
 import {
   User,
   Briefcase,
@@ -20,7 +15,9 @@ import {
   Zap,
   FolderKanban,
   Award,
+ 
 } from "lucide-react";
+
 
 // Import existing Forms
 import PersonalInfoForm from "./forms/PersonalInfoForm";
@@ -41,7 +38,47 @@ const sections = [
   "skills",
 ];
 
+
+
+
 const CVBuilder = () => {
+  // ===== Upload CV =====
+const fileInputRef = useRef(null);
+
+const handleUploadClick = () => {
+  fileInputRef.current.click();
+};
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  console.log("Uploaded CV file:", file);
+  toast.success("CV uploaded successfully");
+};
+
+// ===== Download CV =====
+const handleDownloadCV = () => {
+  const element = document.getElementById("cv-preview");
+
+  if (!element) {
+    toast.error("CV preview not found");
+    return;
+  }
+
+  html2pdf()
+    .set({
+      margin: 0.5,
+      filename: "CV.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    })
+    .from(element)
+    .save(); 
+};
+
+
+
   /* -------------------- STATE -------------------- */
   const formContainerRef = useRef(null);
   const [activeSection, setActiveSection] = useState("personal");
@@ -123,7 +160,7 @@ const CVBuilder = () => {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: "smooth"
     });
     if (formContainerRef.current) {
       formContainerRef.current.scrollTop = 0;
@@ -137,6 +174,8 @@ const CVBuilder = () => {
 
   /* ---------- STEP NAVIGATION ---------- */
   const currentIndex = sections.indexOf(activeSection);
+  const isLastStep = currentIndex === sections.length - 1;
+
 
   const goNext = () => {
     if (currentIndex < sections.length - 1) {
@@ -183,34 +222,70 @@ const CVBuilder = () => {
       <UserNavBar />
       <div className="p-2.5 mt-4">
         {/* main-header */}
-        <div className="flex flex-row gap-4 mb-5 p-2 justify-between items-center">
-          <h1 className="text-2xl font-['Outfit'] select-none">Create CV</h1>
+      {/* main-header */}
+<div className="flex items-center mb-5 p-2">
+  {/* Title */}
+  <h1 className="text-2xl font-['Outfit']">Create CV</h1>
 
-          <div className="flex flex-wrap justify-center md:justify-end items-center gap-2">
-            {/* upload-btn */}
-            <button className="flex gap-2 items-center text-white cursor-pointer bg-gradient-to-br from-blue-600 to-blue-700 border-0 rounded-lg text-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800 py-2 px-5 md:py-2.5 md:px-5">
-              <Upload size={18} />
-              <span className="hidden md:inline">Upload</span>
-            </button>
+  {/* Buttons pinned right */}
+  <div className="ml-auto flex gap-2 items-center">
+    {/* Upload */}
+    <button
+      onClick={handleUploadClick}
+      className="
+        flex items-center justify-center gap-2
+        bg-black text-white rounded-lg
+        h-10 w-10 md:w-auto
+        md:px-5 md:py-2.5
+        transition-all duration-200
+      "
+    >
+      <Upload size={18} />
+      <span className="hidden md:inline">Upload</span>
+    </button>
 
-            {/* export-btn */}
-            <button className="flex gap-2 items-center text-white cursor-pointer bg-indigo-600 border-0 rounded-lg text-sm transition-all duration-200 hover:bg-indigo-700 py-2 px-5 md:py-2.5 md:px-5">
-              <Download size={18} />
-              <span className="hidden md:inline">Export</span>
-            </button>
-          </div>
-        </div>
+    <input
+      type="file"
+      ref={fileInputRef}
+      className="hidden"
+      accept=".pdf,.doc,.docx"
+      onChange={handleFileChange}
+    />
+
+    {/* Download */}
+    <button
+  onClick={handleDownloadCV}
+  // disabled={!isLastStep}
+  // for testing
+  disabled={false}
+  className={`
+    flex items-center justify-center gap-2
+    h-10 w-10 md:w-auto
+    md:px-6 md:py-2.5 rounded-lg font-semibold
+    transition-all duration-200
+
+    ${isLastStep
+      ? "bg-indigo-600 text-white hover:bg-indigo-700"
+      : "bg-indigo-300 text-white cursor-not-allowed"}
+  `}
+>
+  <Download size={18} />
+  <span className="hidden md:inline">Download</span>
+</button>
+
+  </div>
+</div>
 
         {/* main-tabs */}
-        <div className="flex gap-1 bg-gray-100 rounded-lg md:p-1.5 py-2 px-3 mb-4 w-fit mx-auto md:mx-0">
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1.5 mb-4 w-fit">
           <button
-            className={`mr-1 rounded-lg md:py-1 py-2.5 md:px-2.5 px-4 ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
+            className={`py-1 px-2.5 rounded-lg mr-1 ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""}`}
             onClick={() => setActiveTab("builder")}
           >
             Builder
           </button>
           <button
-            className={`py-1 px-2.5 rounded-lg ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
+            className={`py-1 px-2.5 rounded-lg ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""}`}
             onClick={() => setActiveTab("templates")}
           >
             Templates
@@ -242,50 +317,35 @@ const CVBuilder = () => {
             </div>
           </div>
         )}
-        {/* MOBILE LIVE PREVIEW (below alert) */}
-        {activeTab === "builder" && (
-          <div className="block lg:hidden my-4">
-            {!isPreviewHidden && (
-              <CVPreview
-                formData={formData}
-                isMaximized={isPreviewMaximized}
-                onToggleMaximize={() =>
-                  setIsPreviewMaximized(!isPreviewMaximized)
-                }
-                onMinimize={() => setIsPreviewHidden(true)}
-              />
-            )}
-          </div>
-        )}
 
         {/* BUILDER + PREVIEW */}
         {activeTab === "builder" && (
           <div
-            className={`
-    grid gap-6 p-1.5 mx-2
-    grid-cols-1
-    lg:grid-cols-[32%_68%]
-    ${isPreviewMaximized ? "lg:grid-cols-[0_100%]" : ""}
-  `}
-          >
+  className={`grid grid-cols-1 md:grid-cols-[32%_68%] gap-6 md:gap-14 p-1.5 ml-2 mr-2 ${
+    isPreviewMaximized ? "md:grid-cols-[0_100%]" : ""
+  }`}
+>
+
             {/* builder-section */}
-            <div
-              className="bg-white rounded-xl h-full overflow-y-auto pl-0.5 overflow-hidden flex-1"
-              ref={formContainerRef}
-            >
+            <div className="bg-white rounded-xl h-full w-full overflow-y-auto px-3 md:px-0 flex-1">
+
               <FormTabs
                 activeSection={activeSection}
                 setActiveSection={setActiveSection}
               />
               {/* form-content */}
-              <div className="w-full max-h-[60vh] lg:max-h-none mt-5 overflow-auto cv-form-content-scrollable">
+              <div className="w-full mt-5 overflow-auto cv-form-content-scrollable">
+
                 {renderFormContent()}
               </div>
               {/* Previous & Next */}
-              <div className="w-full flex items-center justify-between mt-10">
+              <div className="w-full flex items-center justify-between mt-6 md:mt-10 pb-4">
+
+
                 <button
                   onClick={goPrevious}
                   disabled={currentIndex === 0}
+                  
                   className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
                   <ArrowLeft size={18} />
@@ -302,19 +362,17 @@ const CVBuilder = () => {
               </div>
             </div>
 
-            {/* DESKTOP LIVE PREVIEW */}
-            <div className="hidden lg:block">
-              {!isPreviewHidden && (
-                <CVPreview
-                  formData={formData}
-                  isMaximized={isPreviewMaximized}
-                  onToggleMaximize={() =>
-                    setIsPreviewMaximized(!isPreviewMaximized)
-                  }
-                  onMinimize={() => setIsPreviewHidden(true)}
-                />
-              )}
-            </div>
+            <div className="hidden md:block">
+  {!isPreviewHidden && (
+    <CVPreview
+      formData={formData}
+      isMaximized={isPreviewMaximized}
+      onToggleMaximize={() => setIsPreviewMaximized(!isPreviewMaximized)}
+      onMinimize={() => setIsPreviewHidden(true)}
+    />
+  )}
+</div>
+
           </div>
         )}
         <div className="w-full h-4"></div>
