@@ -280,7 +280,7 @@ function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#1a2e52] font-['Outfit']">
       <NavBar />
-
+      <div className="h-12" />
       {/*  OVERLAY */}
       <div
         onClick={toggleMobileMenu}
@@ -523,7 +523,8 @@ function LandingPage() {
                 <div className="relative inline-flex items-center justify-center p-3 md:p-4 mb-4 md:mb-8 transition-all duration-500 rounded-2xl bg-blue-50 border border-blue-100 group-hover:scale-110 group-hover:bg-[#0077cc] group-hover:shadow-[0_10px_20px_rgba(0,119,204,0.3)] group-hover:rotate-6">
                   <div className="transition-colors duration-500 text-[#0077cc] group-hover:text-white">
                     {React.cloneElement(feature.icon, {
-                      className: "size-6 md:size-7 transition-colors duration-500",
+                      className:
+                        "size-6 md:size-7 transition-colors duration-500",
                     })}
                   </div>
                 </div>
