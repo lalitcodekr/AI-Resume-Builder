@@ -1,7 +1,7 @@
 import React, { useState, useEffect ,useRef} from "react";
 import FormTabs from "./FormTabs";
 
-import html2pdf from "html2pdf.js";
+/*import html2pdf from "html2pdf.js";*/
 
 
 import UserNavBar from "../UserNavBar/UserNavBar";
