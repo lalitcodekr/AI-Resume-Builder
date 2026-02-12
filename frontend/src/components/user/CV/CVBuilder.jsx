@@ -1,5 +1,9 @@
 import React, { useState, useEffect ,useRef} from "react";
 import FormTabs from "./FormTabs";
+
+/*import html2pdf from "html2pdf.js";*/
+
+
 import UserNavBar from "../UserNavBar/UserNavBar";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -34,7 +38,47 @@ const sections = [
   "skills",
 ];
 
+
+
+
 const CVBuilder = () => {
+  // ===== Upload CV =====
+const fileInputRef = useRef(null);
+
+const handleUploadClick = () => {
+  fileInputRef.current.click();
+};
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  console.log("Uploaded CV file:", file);
+  toast.success("CV uploaded successfully");
+};
+
+// ===== Download CV =====
+const handleDownloadCV = () => {
+  const element = document.getElementById("cv-preview");
+
+  if (!element) {
+    toast.error("CV preview not found");
+    return;
+  }
+
+  html2pdf()
+    .set({
+      margin: 0.5,
+      filename: "CV.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    })
+    .from(element)
+    .save(); 
+};
+
+
+
   /* -------------------- STATE -------------------- */
   const formContainerRef = useRef(null);
   const [activeSection, setActiveSection] = useState("personal");
@@ -92,13 +136,7 @@ const CVBuilder = () => {
 
   const [isPreviewMaximized, setIsPreviewMaximized] = useState(false);
   const [isPreviewHidden, setIsPreviewHidden] = useState(false);
-  const [showErrors, setShowErrors] = useState({
-    personal: false,
-    work: false,
-    education: false,
-    projects: false,
-    certs: false,
-  });
+const [warning, setWarning] = useState(false);
 
   /* -------------------- LOAD DATA -------------------- */
   useEffect(() => {
@@ -130,105 +168,98 @@ const CVBuilder = () => {
     }
   }, [activeSection]);
 
+//   useEffect(() => {
+//   setWarning(false);
+// }, [activeSection]);
+
   /* -------------------- HELPERS -------------------- */
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setWarning(false);
   };
 
-  const isEmpty = (value) =>
-    value === undefined || value === null || String(value).trim() === "";
+const validateSection = () => {
+  switch (activeSection) {
+    case "personal":
+      return (
+        formData.fullName.trim() !== "" &&
+        formData.email.trim() !== "" &&
+        formData.phone.trim() !== ""
+      );
 
-  const scrollToFirstErrorField = () => {
-    if (!formContainerRef.current) return;
+    case "education":
+  const validEducation = formData.education.filter(
+    (edu) => edu.school.trim() !== "" || edu.degree.trim() !== ""
+  );
 
-    const container = formContainerRef.current;
-    const fields = container.querySelectorAll(
-      'input[data-required="true"], textarea[data-required="true"]',
-    );
+  return (
+    validEducation.length > 0 &&
+    validEducation.every(
+      (edu) =>
+        edu.school.trim() !== "" &&
+        edu.degree.trim() !== ""
+    )
+  );
 
-    for (const field of fields) {
-      const value = field.value;
-      if (isEmpty(value)) {
-        field.scrollIntoView({ behavior: "smooth", block: "center" });
-        if (typeof field.focus === "function") {
-          field.focus();
-        }
-        break;
-      }
-    }
-  };
 
-  const validateCurrentSection = () => {
-    switch (activeSection) {
-      case "personal": {
-        if (isEmpty(formData.fullName) || isEmpty(formData.email)) {
-          return false;
-        }
-        break;
-      }
-      case "work": {
-        const experiences = formData?.experience ?? [];
-        if (
-          experiences.length === 0 ||
-          experiences.some(
-            (exp) => isEmpty(exp.title) || isEmpty(exp.company),
-          )
-        ) {
-          return false;
-        }
-        break;
-      }
-      case "education": {
-        const educations = formData?.education ?? [];
-        if (
-          educations.length === 0 ||
-          educations.some(
-            (edu) => isEmpty(edu.degree) || isEmpty(edu.school),
-          )
-        ) {
-          return false;
-        }
-        break;
-      }
-      case "projects": {
-        const projects = formData?.projects ?? [];
-        if (
-          projects.length === 0 ||
-          projects.some((proj) => isEmpty(proj.name))
-        ) {
-          return false;
-        }
-        break;
-      }
-      case "certs": {
-        const certs = formData?.certifications ?? [];
-        if (certs.length === 0 || certs.some((cert) => isEmpty(cert.name))) {
-          return false;
-        }
-        break;
-      }
-      default:
-        break;
-    }
+   case "work":
+  const validExperience = formData.experience.filter(
+    (exp) => exp.title.trim() !== "" || exp.company.trim() !== ""
+  );
 
-    return true;
-  };
+  return (
+    validExperience.length > 0 &&
+    validExperience.every(
+      (exp) =>
+        exp.title.trim() !== "" &&
+        exp.company.trim() !== ""
+    )
+  );
+
+
+    case "projects":
+      return formData.projects.every(
+        (proj) =>
+          proj.name.trim() !== "" &&
+          proj.description.trim() !== ""
+      );
+
+    case "certs":
+      return formData.certifications.every(
+        (cert) =>
+          cert.name.trim() !== "" &&
+          cert.issuer.trim() !== ""
+      );
+
+    case "skills":
+      return (
+        formData.skills.technical.length > 0 ||
+        formData.skills.soft.length > 0
+      );
+
+    default:
+      return true;
+  }
+};
+
 
   /* ---------- STEP NAVIGATION ---------- */
   const currentIndex = sections.indexOf(activeSection);
+  const isLastStep = currentIndex === sections.length - 1;
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+
+  if (formContainerRef.current) {
+    formContainerRef.current.scrollTop = 0;
+  }
+};
+
 
   const goNext = () => {
     if (currentIndex < sections.length - 1) {
-      const isValid = validateCurrentSection();
-      if (!isValid) {
-        setShowErrors((prev) => ({
-          ...prev,
-          [activeSection]: true,
-        }));
-        scrollToFirstErrorField();
-        return;
-      }
-      setShowErrors((prev) => ({ ...prev, [activeSection]: false }));
       setActiveSection(sections[currentIndex + 1]);
     }
   };
@@ -250,34 +281,16 @@ const CVBuilder = () => {
           />
         );
       case "work":
-        return (
-          <ExperienceForm
-            formData={formData}
-            setFormData={setFormData}
-          />
-        );
+        return <ExperienceForm formData={formData} setFormData={setFormData} />;
       case "education":
-        return (
-          <EducationForm
-            formData={formData}
-            setFormData={setFormData}
-          />
-        );
+        return <EducationForm formData={formData} setFormData={setFormData} />;
       case "skills":
         return <SkillsForm formData={formData} setFormData={setFormData} />;
       case "projects":
-        return (
-          <ProjectsForm
-            formData={formData}
-            setFormData={setFormData}
-          />
-        );
+        return <ProjectsForm formData={formData} setFormData={setFormData} />;
       case "certs":
         return (
-          <CertificationsForm
-            formData={formData}
-            setFormData={setFormData}
-          />
+          <CertificationsForm formData={formData} setFormData={setFormData} />
         );
       default:
         return null;
@@ -290,19 +303,58 @@ const CVBuilder = () => {
       <UserNavBar />
       <div className="p-2.5 mt-4">
         {/* main-header */}
-        <div className="flex justify-between items-start mb-5 p-2">
-          <h1 className="text-2xl font-['Outfit']">Create CV</h1>
-          <div className="flex gap-2">
-            {/* upload-btn &  export-btn */}
-            <button className="flex gap-2 py-2.5 px-5 text-white cursor-pointer bg-gradient-to-br from-blue-600 to-blue-700 border-0 rounded-lg text-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800">
-              <Upload size={18} />
-              Upload
-            </button>
-            <button className="flex gap-2 py-2.5 px-5 text-white cursor-pointer bg-gradient-to-br from-blue-600 to-blue-700 border-0 rounded-lg text-sm transition-all duration-200 hover:from-blue-700 hover:to-blue-800">
-              <Download size={18} /> Export
-            </button>
-          </div>
-        </div>
+      {/* main-header */}
+<div className="flex items-center mb-5 p-2">
+  {/* Title */}
+  <h1 className="text-2xl font-['Outfit']">Create CV</h1>
+
+  {/* Buttons pinned right */}
+  <div className="ml-auto flex gap-2 items-center">
+    {/* Upload */}
+    <button
+      onClick={handleUploadClick}
+      className="
+        flex items-center justify-center gap-2
+        bg-black text-white rounded-lg
+        h-10 w-10 md:w-auto
+        md:px-5 md:py-2.5
+        transition-all duration-200
+      "
+    >
+      <Upload size={18} />
+      <span className="hidden md:inline">Upload</span>
+    </button>
+
+    <input
+      type="file"
+      ref={fileInputRef}
+      className="hidden"
+      accept=".pdf,.doc,.docx"
+      onChange={handleFileChange}
+    />
+
+    {/* Download */}
+    <button
+  onClick={handleDownloadCV}
+  disabled={!isLastStep}
+  className={`
+    flex items-center justify-center gap-2
+    h-10 w-10 md:w-auto
+    md:px-6 md:py-2.5 rounded-lg font-semibold
+    transition-all duration-200
+
+    ${isLastStep
+      ? "bg-indigo-600 text-white hover:bg-indigo-700"
+      : "bg-indigo-300 text-white cursor-not-allowed"}
+  `}
+>
+  <Download size={18} />
+  <span className="hidden md:inline">Download</span>
+</button>
+
+  </div>
+</div>
+
         {/* main-tabs */}
         <div className="flex gap-1 bg-gray-100 rounded-lg p-1.5 mb-4 w-fit">
           <button
@@ -348,38 +400,52 @@ const CVBuilder = () => {
         {/* BUILDER + PREVIEW */}
         {activeTab === "builder" && (
           <div
-            className={`grid grid-cols-[32%_68%] gap-14 p-1.5 ml-2 mr-2 ${isPreviewMaximized ? "grid-cols-[0_100%]" : ""}`}
-          >
+  className={`grid grid-cols-1 md:grid-cols-[32%_68%] gap-6 md:gap-14 p-1.5 ml-2 mr-2 ${
+    isPreviewMaximized ? "md:grid-cols-[0_100%]" : ""
+  }`}
+>
+
             {/* builder-section */}
-            <div className="bg-white rounded-xl h-full overflow-y-auto pl-0.5 overflow-hidden flex-1" ref={formContainerRef}>
+            <div className="bg-white rounded-xl h-full w-full overflow-y-auto px-3 md:px-0 flex-1">
+
               <FormTabs
                 activeSection={activeSection}
                 setActiveSection={setActiveSection}
               />
               {/* form-content */}
-              <div className="w-full h-[72%] mt-5 overflow-auto cv-form-content-scrollable">
-                {showErrors[activeSection] && (
-                  <div className="flex items-center w-full gap-3 p-4 bg-amber-50 border border-amber-200 rounded-[10px] mb-4">
-                    <AlertTriangle size={20} className="text-amber-600 flex-shrink-0" />
-                    <p className="text-sm text-amber-800 m-0 font-medium">
-                      Please fill the required fields to continue.
-                    </p>
-                  </div>
-                )}
+              <div className="w-full mt-5 overflow-auto cv-form-content-scrollable">
+{warning && (
+  <div className="text-sm text-red-700 bg-yellow-100 border border-yellow-300 px-4 py-2 my-2.5 rounded-lg">
+    Please fill in all required fields to continue.
+  </div>
+)}
+
                 {renderFormContent()}
               </div>
               {/* Previous & Next */}
-              <div className="w-full flex items-center justify-between mt-10">
+              <div className="w-full flex items-center justify-between mt-6 md:mt-10 pb-4">
+
+
                 <button
                   onClick={goPrevious}
                   disabled={currentIndex === 0}
+                  
                   className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
                   <ArrowLeft size={18} />
                   <span>Previous</span>
                 </button>
                 <button
-                  onClick={goNext}
+  onClick={() => {
+    if (!validateSection()) {
+      setWarning(true);
+      scrollToTop();  
+      return;
+    }
+    setWarning(false);
+    goNext();
+  }}
+
                   disabled={currentIndex === sections.length - 1}
                   className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
                 >
@@ -389,14 +455,17 @@ const CVBuilder = () => {
               </div>
             </div>
 
-            {!isPreviewHidden && (
-              <CVPreview
-                formData={formData}
-                isMaximized={isPreviewMaximized}
-                onToggleMaximize={() => setIsPreviewMaximized(!isPreviewMaximized)}
-                onMinimize={() => setIsPreviewHidden(true)}
-              />
-            )}
+            <div className="hidden md:block">
+  {!isPreviewHidden && (
+    <CVPreview
+      formData={formData}
+      isMaximized={isPreviewMaximized}
+      onToggleMaximize={() => setIsPreviewMaximized(!isPreviewMaximized)}
+      onMinimize={() => setIsPreviewHidden(true)}
+    />
+  )}
+</div>
+
           </div>
         )}
         <div className="w-full h-4"></div>

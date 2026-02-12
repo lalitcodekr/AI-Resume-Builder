@@ -46,13 +46,14 @@ const CVPreview = ({ formData = {}, isMaximized, onToggleMaximize, onMinimize })
 
     const CVContent = () => {
         return (
-            <div className="w-full flex justify-center">
-                <div
-                    className="bg-white p-8 lg:p-12 text-slate-800 text-sm leading-relaxed relative shadow-lg w-[794px] min-h-[1123px]"
-                    style={{
-                        transform: `scale(${zoom})`,
-                    }}
-                >
+            <div id="cv-preview" className="w-full flex justify-center">
+  <div
+    className="bg-white p-8 lg:p-12 text-slate-800 text-sm leading-relaxed relative shadow-lg w-[794px] min-h-[1123px]"
+    style={{
+      transform: `scale(${zoom})`,
+    }}
+  >
+
                     <div className="w-full">
                         <div className="pb-6">
                             {fullName && (
