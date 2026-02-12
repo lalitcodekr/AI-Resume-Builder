@@ -2,7 +2,7 @@ import React from "react";
 
 const ModernTemplate = ({ formData }) => (
   <div
-    className="bg-white resume-root space-y-6 w-full border border-slate-300 min-h-[1400px] max-w-[820px]"
+    className="bg-white resume-root space-y-6 w-full border border-slate-300 min-h-[1400px] max-w-[820px] overflow-hidden break-words"
     style={{ fontFamily: '"Inter", "Segoe UI", sans-serif' }}
   >
     <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-12 py-10">
@@ -34,7 +34,7 @@ const ModernTemplate = ({ formData }) => (
             <div className="w-1 h-6 bg-blue-600" />
             PROFESSIONAL SUMMARY
           </h2>
-          <p className="text-sm text-slate-700 leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words">
             {formData.summary}
           </p>
         </div>
@@ -122,47 +122,47 @@ const ModernTemplate = ({ formData }) => (
 
       {(formData.skills?.technical?.length > 0 ||
         formData.skills?.soft?.length > 0) && (
-        <div className="mb-8">
-          <h2 className="text-lg font-bold text-blue-700 mb-3 flex items-center gap-2">
-            <div className="w-1 h-6 bg-blue-600" />
-            SKILLS
-          </h2>
-          {formData.skills.technical?.length > 0 && (
-            <div className="mb-3">
-              <span className="font-semibold text-slate-900 text-sm">
-                Technical:
-              </span>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {formData.skills.technical.map((skill, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
+          <div className="mb-8">
+            <h2 className="text-lg font-bold text-blue-700 mb-3 flex items-center gap-2">
+              <div className="w-1 h-6 bg-blue-600" />
+              SKILLS
+            </h2>
+            {formData.skills.technical?.length > 0 && (
+              <div className="mb-3">
+                <span className="font-semibold text-slate-900 text-sm">
+                  Technical:
+                </span>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.skills.technical.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          {formData.skills.soft?.length > 0 && (
-            <div>
-              <span className="font-semibold text-slate-900 text-sm">
-                Soft Skills:
-              </span>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {formData.skills.soft.map((skill, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            )}
+            {formData.skills.soft?.length > 0 && (
+              <div>
+                <span className="font-semibold text-slate-900 text-sm">
+                  Soft Skills:
+                </span>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.skills.soft.map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
 
       {formData.projects?.some((project) => project.name) && (
         <div className="mb-8">

@@ -8,25 +8,11 @@ import {
   RotateCcw,
   Download,
 } from "lucide-react";
-import CVTemplates from "./CVTemplates";
+import CVTemplates from "./Cvtemplates";
+import PaginatedPreview from "./PaginatedPreview";
 import mergeWithSampleData, {
   hasAnyUserData,
 } from "../../../utils/Datahelpers";
-
-const Page = ({ children }) => (
-  <div
-    className="bg-white shadow-md mb-6"
-    style={{
-      width: 794,
-      minHeight: 1123,
-      padding: 24,
-      pageBreakAfter: "always",
-      breakAfter: "page",
-    }}
-  >
-    {children}
-  </div>
-);
 
 const CVPreview = ({
   formData,
@@ -43,33 +29,18 @@ const CVPreview = ({
 
   const displayData = useMemo(() => mergeWithSampleData(formData), [formData]);
   const showingUserData = useMemo(() => hasAnyUserData(formData), [formData]);
+
   const PreviewContent = () => (
     <div className="flex justify-center">
-      <div
-        style={{
-          width: 794 * zoom,
-          minHeight: 1123 * zoom,
-        }}
-      >
-        <div
-          className="bg-white shadow"
-          style={{
-            width: 794,
-            minHeight: 1123,
-            padding: 24,
-            transform: `scale(${zoom})`,
-            transformOrigin: "top left",
-          }}
-        >
-          {TemplateComponent ? (
-            <TemplateComponent formData={displayData} />
-          ) : (
-            <div className="flex items-center justify-center h-[900px] text-slate-400 text-lg font-medium">
-              Select a template to preview
-            </div>
-          )}
-        </div>
-      </div>
+      <PaginatedPreview zoom={zoom}>
+        {TemplateComponent ? (
+          <TemplateComponent formData={displayData} />
+        ) : (
+          <div className="flex items-center justify-center h-[900px] text-slate-400 text-lg font-medium">
+            Select a template to preview
+          </div>
+        )}
+      </PaginatedPreview>
     </div>
   );
 
@@ -179,7 +150,7 @@ const CVPreview = ({
       </div>
 
       {/* Canvas */}
-      <div className="flex-1 flex justify-center bg-slate-200 py-8">
+      <div className="flex-1 overflow-auto bg-slate-200 py-8">
         <PreviewContent />
       </div>
 

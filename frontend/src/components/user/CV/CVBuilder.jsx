@@ -16,6 +16,7 @@ import TemplatesGallery from "./Templatesgallery";
 
 import CVBuilderTopBar from "./Cvbuildernavbar";
 import ResumeCompletionBanner from "./ResumeCompletionBanner";
+import "./CVBuilder.css";
 
 const sections = [
   "personal",

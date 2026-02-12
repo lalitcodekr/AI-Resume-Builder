@@ -2,7 +2,7 @@ import React from "react";
 
 const ExecutiveTemplate = ({ formData }) => (
   <div
-    className="bg-white resume-root space-y-6 w-full border border-slate-300 min-h-[1400px] max-w-[820px] flex flex-col"
+    className="bg-white resume-root space-y-6 w-full border border-slate-300 min-h-[1400px] max-w-[820px] flex flex-col overflow-hidden break-words"
     style={{ fontFamily: '"Georgia", serif' }}
   >
     <div className="bg-slate-900 text-white px-12 py-8">
@@ -41,46 +41,46 @@ const ExecutiveTemplate = ({ formData }) => (
 
         {(formData.skills?.technical?.length > 0 ||
           formData.skills?.soft?.length > 0) && (
-          <div className="mb-8">
-            <h2 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider border-b border-slate-300 pb-2">
-              Expertise
-            </h2>
-            {formData.skills.technical?.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-xs font-semibold text-slate-700 mb-2">
-                  Technical
-                </h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {formData.skills.technical.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-1 bg-white border border-slate-300 rounded text-xs"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+            <div className="mb-8">
+              <h2 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider border-b border-slate-300 pb-2">
+                Expertise
+              </h2>
+              {formData.skills.technical?.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="text-xs font-semibold text-slate-700 mb-2">
+                    Technical
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {formData.skills.technical.map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 bg-white border border-slate-300 rounded text-xs"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            {formData.skills.soft?.length > 0 && (
-              <div>
-                <h3 className="text-xs font-semibold text-slate-700 mb-2">
-                  Leadership
-                </h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {formData.skills.soft.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-1 bg-white border border-slate-300 rounded text-xs"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+              )}
+              {formData.skills.soft?.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-700 mb-2">
+                    Leadership
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {formData.skills.soft.map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 bg-white border border-slate-300 rounded text-xs"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
 
         {formData.education?.some((edu) => edu.school || edu.degree) && (
           <div className="mb-8">
@@ -142,7 +142,7 @@ const ExecutiveTemplate = ({ formData }) => (
             <h2 className="text-base font-bold text-slate-900 mb-3 uppercase tracking-wider">
               Executive Summary
             </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
+            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words">
               {formData.summary}
             </p>
           </div>

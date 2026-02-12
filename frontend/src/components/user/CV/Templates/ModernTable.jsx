@@ -11,7 +11,7 @@ const TwoColumnATS = ({ formData }) => {
   );
 
   return (
-    <div className="bg-white resume-root space-y-6 w-full max-w-[820px] min-h-[1400px] border border-slate-300 shadow-xl font-sans text-slate-900">
+    <div className="bg-white resume-root space-y-6 w-full max-w-[820px] min-h-[1400px] border border-slate-300 shadow-xl font-sans text-slate-900 overflow-hidden break-words">
       {/* Header */}
       <div className="px-10 py-8 border-b border-slate-300">
         <h1 className="text-3xl font-bold">
@@ -38,14 +38,14 @@ const TwoColumnATS = ({ formData }) => {
         <div>
           {(formData.skills?.technical?.length > 0 ||
             formData.skills?.soft?.length > 0) && (
-            <Section title="Skills">
-              <div className="text-sm space-y-2">
-                {formData.skills.technical?.map((skill, i) => (
-                  <div key={i}>• {skill}</div>
-                ))}
-              </div>
-            </Section>
-          )}
+              <Section title="Skills">
+                <div className="text-sm space-y-2">
+                  {formData.skills.technical?.map((skill, i) => (
+                    <div key={i}>• {skill}</div>
+                  ))}
+                </div>
+              </Section>
+            )}
 
           {formData.education?.length > 0 && (
             <Section title="Education">
@@ -76,7 +76,7 @@ const TwoColumnATS = ({ formData }) => {
         <div>
           {formData.summary && (
             <Section title="Professional Summary">
-              <p className="text-sm leading-relaxed">{formData.summary}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-line break-words">{formData.summary}</p>
             </Section>
           )}
 

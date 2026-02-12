@@ -2,7 +2,7 @@ import React from "react";
 
 const ProfessionalTemplate = ({ formData }) => (
   <div
-    className="bg-white resume-root space-y-6 w-full border border-slate-300 p-12 lg:p-20 min-h-[1400px] max-w-[820px]"
+    className="bg-white resume-root space-y-6 w-full border border-slate-300 p-12 lg:p-20 min-h-[1400px] max-w-[820px] overflow-hidden break-words"
     style={{ fontFamily: '"Times New Roman", Times, serif' }}
   >
     {(formData.fullName || formData.email || formData.phone) && (
@@ -36,7 +36,7 @@ const ProfessionalTemplate = ({ formData }) => (
 
     {formData.summary && (
       <div className="mb-10">
-        <p className="text-sm text-slate-700 leading-relaxed text-justify">
+        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words">
           {formData.summary}
         </p>
       </div>
@@ -158,26 +158,26 @@ const ProfessionalTemplate = ({ formData }) => (
 
     {(formData.skills?.technical?.length > 0 ||
       formData.skills?.soft?.length > 0) && (
-      <div className="mb-10">
-        <h2 className="text-sm font-bold text-slate-900 uppercase border-b border-black mb-4 pb-0.5">
-          SKILLS
-        </h2>
-        <div className="text-sm text-slate-900">
-          {formData.skills.technical?.length > 0 && (
-            <div className="mb-2">
-              <span className="font-bold">Technical: </span>
-              {formData.skills.technical.join(", ")}
-            </div>
-          )}
-          {formData.skills.soft?.length > 0 && (
-            <div>
-              <span className="font-bold">Soft Skills: </span>
-              {formData.skills.soft.join(", ")}
-            </div>
-          )}
+        <div className="mb-10">
+          <h2 className="text-sm font-bold text-slate-900 uppercase border-b border-black mb-4 pb-0.5">
+            SKILLS
+          </h2>
+          <div className="text-sm text-slate-900">
+            {formData.skills.technical?.length > 0 && (
+              <div className="mb-2">
+                <span className="font-bold">Technical: </span>
+                {formData.skills.technical.join(", ")}
+              </div>
+            )}
+            {formData.skills.soft?.length > 0 && (
+              <div>
+                <span className="font-bold">Soft Skills: </span>
+                {formData.skills.soft.join(", ")}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
     {formData.certifications?.some((cert) => cert.name) && (
       <div className="mb-10">

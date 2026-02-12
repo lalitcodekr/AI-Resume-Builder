@@ -2,7 +2,7 @@ import React from "react";
 
 const MinimalTemplate = ({ formData }) => (
   <div
-    className="bg-white resume-root space-y-6 w-full border border-slate-300 p-16 min-h-[1400px] max-w-[820px]"
+    className="bg-white resume-root space-y-6 w-full border border-slate-300 p-16 min-h-[1400px] max-w-[820px] overflow-hidden break-words"
     style={{ fontFamily: '"Helvetica Neue", Arial, sans-serif' }}
   >
     {formData.fullName && (
@@ -20,7 +20,7 @@ const MinimalTemplate = ({ formData }) => (
 
     {formData.summary && (
       <div className="mb-12">
-        <p className="text-sm text-slate-700 leading-relaxed">
+        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words">
           {formData.summary}
         </p>
       </div>
@@ -96,20 +96,20 @@ const MinimalTemplate = ({ formData }) => (
 
     {(formData.skills?.technical?.length > 0 ||
       formData.skills?.soft?.length > 0) && (
-      <div className="mb-12">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
-          Skills
-        </h2>
-        <div className="text-sm text-slate-700">
-          {formData.skills.technical?.length > 0 && (
-            <div className="mb-2">{formData.skills.technical.join(" • ")}</div>
-          )}
-          {formData.skills.soft?.length > 0 && (
-            <div>{formData.skills.soft.join(" • ")}</div>
-          )}
+        <div className="mb-12">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
+            Skills
+          </h2>
+          <div className="text-sm text-slate-700">
+            {formData.skills.technical?.length > 0 && (
+              <div className="mb-2">{formData.skills.technical.join(" • ")}</div>
+            )}
+            {formData.skills.soft?.length > 0 && (
+              <div>{formData.skills.soft.join(" • ")}</div>
+            )}
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
     {formData.projects?.some((project) => project.name) && (
       <div className="mb-12">

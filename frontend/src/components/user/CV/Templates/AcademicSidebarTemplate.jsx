@@ -3,7 +3,7 @@ import React from "react";
 const AcademicSidebarTemplate = ({ formData }) => {
   return (
     <div
-      className="bg-white border border-slate-300 w-full max-w-[900px] min-h-[1400px] flex resume-root"
+      className="bg-white border border-slate-300 w-full max-w-[900px] min-h-[1400px] flex resume-root overflow-hidden break-words"
       style={{ fontFamily: '"Garamond", "Times New Roman", serif' }}
     >
       {/* LEFT SIDEBAR */}
@@ -70,7 +70,7 @@ const AcademicSidebarTemplate = ({ formData }) => {
             <h2 className="text-lg font-bold text-slate-900 mb-3">
               Research Profile
             </h2>
-            <p className="text-sm text-slate-700 leading-relaxed">
+            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words">
               {formData.summary}
             </p>
           </section>

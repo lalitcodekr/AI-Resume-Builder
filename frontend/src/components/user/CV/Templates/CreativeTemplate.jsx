@@ -2,7 +2,7 @@ import React from "react";
 
 const CreativeTemplate = ({ formData }) => (
   <div
-    className="bg-white w-full border border-slate-300 min-h-[1400px] max-w-[820px] flex resume-root space-y-6"
+    className="bg-white w-full border border-slate-300 min-h-[1400px] max-w-[820px] flex resume-root space-y-6 overflow-hidden break-words"
     style={{ fontFamily: '"Poppins", sans-serif' }}
   >
     <div className="w-1/3 bg-gradient-to-b from-purple-600 to-purple-800 text-white p-8">
@@ -34,40 +34,40 @@ const CreativeTemplate = ({ formData }) => (
 
       {(formData.skills?.technical?.length > 0 ||
         formData.skills?.soft?.length > 0) && (
-        <div className="mb-8">
-          <h2 className="text-sm font-bold uppercase tracking-wider mb-3 opacity-90">
-            Skills
-          </h2>
-          {formData.skills.technical?.length > 0 && (
-            <div className="mb-4">
-              <h3 className="text-xs font-semibold mb-2 opacity-80">
-                Technical
-              </h3>
-              <div className="space-y-1.5">
-                {formData.skills.technical.map((skill, idx) => (
-                  <div key={idx} className="text-sm">
-                    • {skill}
-                  </div>
-                ))}
+          <div className="mb-8">
+            <h2 className="text-sm font-bold uppercase tracking-wider mb-3 opacity-90">
+              Skills
+            </h2>
+            {formData.skills.technical?.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-xs font-semibold mb-2 opacity-80">
+                  Technical
+                </h3>
+                <div className="space-y-1.5">
+                  {formData.skills.technical.map((skill, idx) => (
+                    <div key={idx} className="text-sm">
+                      • {skill}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          {formData.skills.soft?.length > 0 && (
-            <div>
-              <h3 className="text-xs font-semibold mb-2 opacity-80">
-                Soft Skills
-              </h3>
-              <div className="space-y-1.5">
-                {formData.skills.soft.map((skill, idx) => (
-                  <div key={idx} className="text-sm">
-                    • {skill}
-                  </div>
-                ))}
+            )}
+            {formData.skills.soft?.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold mb-2 opacity-80">
+                  Soft Skills
+                </h3>
+                <div className="space-y-1.5">
+                  {formData.skills.soft.map((skill, idx) => (
+                    <div key={idx} className="text-sm">
+                      • {skill}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
 
       {formData.certifications?.some((cert) => cert.name) && (
         <div>
@@ -97,7 +97,7 @@ const CreativeTemplate = ({ formData }) => (
           <h2 className="text-xl font-bold text-purple-700 mb-3 uppercase tracking-wide">
             Profile
           </h2>
-          <p className="text-sm text-slate-700 leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words">
             {formData.summary}
           </p>
         </div>

@@ -2,7 +2,7 @@ import React from "react";
 
 const AcademicTemplate = ({ formData }) => (
   <div
-    className="bg-white w-full border border-slate-300 p-16 min-h-[1400px] max-w-[820px ] resume-root space-y-6"
+    className="bg-white w-full border border-slate-300 p-16 min-h-[1400px] max-w-[820px] resume-root space-y-6 overflow-hidden break-words"
     style={{ fontFamily: '"Garamond", "Times New Roman", serif' }}
   >
     {formData.fullName && (
@@ -28,7 +28,7 @@ const AcademicTemplate = ({ formData }) => (
         <h2 className="text-lg font-bold text-slate-900 mb-3">
           Research Interests
         </h2>
-        <p className="text-sm text-slate-700 leading-relaxed">
+        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line break-words">
           {formData.summary}
         </p>
       </div>
