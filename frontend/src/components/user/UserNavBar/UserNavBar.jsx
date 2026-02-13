@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Bell, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import UptoSkillsLogo from "../../../assets/UptoSkills.webp";
+import UptoSkillsLogo from "../../../assets/logo6.png";
 
 export default function UserNavbar() {
   const [showNotifications, setShowNotifications] = useState(false);
