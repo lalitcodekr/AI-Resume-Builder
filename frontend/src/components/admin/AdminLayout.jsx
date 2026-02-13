@@ -2,13 +2,20 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import AdminNavbar from "./AdminNavBar/AdminNavBar";
 import AdminSidebar from "./AdminSidebar/AdminSidebar";
+import { NotificationProvider } from "../../context/NotificationContext";
 
 export default function AdminLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   return (
-    <>
-      <AdminNavbar isCollapsed={isCollapsed} />
+    <NotificationProvider>
+      <AdminNavbar 
+        isCollapsed={isCollapsed} 
+        setIsCollapsed={setIsCollapsed}
+        isMobileOpen={isMobileOpen}
+        setIsMobileOpen={setIsMobileOpen}
+      />
 
       <AdminSidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
@@ -22,6 +29,6 @@ export default function AdminLayout() {
       >
         <Outlet />
       </main>
-    </>
+    </NotificationProvider>
   );
 }

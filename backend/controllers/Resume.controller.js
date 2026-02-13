@@ -1,13 +1,9 @@
 import mongoose from "mongoose";
-
-// Models
-import Resume from "../Models/resume.js";
 import AtsScans from "../Models/atsScan.js";
+import Resume from "../Models/resume.js";
+import Notification from "../Models/notification.js";
 
-// AI Service
-import generateResumeAI from "../ai/aiService.js";
-
-// Resume Parsing Services
+// services
 import {
   parseResume,
   extractResumeData,
@@ -101,7 +97,6 @@ export const uploadAndAnalyzeResume = async (req, res) => {
     const userId = req.userId;
     const file = req.file;
 
-    // Parse resume
     const parseResult = await parseResume(file);
 
     if (!parseResult?.success || !parseResult?.text) {
@@ -113,16 +108,12 @@ export const uploadAndAnalyzeResume = async (req, res) => {
     }
 
     const resumeText = parseResult.text;
-
-    // Extract structured data
     const extractedData = extractResumeData(resumeText);
 
-    // ATS analysis
     const analysis = analyzeATSCompatibility(resumeText, extractedData);
     const passes = passesATSThreshold(analysis.overallScore);
     const recommendations = generateRecommendations(analysis);
 
-    // Save ATS scan
     const atsScan = new AtsScans({
       userId,
       filename: file.filename,
@@ -142,6 +133,22 @@ export const uploadAndAnalyzeResume = async (req, res) => {
 
     await atsScan.save();
 
+    // 🔔 USER NOTIFICATION
+    await Notification.create({
+      actor: "system",
+      type: "ATS_SCAN",
+      message: `You uploaded a resume. Your ATS score is ${analysis.overallScore}`,
+      userId,
+    });
+
+    // 🔔 ADMIN NOTIFICATION
+    await Notification.create({
+      actor: "user",
+      type: "ATS_SCAN",
+      message: `User uploaded a resume (ATS Score: ${analysis.overallScore})`,
+      userId,
+    });
+
     res.status(200).json({
       success: true,
       message: "Resume uploaded and analyzed successfully",
@@ -155,11 +162,10 @@ export const uploadAndAnalyzeResume = async (req, res) => {
         recommendations,
         passThreshold: passes,
         extractedData,
-        metrics: analysis.metrics,
       },
     });
   } catch (error) {
-    console.error("❌ Resume upload error:", error);
+    console.error("Resume upload error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to upload and analyze resume",
@@ -168,64 +174,7 @@ export const uploadAndAnalyzeResume = async (req, res) => {
   }
 };
 
-/* =====================================================
-   GET ALL USER SCANS
-===================================================== */
-export const getUserScans = async (req, res) => {
-  try {
-    const scans = await AtsScans.find({ userId: req.userId })
-      .sort({ createdAt: -1 })
-      .select(
-        "filename originalName overallScore passThreshold createdAt sectionScores"
-      );
-
-    res.status(200).json({
-      success: true,
-      count: scans.length,
-      data: scans,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch scans",
-      error: error.message,
-    });
-  }
-};
-
-/* =====================================================
-   GET SCAN BY ID
-===================================================== */
-export const getScanById = async (req, res) => {
-  try {
-    const scan = await AtsScans.findOne({
-      _id: req.params.id,
-      userId: req.userId,
-    });
-
-    if (!scan) {
-      return res.status(404).json({
-        success: false,
-        message: "Scan not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: scan,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch scan",
-      error: error.message,
-    });
-  }
-};
-
-/* =====================================================
-   DELETE SCAN
-===================================================== */
+/* ================= DELETE SCAN ================= */
 export const deleteScan = async (req, res) => {
   try {
     const scan = await AtsScans.findOne({
@@ -242,6 +191,22 @@ export const deleteScan = async (req, res) => {
 
     deleteFile(scan.filePath);
     await AtsScans.findByIdAndDelete(scan._id);
+
+    // USER
+    await Notification.create({
+      actor: "system",
+      type: "ATS_DELETED",
+      message: "You deleted an ATS scan",
+      userId: req.userId,
+    });
+
+    // ADMIN
+    await Notification.create({
+      actor: "user",
+      type: "ATS_DELETED",
+      message: "User deleted an ATS scan",
+      userId: req.userId,
+    });
 
     res.status(200).json({
       success: true,
@@ -282,6 +247,22 @@ export const downloadResume = async (req, res) => {
       });
     }
 
+    // USER
+    await Notification.create({
+      actor: "system",
+      type: "RESUME_DOWNLOADED",
+      message: "You downloaded your resume",
+      userId: req.userId,
+    });
+
+    // ADMIN
+    await Notification.create({
+      actor: "user",
+      type: "RESUME_DOWNLOADED",
+      message: "User downloaded a resume",
+      userId: req.userId,
+    });
+
     res.setHeader(
       "Content-Disposition",
       `attachment; filename="${scan.originalName}"`
@@ -292,52 +273,6 @@ export const downloadResume = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to download resume",
-      error: error.message,
-    });
-  }
-};
-
-/* =====================================================
-   SCAN STATISTICS
-===================================================== */
-export const getScanStatistics = async (req, res) => {
-  try {
-    const userId = req.userId;
-
-    const totalScans = await AtsScans.countDocuments({ userId });
-
-    const avgScore = await AtsScans.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
-      { $group: { _id: null, avgScore: { $avg: "$overallScore" } } },
-    ]);
-
-    const passedScans = await AtsScans.countDocuments({
-      userId,
-      passThreshold: true,
-    });
-
-    const recentScans = await AtsScans.find({ userId })
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .select("filename overallScore createdAt");
-
-    res.status(200).json({
-      success: true,
-      data: {
-        totalScans,
-        averageScore: avgScore[0]?.avgScore?.toFixed(1) || 0,
-        passedScans,
-        passRate:
-          totalScans > 0
-            ? ((passedScans / totalScans) * 100).toFixed(1)
-            : 0,
-        recentScans,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch statistics",
       error: error.message,
     });
   }

@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import notificationRoutes from "./routers/notification.router.js";
 
 // Routers
 import authRouter from "./routers/auth.router.js";
@@ -43,6 +44,7 @@ app.use(
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/template", templateRouter);
+app.use("/api/notifications", notificationRoutes);
 
 // Serve uploads directory (for images/resumes)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
