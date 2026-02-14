@@ -99,106 +99,104 @@ export default function AdminNavbar({ isCollapsed, setIsCollapsed, isMobileOpen,
               )}
             </motion.button>
 
+            {/* ✅ FIXED AnimatePresence STRUCTURE */}
             <AnimatePresence>
               {showNotifications && (
-                <>
-                  {/* Backdrop */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="fixed inset-0 bg-black/10 z-[60] backdrop-blur-[2px]"
-                    onClick={() => setShowNotifications(false)}
-                  />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 bg-black/10 z-[60] backdrop-blur-[2px]"
+                  onClick={() => setShowNotifications(false)}
+                />
+              )}
+              {showNotifications && (
+                <motion.div
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                  className="fixed top-0 right-0 bottom-0 w-[420px] bg-white shadow-2xl z-[70] flex flex-col overflow-hidden"
+                >
+                  {/* Header */}
+                  <div className="flex-shrink-0 px-8 py-6 bg-white flex items-center justify-between border-b border-gray-50">
+                    <h2 className="text-2xl font-bold text-gray-900">Notifications ({unreadCount})</h2>
+                    <button
+                      onClick={() => setShowNotifications(false)}
+                      className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <X size={24} />
+                    </button>
+                  </div>
 
-                  {/* Sidebar */}
-                  <motion.div
-                    initial={{ x: "100%" }}
-                    animate={{ x: 0 }}
-                    exit={{ x: "100%" }}
-                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                    className="fixed top-0 right-0 bottom-0 w-[420px] bg-white shadow-2xl z-[70] flex flex-col overflow-hidden"
-                  >
-                    {/* Header */}
-                    <div className="flex-shrink-0 px-8 py-6 bg-white flex items-center justify-between border-b border-gray-50">
-                      <h2 className="text-2xl font-bold text-gray-900">Notifications ({unreadCount})</h2>
-                      <button
-                        onClick={() => setShowNotifications(false)}
-                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        <X size={24} />
-                      </button>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 px-8 py-6 overflow-y-auto">
-
-                      {displayedNotifications.length === 0 ? (
-                        <div className="text-center py-12">
-                          <Bell size={32} className="text-gray-300 mx-auto mb-3" />
-                          <p className="text-gray-500 text-sm">No notifications yet</p>
-                        </div>
-                      ) : (
-                        <>
-                          {/* TODAY SECTION */}
-                          {displayedNotifications.some(n => n.category === 'today') && (
-                            <div className="mb-0">
-                              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Today</h3>
-                              <div className="space-y-8">
-                                {displayedNotifications.filter(n => n.category === 'today').map(notification => (
-                                  <NotificationItem
-                                    key={notification.id}
-                                    data={notification}
-                                    onMarkRead={handleMarkRead}
-                                    onClick={() => {
-                                      if (notification.isUnread) handleMarkRead(notification.id);
-                                      setShowNotifications(false);
-                                      navigate('/admin/notifications');
-                                    }}
-                                  />
-                                ))}
-                              </div>
+                  {/* Content */}
+                  <div className="flex-1 px-8 py-6 overflow-y-auto">
+                    {displayedNotifications.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Bell size={32} className="text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 text-sm">No notifications yet</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* TODAY SECTION */}
+                        {displayedNotifications.some(n => n.category === 'today') && (
+                          <div className="mb-0">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Today</h3>
+                            <div className="space-y-8">
+                              {displayedNotifications.filter(n => n.category === 'today').map(notification => (
+                                <NotificationItem
+                                  key={notification.id}
+                                  data={notification}
+                                  onMarkRead={handleMarkRead}
+                                  onClick={() => {
+                                    if (notification.isUnread) handleMarkRead(notification.id);
+                                    setShowNotifications(false);
+                                    navigate('/admin/notifications');
+                                  }}
+                                />
+                              ))}
                             </div>
-                          )}
+                          </div>
+                        )}
 
-                          {/* OLDER SECTION */}
-                          {displayedNotifications.some(n => n.category === 'older') && (
-                            <div className="mt-8">
-                              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Older</h3>
-                              <div className="space-y-8">
-                                {displayedNotifications.filter(n => n.category === 'older').map(notification => (
-                                  <NotificationItem
-                                    key={notification.id}
-                                    data={notification}
-                                    onMarkRead={handleMarkRead}
-                                    onClick={() => {
-                                      if (notification.isUnread) handleMarkRead(notification.id);
-                                      setShowNotifications(false);
-                                      navigate('/admin/notifications');
-                                    }}
-                                  />
-                                ))}
-                              </div>
+                        {/* OLDER SECTION */}
+                        {displayedNotifications.some(n => n.category === 'older') && (
+                          <div className="mt-8">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Older</h3>
+                            <div className="space-y-8">
+                              {displayedNotifications.filter(n => n.category === 'older').map(notification => (
+                                <NotificationItem
+                                  key={notification.id}
+                                  data={notification}
+                                  onMarkRead={handleMarkRead}
+                                  onClick={() => {
+                                    if (notification.isUnread) handleMarkRead(notification.id);
+                                    setShowNotifications(false);
+                                    navigate('/admin/notifications');
+                                  }}
+                                />
+                              ))}
                             </div>
-                          )}
-                        </>
-                      )}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
 
-                    {/* Footer */}
-                    <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-                      <button
-                        onClick={() => {
-                          setShowNotifications(false);
-                          navigate('/admin/notifications');
-                        }}
-                        className="w-full text-center text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline py-2 transition-all"
-                      >
-                        View all notifications
-                      </button>
-                    </div>
-                  </motion.div>
-                </>
+                  {/* Footer */}
+                  <div className="p-4 border-t border-gray-100 bg-gray-50/50">
+                    <button
+                      onClick={() => {
+                        setShowNotifications(false);
+                        navigate('/admin/notifications');
+                      }}
+                      className="w-full text-center text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline py-2 transition-all"
+                    >
+                      View all notifications
+                    </button>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>

@@ -162,11 +162,11 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     console.error("Change password error:", error);
     res.status(500).json({ message: "Failed to change password" });
-=======
+
     res
       .status(500)
       .json({ message: "Something went wrong", error: error.message });
->>>>>>> 4a6090920b292dc000022489930c8535635b3810
+
   }
 };
 
