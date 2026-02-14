@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   User,
@@ -12,27 +12,66 @@ import {
 } from "lucide-react";
 import "./EditProfile.css";
 import logo from "../../../assets/UptoSkills.webp";
+import axios from "../../../api/axios";
+import toast from "react-hot-toast";
 
 const EditProfile = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    fullName: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco, CA",
-    username: "johndoe",
-    bio: "Building AI resumes with UptoSkills.",
-    github: "github.com/johndoe",
-    linkedin: "linkedin.com/in/johndoe",
+    fullName: "",
+    email: "",
+    phone: "",
+    location: "",
+    username: "",
+    bio: "",
+    github: "",
+    linkedin: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [fetchingProfile, setFetchingProfile] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get("/api/user/profile");
+        if (res.data?.user) {
+          setFormData({
+            fullName: res.data.user.fullName || "",
+            email: res.data.user.email || "",
+            phone: res.data.user.phone || "",
+            location: res.data.user.location || "",
+            username: res.data.user.username || "",
+            bio: res.data.user.bio || "",
+            github: res.data.user.github || "",
+            linkedin: res.data.user.linkedin || "",
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load profile");
+      } finally {
+        setFetchingProfile(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    console.log("Saving profile:", formData);
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.put("/api/user/profile", formData);
+      toast.success(res.data?.message || "Profile updated");
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || "Update failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,15 +97,18 @@ const EditProfile = () => {
           <div className="profile-sidebar-card">
             <div className="profile-header-section">
               <div className="avatar-frame">
-                {formData.fullName
-                  .split(" ")
-                  .map((n, i) => (i < 2 ? n[0].toUpperCase() : ""))
-                  .join("")}
+                {formData.fullName && formData.fullName.trim()
+                  ? formData.fullName
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((n) => n[0].toUpperCase())
+                      .join("")
+                  : "?"}
               </div>
             </div>
 
-            <h2 className="profile-name">{formData.fullName}</h2>
-            <p className="profile-bio">{formData.bio}</p>
+            <h2 className="profile-name">{formData.fullName || "User"}</h2>
+            <p className="profile-bio">{formData.bio || "No bio added"}</p>
 
             <div className="member-info">
               <User size={14} />
@@ -94,102 +136,118 @@ const EditProfile = () => {
             </div>
 
             <div className="card-content">
-              <div className="form-section">
-                <h3>Basic Information</h3>
+              {fetchingProfile ? (
+                <div style={{ textAlign: "center", padding: "2rem" }}>
+                  <p style={{ color: "#6b7280" }}>Loading profile...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="form-section">
+                    <h3>Basic Information</h3>
 
-                <div className="field-row">
-                  <div className="field-group full-width">
-                    <label>Profile URL</label>
-                    <div className="url-input">
-                      <span>uptoskills.com/</span>
-                      <input
-                        type="text"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                      />
+                    <div className="field-row">
+                      <div className="field-group">
+                        <label>Username</label>
+                        <input
+                          type="text"
+                          name="username"
+                          value={formData.username}
+                          onChange={handleChange}
+                          placeholder="Your unique username"
+                        />
+                      </div>
+
+                      <div className="field-group">
+                        <label><User size={16} /> Full Name</label>
+                        <input
+                          type="text"
+                          name="fullName"
+                          value={formData.fullName}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="field-row">
+                      <div className="field-group">
+                        <label><Mail size={16} /> Email</label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className="field-group">
+                        <label><Phone size={16} /> Phone</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="field-row">
+                      <div className="field-group full-width">
+                        <label><MapPin size={16} /> Location</label>
+                        <input
+                          type="text"
+                          name="location"
+                          value={formData.location}
+                          onChange={handleChange}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="field-row">
-                  <div className="field-group">
-                    <label><User size={16} /> Full Name</label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                    />
+                  <div className="form-section">
+                    <h3>Social Links</h3>
+                    <div className="field-row">
+                      <div className="field-group">
+                        <label><LinkIcon size={16} /> GitHub</label>
+                        <input
+                          type="text"
+                          name="github"
+                          value={formData.github}
+                          onChange={handleChange}
+                          placeholder="github.com/username"
+                        />
+                      </div>
+
+                      <div className="field-group">
+                        <label><LinkIcon size={16} /> LinkedIn</label>
+                        <input
+                          type="text"
+                          name="linkedin"
+                          value={formData.linkedin}
+                          onChange={handleChange}
+                          placeholder="linkedin.com/in/username"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="field-group">
-                    <label><Mail size={16} /> Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
+                  <div className="form-actions">
+                    <button 
+                      className="btn-cancel"
+                      onClick={() => navigate("/user/dashboard")}
+                    >
+                      <X size={18} /> Cancel
+                    </button>
+
+                    <button 
+                      className="btn-save" 
+                      onClick={handleSave}
+                      disabled={loading || fetchingProfile}
+                    >
+                      <Save size={18} /> {loading ? "Saving..." : "Save Changes"}
+                    </button>
                   </div>
-                </div>
-
-                <div className="field-row">
-                  <div className="field-group">
-                    <label><Phone size={16} /> Phone</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="field-group">
-                    <label><MapPin size={16} /> Location</label>
-                    <input
-                      type="text"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-section">
-                <div className="field-row">
-                  <div className="field-group">
-                    <label><LinkIcon size={16} /> GitHub</label>
-                    <input
-                      type="text"
-                      name="github"
-                      value={formData.github}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="field-group">
-                    <label><LinkIcon size={16} /> LinkedIn</label>
-                    <input
-                      type="text"
-                      name="linkedin"
-                      value={formData.linkedin}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-actions">
-                <button className="btn-cancel">
-                  <X size={18} /> Cancel
-                </button>
-
-                <button className="btn-save" onClick={handleSave}>
-                  <Save size={18} /> Save Changes
-                </button>
-              </div>
+                </>
+              )}
             </div>
           </div>
 

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { X, Eye, EyeOff, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import axios from "../../../api/axios";
 import logo from "../../../assets/UptoSkills.webp";
 
 export default function Security() {
@@ -45,26 +46,25 @@ export default function Security() {
 
     try {
       setLoading(true);
-      await new Promise((res) => setTimeout(res, 1200));
-      toast.success("Password updated successfully");
-
-      setForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
+      const res = await axios.put("/api/user/password", {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
       });
-    } catch {
-      toast.error("Something went wrong. Try again.");
+      toast.success(res.data?.message || "Password updated successfully");
+      setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || "Something went wrong. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#f4f6f8] m-0 p-0">
+    <div className="w-full min-h-screen bg-[#f4f6f8]">
 
       {/* LOGO BAR */}
-      <div className="fixed md:static top-0 left-0 w-full z-50 h-[56px] sm:h-[64px] bg-white border-b border-gray-200 flex items-center justify-center sm:justify-start px-4 sm:px-8 m-0">
+      <div className="h-[56px] sm:h-[64px] bg-white border-b border-gray-200 flex items-center px-4 sm:px-8">
         <img
           src={logo}
           alt="UpToSkills Logo"
@@ -74,15 +74,22 @@ export default function Security() {
       </div>
 
       {/* CENTERED CONTENT */}
-      <div className="flex items-center justify-center min-h-screen md:min-h-[calc(100vh-64px)] px-4 pt-[56px] md:pt-0">
+      <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4">
 
         <div className="w-full max-w-xl">
 
           {/* HEADER */}
-          <div className="mb-6">
+          <div className="flex items-center justify-between mb-6">
             <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">
               Change Password
             </h1>
+
+            <button
+              onClick={() => navigate(-1)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X size={22} />
+            </button>
           </div>
 
           {/* FORM */}

@@ -10,7 +10,7 @@ export default function AdminLayout() {
 
   return (
     <NotificationProvider>
-      <AdminNavbar
+      <AdminNavbar 
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
         isMobileOpen={isMobileOpen}
