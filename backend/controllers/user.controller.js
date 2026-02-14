@@ -4,6 +4,7 @@ import User from "../Models/User.js";
 import Payment from "../Models/payment.js";
 import Resume from "../Models/resume.js";
 import Subscription from "../Models/subscription.js";
+import bcrypt from "bcryptjs";
 
 // Helper: last month date
 const getLastMonthDate = () => {
@@ -282,5 +283,84 @@ export const getAdminDashboardStats = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Dashboard stats fetch failed" });
+  }
+};
+
+// -------------------- USER: GET PROFILE --------------------
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch profile", error: error.message });
+  }
+};
+
+// -------------------- USER: UPDATE PROFILE --------------------
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { fullName, phone, location, bio, github, linkedin } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (fullName !== undefined) user.fullName = fullName;
+    if (phone !== undefined) user.phone = phone;
+    if (location !== undefined) user.location = location;
+    if (bio !== undefined) user.bio = bio;
+    if (github !== undefined) user.github = github;
+    if (linkedin !== undefined) user.linkedin = linkedin;
+
+    await user.save();
+    res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update profile", error: error.message });
+  }
+};
+
+// -------------------- USER: CHANGE PASSWORD --------------------
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current and new password are required" });
+    }
+
+    if (newPassword.length < 6) {
+       return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect current password" });
+    }
+
+    const hashedPass = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPass;
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to change password", error: error.message });
+  }
+};
+
+// -------------------- USER: GET USER NAME --------------------
+export const getUserName = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId).select("username");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ username: user.username });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch user name", error: error.message });
   }
 };
