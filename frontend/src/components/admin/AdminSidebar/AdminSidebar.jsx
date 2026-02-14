@@ -9,7 +9,7 @@ import {
   Drone,
   BarChart,
   LogOut,
-  Bell,
+  Bell,  // ← ADDED
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +27,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
   const navigate = useNavigate();
   const location = useLocation();
 
+<<<<<<< HEAD
   // Check if mobile on mount and resize
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -123,7 +124,6 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
       >
         {isMobileOpen ? <X size={24} className="text-slate-700" /> : <Menu size={24} className="text-slate-700" />}
       </button>
-
       {/* Overlay for mobile */}
       {isMobileOpen && (
         <div
@@ -145,7 +145,6 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
       >
         {/* Menu */}
         <nav className="p-3 space-y-2 mt-20 flex-1 overflow-y-auto">
-          {menuItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
 
@@ -160,7 +159,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
                         ? "bg-blue-50 text-blue-600 font-semibold"
                         : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                     }
-                    ${item.id === 'notifications' && unreadCount > 0 ? 'relative' : ''}`}
+                    ${item.id === 'notifications' && unreadCount > 0 ? 'relative' : ''}`}  // ← Added for badge positioning
                   aria-current={active ? "page" : undefined}
                 >
                   <Icon size={22} aria-hidden="true" />
