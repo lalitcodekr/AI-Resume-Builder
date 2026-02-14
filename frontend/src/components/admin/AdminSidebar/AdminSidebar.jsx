@@ -27,7 +27,6 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
   const navigate = useNavigate();
   const location = useLocation();
 
-<<<<<<< HEAD
   // Check if mobile on mount and resize
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -197,7 +196,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen
                 </AnimatePresence>
               </div>
             );
-          })}
+          
         </nav>
 
         {/* Logout Button */}

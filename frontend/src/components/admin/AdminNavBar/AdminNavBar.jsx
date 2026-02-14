@@ -184,6 +184,7 @@ export default function AdminNavbar({ isCollapsed, setIsCollapsed, isMobileOpen,
                           )}
                         </>
                       )}
+                      </div>
 
                     {/* Footer */}
                     <div className="p-4 border-t border-gray-100 bg-gray-50/50">
