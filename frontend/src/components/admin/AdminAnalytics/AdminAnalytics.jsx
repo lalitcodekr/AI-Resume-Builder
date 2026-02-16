@@ -7,7 +7,7 @@ export default function AdminAnalytics() {
   const [userGrowth, setUserGrowth] = useState({ count: 0, note: "" });
   const [conversions, setConversions] = useState({ count: 0, note: "" });
   const [activeUsers, setActiveUsers] = useState({ count: 0, note: "" });
-  const [churnRate, setChurnRate] = useState({ count: 0, note: "" });
+  const [deletedUsers, setDeletedUsers] = useState({ count: 0, note: "" });
   const [mostUsedTemplates, setMostUsedTemplates] = useState([]);
   const [revenueTrend, setRevenueTrend] = useState([]);
   const [subscriptionTrend, setSubscriptionTrend] = useState([]);
@@ -23,7 +23,7 @@ export default function AdminAnalytics() {
       setUserGrowth(response.data.userGrowth);
       setConversions(response.data.conversions);
       setActiveUsers(response.data.activeUsers);
-      setChurnRate(response.data.churnRate);
+      setDeletedUsers(response.data.deletedUsers || { count: 0, note: "" });
       setMostUsedTemplates(response.data.mostUsedTemplates || []);
       setRevenueTrend(response.data.revenueTrend || []);
       setSubscriptionTrend(response.data.subscriptionTrend || []);
@@ -60,9 +60,9 @@ export default function AdminAnalytics() {
       valueColor: "text-slate-900",
     },
     {
-      title: "Churned Users",
-      value: loading ? "..." : `${churnRate.count} Users`,
-      note: churnRate.note,
+      title: "Deleted Users",
+      value: loading ? "..." : `${deletedUsers.count} Users`,
+      note: deletedUsers.note,
       icon: <UserMinus className="text-red-600" />,
       iconBg: "bg-red-50",
       valueColor: "text-slate-900",
@@ -70,17 +70,17 @@ export default function AdminAnalytics() {
   ];
 
   return (
-    <div className="min-h-screen flex-1 p-6 sm:p-8 lg:p-10 bg-slate-50 text-slate-900">
+    <div className="min-h-screen flex-1 p-4 sm:p-6 bg-slate-50 text-slate-900">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">System Analytics</h1>
-        <p className="text-slate-600 mt-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">System Analytics</h1>
+        <p className="text-sm sm:text-base text-slate-600 mt-1 sm:mt-2">
           Deep dive into platform performance & user engagement.
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5 mb-10">
         {stats.map((item) => (
           <div
             key={item.title}
@@ -162,7 +162,7 @@ export default function AdminAnalytics() {
       </div>
 
       {/* Data Quality & Security Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6">
         {/* Uptime */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -228,22 +228,22 @@ export default function AdminAnalytics() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis 
-                  dataKey="month" 
-                  stroke="#64748b" 
+                <XAxis
+                  dataKey="month"
+                  stroke="#64748b"
                   fontSize={12}
                   allowDuplicatedCategory={false}
                 />
                 <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#fff',
                     border: '1px solid #e2e8f0',
                     borderRadius: '8px'
                   }}
                 />
                 <Legend />
-                
+
                 {revenueTrend.length > 0 && (
                   <Line
                     data={revenueTrend}
@@ -256,7 +256,7 @@ export default function AdminAnalytics() {
                     activeDot={{ r: 6 }}
                   />
                 )}
-                
+
                 {subscriptionTrend.length > 0 && (
                   <Line
                     data={subscriptionTrend}

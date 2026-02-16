@@ -1,161 +1,232 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   LayoutDashboard,
+  Menu,
+  X,
   Plus,
   IndianRupee,
   User,
+  Drone,
   BarChart,
   LogOut,
+  Bell,  // ← ADDED
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+const SIDEBAR_WIDTH = {
+  expanded: 256,
+  collapsed: 80,
+};
+
+export default function AdminSidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen, notifications = [] }) {
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menuItems = [
-    {
-      id: "dashboard",
-      icon: LayoutDashboard,
-      label: "Dashboard",
-      path: "/admin",
-    },
-    {
-      id: "create",
-      icon: Plus,
-      label: "Templates",
-      path: "/admin/create-templates",
-    },
-    {
-      id: "subscription",
-      icon: IndianRupee,
-      label: "Subscription",
-      path: "/admin/subscription",
-    },
-    { id: "users", icon: User, label: "Users", path: "/admin/users" },
-    {
-      id: "analytics",
-      icon: BarChart,
-      label: "Analytics",
-      path: "/admin/analytics",
-    },
-  ];
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // ← ADDED unreadCount calculation
+  const unreadCount = notifications.filter(n => n.unread).length;
+
+  const menuItems = useMemo(
+    () => [
+      {
+        id: "dashboard",
+        icon: LayoutDashboard,
+        label: "Dashboard",
+        path: "/admin",
+      },
+      {
+        id: "create",
+        icon: Plus,
+        label: "Templates",
+        path: "/admin/create-templates",
+      },
+      {
+        id: "subscription",
+        icon: IndianRupee,
+        label: "Subscription",
+        path: "/admin/subscription",
+      },
+      { id: "users", icon: User, label: "Users", path: "/admin/users" },
+      {
+        id: "accept",
+        icon: Drone,
+        label: "Accept User Template",
+        path: "/admin/template-requests",
+      },
+      // ← ADDED Notifications item
+      {
+        id: "notifications",
+        icon: Bell,
+        label: "Notifications",
+        path: "/admin/notifications",
+      },
+      {
+        id: "analytics",
+        icon: BarChart,
+        label: "Analytics",
+        path: "/admin/analytics",
+      },
+    ],
+    []
+  );
 
   // Navigate to page
-  const handleNavigate = (path) => {
-    navigate(path);
-    setIsMobileOpen(false);
-  };
+  const handleNavigate = useCallback(
+    (path) => {
+      navigate(path);
+      setIsMobileOpen(false);
+    },
+    [navigate]
+  );
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.clear();
-    setIsMobileOpen(false);
-    setTimeout(() => {
-      navigate("/", { replace: true });
-      window.location.reload();
-    }, 100);
-  };
+  // Check if path is active
+  const isActive = useCallback(
+    (itemPath) => {
+      if (itemPath === "/admin") {
+        return location.pathname === "/admin";
+      }
+      return location.pathname.startsWith(itemPath);
+    },
+    [location.pathname]
+  );
 
   return (
     <>
-      {/* Toggle Buttons */}
-      <div className="fixed top-4 left-4 z-[60] flex gap-2">
-        <button onClick={() => setIsMobileOpen(!isMobileOpen)} className="md:hidden">
-          <div className="lines">
-            <span className={`line transition-all duration-300 ${isMobileOpen ? 'rotate-45 translate-y-2 block' : 'block'}`}></span>
-            <span className={`line transition-all duration-300 ${isMobileOpen ? 'opacity-0' : 'opacity-100'}`}></span>
-            <span className={`line transition-all duration-300 ${isMobileOpen ? '-rotate-45 -translate-y-2 block' : 'block'}`}></span>
-          </div>
-        </button>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden md:flex nav-item toggle"
-        >
-          <div className="lines">
-            <span className="line"></span>
-            <span className="line"></span>
-            <span className="line"></span>
-          </div>
-        </button>
-      </div>
+      {/* Desktop Hamburger Button - Only visible on desktop */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="hidden md:block fixed top-3 left-4 z-[105] p-3 hover:bg-slate-50 rounded-lg transition-colors bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white active:bg-white"
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-expanded={!isCollapsed}
+      >
+        <Menu size={24} className="text-slate-700" />
+      </button>
 
+      {/* Mobile menu toggle - Only visible on mobile */}
+      <button
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className="md:hidden fixed top-3 left-4 z-[105] p-3 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white active:bg-white"
+        aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+        aria-expanded={isMobileOpen}
+      >
+        {isMobileOpen ? <X size={24} className="text-slate-700" /> : <Menu size={24} className="text-slate-700" />}
+      </button>
       {/* Overlay for mobile */}
       {isMobileOpen && (
         <div
           onClick={() => setIsMobileOpen(false)}
-          className="fixed inset-0 bg-black/30 z-30 md:hidden"
+          className="fixed inset-0 bg-black/30 z-[80] md:hidden"
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <motion.aside
-        className="fixed top-0 left-0 z-40 bg-white border-r border-slate-200 flex flex-col"
-        style={{ width: isCollapsed ? 80 : 256, height: "100vh" }}
-        animate={{ x: isMobileOpen || window.innerWidth >= 768 ? 0 : "-100%" }}
+        className="fixed top-0 left-0 z-[90] bg-white border-r border-slate-200 flex flex-col"
+        style={{
+          width: isMobile ? SIDEBAR_WIDTH.expanded : isCollapsed ? SIDEBAR_WIDTH.collapsed : SIDEBAR_WIDTH.expanded,
+          height: "100vh",
+        }}
+        animate={{ x: isMobile && !isMobileOpen ? -SIDEBAR_WIDTH.expanded : 0 }}
         transition={{ type: "spring", stiffness: 220, damping: 25 }}
       >
-        <nav className="p-3 space-y-2 mt-16 flex-1">
-          {menuItems.map((item, index) => {
+        {/* Menu */}
+        <nav className="p-3 space-y-2 mt-16 flex-1 overflow-y-auto">
+          {menuItems.map((item) => {
             const Icon = item.icon;
-            const active =
-              item.path === "/admin"
-                ? location.pathname === "/admin"
-                : location.pathname.startsWith(item.path);
+            const active = isActive(item.path);
 
             return (
-              <div key={item.id} className={`relative group ${index !== 0 ? "mt-[45px]" : ""}`}>
+              <div key={item.id} className="relative group">
                 <button
                   onClick={() => handleNavigate(item.path)}
-                  onMouseEnter={() => isCollapsed && setHoveredItem(item.id)}
-                  onMouseLeave={() => setHoveredItem(null)}
                   className={`w-full flex items-center rounded-xl transition-all
-                    ${isCollapsed ? "justify-center px-0" : "gap-3 px-4"} py-3
-                    ${active ? "bg-blue-50 text-blue-600 font-semibold" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
+                    ${isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-4"} py-3
+                    ${active
+                      ? "bg-blue-50 text-blue-600 font-semibold"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    }
+                    ${item.id === 'notifications' && unreadCount > 0 ? 'relative' : ''}`}  // ← Added for badge positioning
+                  aria-current={active ? "page" : undefined}
                 >
-                  <Icon size={22} />
-                  {!isCollapsed && <span className="whitespace-nowrap">{item.label}</span>}
+                  <Icon size={22} aria-hidden="true" />
+                  {(!isCollapsed || isMobile) && (
+                    <span className="whitespace-nowrap">{item.label}</span>
+                  )}
+
+                  {/* ← ADDED Notification Badge */}
+                  {item.id === 'notifications' && unreadCount > 0 && (
+                    <motion.div
+                      className={`ml-auto w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-lg absolute -top-2 -right-2 transform translate-x-1/2 -translate-y-1/2 ${isCollapsed && !isMobile ? 'right-1 top-1' : ''}`}
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </motion.div>
+                  )}
                 </button>
-                {/* Tooltip for collapsed state */}
-                {isCollapsed && hoveredItem === item.id && (
-                  <div className="tooltip">
-                    {item.label}
-                  </div>
-                )}
+
+                {/* Tooltip when collapsed - Desktop only */}
+                <AnimatePresence>
+                  {isCollapsed && !isMobile && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -6 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -6 }}
+                      className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex pointer-events-none"
+                      role="tooltip"
+                    >
+                      <div className="bg-slate-900 text-white text-sm px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                        {item.label}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
+
         </nav>
 
-        {/* Logout */}
-        <div className="p-3 border-t border-slate-200 mt-auto relative">
-          <button
-            onClick={handleLogout}
-            onMouseEnter={() => isCollapsed && setHoveredItem("logout")}
-            onMouseLeave={() => setHoveredItem(null)}
-            className={`w-full flex items-center rounded-xl transition-all text-red-500 hover:bg-red-50
-              ${isCollapsed ? "justify-center px-0" : "gap-3 px-4"} py-3`}
-          >
-            <LogOut size={22} />
-            {!isCollapsed && <span>Logout</span>}
-          </button>
-          {/* Tooltip for logout in collapsed state */}
-          {isCollapsed && hoveredItem === "logout" && (
-            <div className="tooltip">
-              Logout
-            </div>
-          )}
+        {/* Logout Button */}
+        <div className="p-3 border-t border-slate-200">
+          <div className="relative group">
+            <button
+              onClick={() => navigate("/")}
+              className={`w-full flex items-center rounded-xl transition-all text-red-500 hover:bg-red-50
+                ${isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-4"} py-3`}
+              aria-label="Logout"
+            >
+              <LogOut size={22} aria-hidden="true" />
+              {(!isCollapsed || isMobile) && <span>Logout</span>}
+            </button>
+
+            {/* Tooltip when collapsed - Desktop only */}
+            {isCollapsed && !isMobile && (
+              <div
+                className="absolute left-full ml-3 top-1/2 -translate-y-1/2 hidden group-hover:flex pointer-events-none"
+                role="tooltip"
+              >
+                <div className="bg-slate-900 text-white text-sm px-3 py-1.5 rounded-lg shadow-lg">
+                  Logout
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </motion.aside>
-
-      {/* Right Panel (Navbar + Content) */}
-      <div className="transition-all duration-300" style={{ marginLeft: isCollapsed ? 80 : 256 }}>
-        {/* Content goes here via Outlet if used */}
-      </div>
     </>
   );
 }

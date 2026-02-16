@@ -41,11 +41,12 @@ import AdminDashboard from "./components/admin/AdminDashboard/AdminDashboard";
 // import TemplateDocs from "./components/admin/AdminCreateTemplates/TemplateDocs";
 import Resume from "./components/admin/resume";
 import AdminUsers from "./components/admin/AdminUser/AdminUsers";
+import AdminNotification from "./components/admin/AdminNotification/Notification";
 import AdminSubscription from "./components/admin/AdminSubscription/AdminSubscription";
 import AdminAcceptUser from "./components/admin/AdminAcceptUserTemplate/AdminAcceptUser";
 import AdminAnalytics from "./components/admin/AdminAnalytics/AdminAnalytics";
 import AdminTemplates from "./components/admin/AdminCreateTemplates/Template";
-import ResumeEditor from "./components/admin/ResumeEditor/ResumeEditor";
+
 // User routes
 import UserRoutes from "./pages/UserRoutes";
 import ResumeExample from "./pages/ResumeExample";
@@ -103,15 +104,16 @@ function App() {
           <Route path="/WritingCoverLetter" element={<WritingCoverLetter />}/>
 
           {/* ================= USER DASHBOARD ROUTES ================= */}
-          <Route path="/user/*" element={<RequireAuth><UserRoutes /></RequireAuth>} />
+          <Route path="/user/*" element={<RequireAuth allowedRoles={['user']}><UserRoutes /></RequireAuth>} />
 
           {/* ================= ADMIN ROUTES ================= */}
-          <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
+          <Route path="/admin" element={<RequireAuth allowedRoles={['admin']}><AdminLayout /></RequireAuth>}>
             <Route index element={<AdminDashboard />} />
-            <Route path="create-templates" element={<AdminTemplates />} />
-            <Route path="resume-editor" element={<ResumeEditor />} />
+            <Route path="manage-templates" element={<AdminTemplates />} />
+
             <Route path="templates" element={<Resume />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="notifications" element={<AdminNotification />} />
             <Route path="subscription" element={<AdminSubscription />} />
 
             <Route path="analytics" element={<AdminAnalytics />} />

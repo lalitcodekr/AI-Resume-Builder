@@ -4,25 +4,40 @@ import axiosInstance from "../../../api/axios";
 import { usePricing } from "../../../context/Pricingcontext";
 
 const AdminSubscription = () => {
-  const { plans, setPlans, savePlans, fetchPlans } = usePricing(); // ⭐ Added fetchPlans
+  const { plans, setPlans, savePlans, fetchPlans } = usePricing();
   const [paidUsers, setPaidUsers] = useState([]);
+  const [freeUsersCount, setFreeUsersCount] = useState(0);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchPaidUsers();
-    fetchPlans(); // ⭐ Refresh plans when component mounts
+    fetchData();
+    fetchPlans();
   }, []);
 
-  const fetchPaidUsers = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axiosInstance.get("/api/user");
-      // Filter for Pro users
-      const proUsers = response.data.filter(user => user.plan === "Pro");
-      setPaidUsers(proUsers);
+      setLoading(true);
+
+      // Fetch all users
+      const usersResponse = await axiosInstance.get("/api/user");
+      const allUsers = usersResponse.data;
+
+      // Filter users
+      const pro = allUsers.filter(user => user.plan === "Pro" || user.plan === "Premium");
+      const free = allUsers.filter(user => !user.plan || user.plan === "Free");
+
+      setPaidUsers(pro);
+      setFreeUsersCount(free.length);
+
+      // Fetch stats for revenue
+      const statsResponse = await axiosInstance.get("/api/user/dashboard-stat");
+      setStats(statsResponse.data);
+
       setLoading(false);
     } catch (err) {
-      console.error("Failed to fetch users", err);
+      console.error("Failed to fetch data", err);
       setLoading(false);
     }
   };
@@ -45,7 +60,7 @@ const AdminSubscription = () => {
     setSaving(true);
     const result = await savePlans(plans);
     setSaving(false);
-    
+
     if (result.success) {
       alert('✅ Pricing changes saved successfully! The changes will now be visible on the pricing page.');
       // ⭐ Refresh plans from backend to ensure sync
@@ -56,23 +71,28 @@ const AdminSubscription = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 px-6 py-10">
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-gray-900">
+      <div className="mb-6 sm:mb-10">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
           Subscription Management
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-sm sm:text-base text-slate-600 mt-1 sm:mt-2">
           Admin can enable, disable and update pricing for subscription plans
         </p>
       </div>
 
       {/* Stats / Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-10">
         <div className="bg-white p-6 rounded-xl shadow flex flex-col gap-2">
           <p className="text-sm text-gray-500">Total Revenue</p>
           <p className="text-2xl font-bold">
-            ₹124,500 <span className="text-green-500 text-sm">+12%</span>
+            ₹{stats?.revenue?.total?.toLocaleString() || 0}
+            {stats?.revenue?.change !== 0 && (
+              <span className={`text-sm ml-2 ${stats?.revenue?.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {stats?.revenue?.change > 0 ? '+' : ''}{stats?.revenue?.change}%
+              </span>
+            )}
           </p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow flex flex-col gap-2">
@@ -84,14 +104,14 @@ const AdminSubscription = () => {
         <div className="bg-white p-6 rounded-xl shadow flex flex-col gap-2">
           <p className="text-sm text-gray-500">Free Users</p>
           <p className="text-2xl font-bold">
-            15,400{" "}
-            <span className="text-gray-400 text-sm">(Potential leads)</span>
+            {freeUsersCount.toLocaleString()}
+            <span className="text-gray-400 text-sm ml-2">(Potential leads)</span>
           </p>
         </div>
       </div>
 
       {/* Plans */}
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
         {plans.map((plan) => (
           <div
             key={plan.id}
@@ -157,7 +177,7 @@ const AdminSubscription = () => {
 
       {/* Save Button */}
       <div className="mt-12 flex justify-end">
-        <button 
+        <button
           onClick={handleSaveChanges}
           disabled={saving}
           className="px-6 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 mb-10 disabled:bg-gray-400"
@@ -166,12 +186,14 @@ const AdminSubscription = () => {
         </button>
       </div>
 
-      {/* Paid Users Table */}
-      <div className="bg-white border rounded-xl overflow-hidden shadow-sm mb-10">
+      {/* Paid Users Section */}
+      <div className="bg-white border rounded-xl shadow-sm mb-10 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">Paid Users</h2>
         </div>
-        <div className="overflow-x-auto">
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500">
               <tr>
@@ -227,6 +249,52 @@ const AdminSubscription = () => {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card Grid View */}
+        <div className="md:hidden p-4">
+          {loading ? (
+            <div className="text-center text-gray-500 py-4">Loading paid users...</div>
+          ) : paidUsers.length === 0 ? (
+            <div className="text-center text-gray-500 py-4">No paid users found.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {paidUsers.map((user) => (
+                <div
+                  key={user._id}
+                  className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3 shadow-sm"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">
+                        {user.username || "User"}
+                      </h3>
+                      <p className="text-xs text-gray-500 break-all">{user.email}</p>
+                    </div>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${user.isActive
+                        ? "bg-green-100 text-green-700 border-green-200"
+                        : "bg-red-100 text-red-700 border-red-200"
+                        }`}
+                    >
+                      {user.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-200 mt-auto">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                      {user.plan}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString()
+                        : "N/A"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
