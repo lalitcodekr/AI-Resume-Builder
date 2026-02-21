@@ -92,8 +92,6 @@ const bootstrapAdmin = async () => {
       });
       await newAdmin.save();
       console.log(`✅ Admin user created: ${adminEmail}`);
-    } else {
-      console.log(`ℹ️ Admin user already exists: ${adminEmail} (ID: ${adminExists._id})`);
     }
   } catch (error) {
     console.error("❌ Error bootstrapping admin:", error);
