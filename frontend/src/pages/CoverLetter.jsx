@@ -47,7 +47,7 @@ const SimpleCoverLetterPage = () => {
             </button>
           </div>
 
-          <div className="flex flex-col items-center gap-16 lg:flex-row lg:text-left">
+          <div className="flex flex-col items-center gap-16 lg:flex-row lg:text-left pt-10">
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-blue-50">
                 <Sparkles size={16} className="text-[#0077cc]" />
@@ -79,7 +79,7 @@ const SimpleCoverLetterPage = () => {
               <img
                 src={cover}
                 alt="AI Cover Letter Preview"
-                className="w-full h-auto rounded-[2rem]"
+                className="hidden md:block w-full h-auto rounded-[2rem]"
               />
             </div>
           </div>
@@ -96,7 +96,7 @@ const SimpleCoverLetterPage = () => {
           <div className="mb-12 space-y-6 text-lg text-gray-600">
             <p>
               A cover letter is a professional document that accompanies your resume to provide a
-              detailed introduction of your skills, experiences, and interest in a specific job role.
+              detailed introduction of your skills, experiences, and interests in a specific job role.
               It acts as a bridge between your technical qualifications and the unique value you bring
               to a potential employer.
             </p>
@@ -143,7 +143,7 @@ const SimpleCoverLetterPage = () => {
               </span>
               <h3 className="mb-6 text-2xl font-bold">Manual Writing</h3>
               <ul className="space-y-4">
-                {["Generic Greetings", "Hours of editing", "Zero Keyword Optimization"].map(
+                {["Generic Greetings", "Hours of Editing", "Zero Keyword Optimization"].map(
                   (text, i) => (
                     <li
                       key={i}
@@ -167,7 +167,7 @@ const SimpleCoverLetterPage = () => {
               <h3 className="mb-6 text-2xl font-bold">AI Builder</h3>
               <ul className="space-y-4">
                 {[
-                  "Tailored to specific Job Role",
+                  "Tailored to specific job role",
                   "Finished in under 10 seconds",
                   "Guaranteed ATS compatibility"
                 ].map((text, i) => (
