@@ -171,13 +171,6 @@ export default function AdminUsers({ head = "Manage Users" }) {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
-      <Toaster
-        position="top-right"
-        containerStyle={{
-          top: 80 // Offset below navbar
-        }}
-      />
-
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">{head}</h1>
 
