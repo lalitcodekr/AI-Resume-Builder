@@ -67,47 +67,47 @@ export const login = async (req, res) => {
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
-        // Ensure there is an admin user in DB and use its ObjectId in the token
-        let adminUser = await User.findOne({ email: process.env.ADMIN_EMAIL });
-        if (!adminUser) {
-          const hashedPass = await bcrypt.hash(password, 10);
-          adminUser = new User({
-            username: 'Admin',
-            email: process.env.ADMIN_EMAIL,
-            password: hashedPass,
-            isAdmin: true,
-            isActive: true,
-          });
-          await adminUser.save();
-        }
-
-        const token = genrateToken(
-  {
-    id: adminUser._id,
-    isAdmin: true,
-  },
-  rememberMe
-);
-
-
-        const cookieExpiry = rememberMe
-  ? 30 * 24 * 60 * 60 * 1000   // 30 days
-  : 2 * 60 * 60 * 1000;        // 2 hours
-
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "Strict",
-  maxAge: cookieExpiry,
-});
-
-        return res.status(200).json({
-          success: true,
-          token,
-          userID: adminUser._id,
+      // Ensure there is an admin user in DB and use its ObjectId in the token
+      let adminUser = await User.findOne({ email: process.env.ADMIN_EMAIL });
+      if (!adminUser) {
+        const hashedPass = await bcrypt.hash(password, 10);
+        adminUser = new User({
+          username: 'Admin',
+          email: process.env.ADMIN_EMAIL,
+          password: hashedPass,
           isAdmin: true,
-          message: "Admin login successful",
+          isActive: true,
         });
+        await adminUser.save();
+      }
+
+      const token = genrateToken(
+        {
+          id: adminUser._id,
+          isAdmin: true,
+        },
+        rememberMe
+      );
+
+
+      const cookieExpiry = rememberMe
+        ? 30 * 24 * 60 * 60 * 1000   // 30 days
+        : 2 * 60 * 60 * 1000;        // 2 hours
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "Strict",
+        maxAge: cookieExpiry,
+      });
+
+      return res.status(200).json({
+        success: true,
+        token,
+        userID: adminUser._id,
+        isAdmin: true,
+        message: "Admin login successful",
+      });
     }
 
     /* ---------- NORMAL USER LOGIN ---------- */
@@ -151,24 +151,24 @@ res.cookie("token", token, {
     await user.save();
 
     const token = genrateToken(
-  {
-    id: user._id,
-    isAdmin: user.isAdmin,
-  },
-  rememberMe
-);
+      {
+        id: user._id,
+        isAdmin: user.isAdmin,
+      },
+      rememberMe
+    );
 
 
     const cookieExpiry = rememberMe
-  ? 30 * 24 * 60 * 60 * 1000
-  : 2 * 60 * 60 * 1000;
+      ? 30 * 24 * 60 * 60 * 1000
+      : 2 * 60 * 60 * 1000;
 
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "Strict",
-  maxAge: cookieExpiry,
-});
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "Strict",
+      maxAge: cookieExpiry,
+    });
 
     res.status(200).json({
       success: true,
