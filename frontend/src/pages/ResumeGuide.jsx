@@ -24,15 +24,10 @@ import TemplateFeature from "../assets/LiveQuality.png";
 
 const ResumeGuide = () => {
   const navigate = useNavigate();
-  const isLoggedIn = typeof window !== "undefined" && !!localStorage.getItem("token");
   const [activeStep, setActiveStep] = useState(0);
 
-  const handleFeatureClick = (path) => {
-    if (isLoggedIn) navigate(path);
-    else {
-      localStorage.setItem("redirectPath", path);      
-      navigate("/login");
-    }
+  const handleBackHome = () => {
+    navigate("/");
   };
 
   const guideSteps = [
@@ -78,7 +73,14 @@ const ResumeGuide = () => {
   <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
   
   <div className="relative z-10 mx-auto max-w-7xl">
-    <div className="flex flex-col items-center gap-16 lg:flex-row lg:text-left pt-12">
+    <div className="mb-4"> 
+      <button onClick={handleBackHome} className="group inline-flex items-center gap-2 text-sm font-bold text-[#0077cc] transition-all duration-200">
+        <ArrowLeft size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
+        <span>Back to home</span>
+      </button>
+    </div>
+
+    <div className="flex flex-col items-center gap-16 lg:flex-row lg:text-left">
       <div className="flex-1 text-center lg:text-left">
         <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-blue-50">
           <PencilLine size={16} className="text-[#0077cc]" />
@@ -94,14 +96,15 @@ const ResumeGuide = () => {
           A winning resume is a professional blueprint. We show you how to structure your career narrative to land interviews in <span className="font-bold text-[#1a2e52]">record time</span>.
         </p>
 
-        <button onClick={() => handleFeatureClick("/user/resume-builder")} className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-[0_10px_25px_rgba(230,81,0,0.3)] hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)] hover:-translate-y-1 active:scale-95 mx-auto lg:mx-0">
+        <button onClick={() => navigate("/login")} className="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-[#e65100] to-[#f4511e] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-[0_10px_25px_rgba(230,81,0,0.3)] hover:shadow-[0_15px_35px_rgba(230,81,0,0.45)] hover:-translate-y-1 active:scale-95 mx-auto lg:mx-0">
           <span>Start Building Now</span>
           <ArrowRight size={22} className="transition-transform duration-300 group-hover:translate-x-2" />
         </button>
       </div>
 
       <div className="relative flex-1 w-full max-w-[550px]">
-        <img src={TemplateFeature} alt="Resume Mastery" className="w-full h-auto" />
+          
+                  <img src={TemplateFeature} alt="Resume Mastery" className="w-full h-auto" />
       </div>
     </div>
   </div>

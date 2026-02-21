@@ -3,7 +3,7 @@ import { Bot, SendHorizontal, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import axiosInstance from "./../api/axios";
-export default function App() {
+export default function AiChatBot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
     {

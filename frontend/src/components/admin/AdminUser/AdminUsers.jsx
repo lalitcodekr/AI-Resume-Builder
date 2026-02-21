@@ -127,6 +127,25 @@ export default function AdminUsers({ head = "Manage Users" }) {
     }
   }
 
+  const handleToggleRole = async (user) => {
+    const newIsAdmin = !user.isAdmin;
+    try {
+      // Optimistic update
+      setUsers(prev => prev.map(u => u._id === user._id ? { ...u, isAdmin: newIsAdmin } : u));
+
+      await axiosInstance.put(`/api/user/${user._id}`, {
+        isAdmin: newIsAdmin
+      });
+
+      toast.success(`${user.username || user.email} is now an ${newIsAdmin ? 'Admin' : 'User'}`);
+    } catch (err) {
+      console.error(err);
+      // Revert optimistic update
+      setUsers(prev => prev.map(u => u._id === user._id ? { ...u, isAdmin: user.isAdmin } : u));
+      toast.error(`Failed to update ${user.username || user.email}'s role`);
+    }
+  }
+
   const handleDeleteClick = (id) => {
     setDeleteConfirmId(id);
   };
@@ -280,11 +299,10 @@ export default function AdminUsers({ head = "Manage Users" }) {
           )}
         </div>
 
-        {/* Desktop Table View */}
         <div className="hidden md:block bg-white border rounded-xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500">
+
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-gray-500">
               <tr>
                 <th className="px-6 py-4 text-left">User Details</th>
                 <th className="px-6 py-4 text-center">Role</th>
@@ -334,9 +352,11 @@ export default function AdminUsers({ head = "Manage Users" }) {
 
                     <td className="px-6 py-4 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${u.isAdmin
-                          ? "bg-purple-100 text-purple-700 border border-purple-200"
-                          : "bg-blue-50 text-blue-700 border border-blue-200"
+                        onClick={() => handleToggleRole(u)}
+                        title={`Click to switch to ${u.isAdmin ? 'User' : 'Admin'}`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all hover:scale-105 active:scale-95 ${u.isAdmin
+                          ? "bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200"
+                          : "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                           }`}
                       >
                         {u.isAdmin ? "Admin" : "User"}
@@ -369,7 +389,7 @@ export default function AdminUsers({ head = "Manage Users" }) {
                     </td>
 
                     <td className="px-6 py-4 text-center text-gray-500">
-                      {u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}
+                      {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "N/A"}
                     </td>
 
                     <td className="px-6 py-4">
@@ -400,12 +420,11 @@ export default function AdminUsers({ head = "Manage Users" }) {
                 </tr>
               )}
             </tbody>
-            </table>
-          </div>
+          </table>
         </div>
 
         {/* Mobile Card Grid */}
-        <div className="md:hidden">
+        <div className="md:hidden p-4">
           {users.length === 0 ? (
             <div className="text-center text-gray-500 py-4">No users found.</div>
           ) : (
@@ -440,7 +459,9 @@ export default function AdminUsers({ head = "Manage Users" }) {
                   <div className="flex items-center justify-between mt-1 pt-3 border-t border-slate-200">
                     <div className="flex gap-2">
                       <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${u.isAdmin
+                        onClick={() => handleToggleRole(u)}
+                        title={`Click to switch to ${u.isAdmin ? 'User' : 'Admin'}`}
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border cursor-pointer transition-all active:scale-95 ${u.isAdmin
                           ? "bg-purple-100 text-purple-700 border-purple-200"
                           : "bg-blue-50 text-blue-700 border-blue-200"
                           }`}
