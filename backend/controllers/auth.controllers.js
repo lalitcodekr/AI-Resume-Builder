@@ -211,3 +211,50 @@ export const forgotPassword = async (req, res) => {
     });
   }
 };
+
+/* ================= CHANGE PASSWORD ================= */
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters long" });
+    }
+
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ message: "New password must be different from old password" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    const hashedPass = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPass;
+    await user.save();
+
+
+    res.clearCookie("token");
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully. Please login again.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Change password failed",
+      error: error.message,
+    });
+  }
+};
