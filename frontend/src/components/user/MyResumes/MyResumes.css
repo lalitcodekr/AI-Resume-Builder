@@ -4,7 +4,7 @@
   min-height: calc(100vh - 64px);
   /* Subtract navbar height */
   padding: 24px 32px;
-  font-family: Inter, system-ui, sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: #0f172a;
   width: 100%;
   max-width: 100%;
@@ -126,11 +126,17 @@
 .page-header h1 {
   margin: 0;
   font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #0f172a;
 }
 
 .page-header p {
-  margin-top: 4px;
+  margin-top: 6px;
   color: #64748b;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.1px;
 }
 
 .create-btn {
@@ -139,8 +145,20 @@
   border: none;
   padding: 12px 18px;
   border-radius: 8px;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.2px;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.create-btn:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+}
+
+.create-btn:active {
+  transform: translateY(0);
 }
 
 /* Card */
@@ -220,8 +238,24 @@
   text-align: left;
 }
 
+.resume-table thead th {
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .resume-table tbody td {
   border-top: 1px solid #e2e8f0;
+  font-weight: 500;
+  color: #334155;
+}
+
+.resume-table tbody td:first-child {
+  font-weight: 600;
+  color: #0f172a;
 }
 
 
@@ -284,35 +318,62 @@
   font-size: 18px;
   cursor: pointer;
   padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.dots-btn:hover {
+  background: #f1f5f9;
 }
 
 .dropdown-menu {
   position: absolute;
   right: 0;
-  top: 28px;
+  top: 32px;
   background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  min-width: 120px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  min-width: 130px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+  animation: dropdownFadeIn 0.15s ease;
+  overflow: hidden;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-menu button {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: none;
   border: none;
   text-align: left;
   cursor: pointer;
+  font-size: 14px;
+  color: #334155;
+  transition: background 0.15s ease;
 }
 
 .dropdown-menu button:hover {
-  background: #f5f5f5;
+  background: #f1f5f9;
 }
 
 .dropdown-menu .danger {
-  color: #d9534f;
+  color: #dc2626;
+}
+
+.dropdown-menu .danger:hover {
+  background: #fef2f2;
 }
 
 /* Table Bottom */
@@ -345,9 +406,514 @@
   color: #64748b;
 }
 
+/* Empty State */
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 15px;
+  border: 2px dashed #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+/* =============================================
+   CUSTOM CONFIRM MODAL
+   ============================================= */
+
+/* Overlay */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: overlayFadeIn 0.2s ease;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Card */
+.confirm-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  text-align: center;
+  animation: modalSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Warning Icon */
+.confirm-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  background: #fef2f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+  animation: iconPulse 1.6s ease-in-out infinite;
+}
+
+.confirm-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+@keyframes iconPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Title */
+.confirm-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+}
+
+/* Message */
+.confirm-message {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+/* Action Buttons Row */
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confirm-cancel-btn,
+.confirm-delete-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.2px;
+}
+
+/* Cancel */
+.confirm-cancel-btn {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.confirm-cancel-btn:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+/* Delete */
+.confirm-delete-btn {
+  background: #ef4444;
+  border: none;
+  color: #fff;
+}
+
+.confirm-delete-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
+.confirm-delete-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* =============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================= */
+
 /* Large Screens Enhancement */
 @media (min-width: 1400px) {
   .myresumes-wrapper {
     padding: 32px 64px;
+  }
+}
+
+/* ---- Laptop / Small Desktop (<= 1024px) ---- */
+@media (max-width: 1024px) {
+  .myresumes-wrapper {
+    padding: 20px 24px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .resume-table thead th,
+  .resume-table tbody td {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ---- Tablet (<= 768px) ---- */
+@media (max-width: 768px) {
+  .myresumes-wrapper {
+    padding: 16px;
+  }
+
+  /* Page header → stack vertically */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+  }
+
+  .create-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Filter row → stack */
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .format-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ===== TABLE → CARD LAYOUT ===== */
+  .resume-table {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .resume-table thead {
+    display: none;
+    /* Hide column headers */
+  }
+
+  .resume-table tbody tr {
+    display: block;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    padding: 16px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .resume-table tbody tr:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .resume-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: none;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 14px;
+  }
+
+  .resume-table tbody td:last-child {
+    border-bottom: none;
+    padding-top: 12px;
+  }
+
+  /* Show data-label as a pseudo-element */
+  .resume-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #475569;
+    flex-shrink: 0;
+    margin-right: 12px;
+    min-width: 110px;
+    font-size: 13px;
+  }
+
+  /* Actions row – align right */
+  .resume-table tbody td.actions {
+    justify-content: flex-end;
+  }
+
+  .resume-table tbody td.actions::before {
+    display: none;
+  }
+
+  /* Dropdown fix for tablet card layout */
+  .dropdown-wrapper {
+    position: static;
+  }
+
+  .resume-table tbody tr {
+    position: relative;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    right: 12px;
+    bottom: 8px;
+    top: auto;
+    min-width: 140px;
+  }
+
+  /* Table bottom */
+  .table-bottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+
+  /* Footer */
+  .footer {
+    font-size: 12px;
+  }
+}
+
+/* ---- Small Tablet / Large Phone (<= 600px) ---- */
+@media (max-width: 600px) {
+  .myresumes-wrapper {
+    padding: 14px;
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+  }
+
+  .page-header p {
+    font-size: 15px;
+  }
+
+  .create-btn {
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .filter-input {
+    padding: 10px 12px;
+  }
+
+  .filter-input input {
+    font-size: 15px;
+  }
+
+  .format-btn {
+    font-size: 15px;
+    padding: 10px 14px;
+  }
+
+  .resume-table tbody tr {
+    padding: 16px;
+  }
+
+  .resume-table tbody td {
+    font-size: 15px;
+    padding: 8px 0;
+  }
+
+  .resume-table tbody td::before {
+    min-width: 110px;
+    font-size: 13px;
+  }
+}
+
+/* ---- Mobile (<= 480px) ---- */
+@media (max-width: 480px) {
+  .myresumes-wrapper {
+    padding: 12px 10px;
+    min-height: calc(100vh - 56px);
+  }
+
+  .page-header {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .page-header p {
+    font-size: 14px;
+    margin-top: 4px;
+    color: #64748b;
+  }
+
+  .create-btn {
+    padding: 12px 16px;
+    font-size: 15px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .card {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .filter-row {
+    gap: 10px;
+  }
+
+  .filter-input {
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .filter-input input {
+    font-size: 15px;
+  }
+
+  .format-btn {
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+
+  /* Card layout adjustments */
+  .resume-table tbody tr {
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .resume-table tbody td {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 8px 0;
+    font-size: 16px;
+  }
+
+  .resume-table tbody td::before {
+    font-size: 13px;
+    font-weight: 600;
+    min-width: unset;
+    margin-right: 0;
+    margin-bottom: 2px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  /* Keep actions horizontal */
+  .resume-table tbody td.actions {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding-top: 10px;
+  }
+
+  .action-btn .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .dots-btn {
+    font-size: 22px;
+    padding: 6px 10px;
+  }
+
+  /* Score badges */
+  .score {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* Table bottom */
+  .table-bottom {
+    font-size: 14px;
+    padding-top: 4px;
+  }
+
+  .pagination button {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  /* Dropdown menu – prevent overflow on small screens */
+  .dropdown-menu {
+    min-width: 140px;
+    right: 0;
+    left: auto;
+  }
+
+  .dropdown-menu button {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    font-size: 15px;
+    padding: 40px 16px;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 24px;
+    font-size: 13px;
   }
 }
