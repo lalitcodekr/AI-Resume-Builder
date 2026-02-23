@@ -44,6 +44,8 @@ const CoverLetterBuilder = () => {
     closingParagraph: "",
     salutation: "Sincerely",
     customSalutation: "",
+    skills: "",
+    experience: "",
   });
 
   const [selectedTemplate, setSelectedTemplate] = useState("professional");
