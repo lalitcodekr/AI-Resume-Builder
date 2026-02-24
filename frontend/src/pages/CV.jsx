@@ -77,7 +77,7 @@ const CVFormattingPage = () => {
               </div>
 
 
-              <img src={CV} alt="Professional CV Structure" className="w-full h-auto" />
+              <img src={CV} alt="Professional CV Structure" className="hidden md:block w-full h-auto" />
 
 
             </div>

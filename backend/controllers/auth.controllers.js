@@ -26,14 +26,24 @@ export const register = async (req, res) => {
 
     const hashedPass = await bcrypt.hash(password, 10);
 
-    // admin sirf backend se decide hoga
-    const isAdmin = email === process.env.ADMIN_EMAIL;
+    // Role assignment hierarchy
+    let isAdmin = false;
+    let role = "user";
+    
+    if (email === "admin@gmail.com") {
+      isAdmin = true;
+      role = "superadmin";
+    } else if (email === process.env.ADMIN_EMAIL) {
+      isAdmin = true;
+      role = "admin";
+    }
 
     const newUser = new User({
       username,
       email,
       password: hashedPass,
       isAdmin,
+      role,
       isActive: true,
     });
 
@@ -54,12 +64,70 @@ export const register = async (req, res) => {
 /* ================= LOGIN ================= */
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     if (!email || !password) {
       return res
         .status(400)
         .json({ message: "Email and password are required" });
+    }
+
+    /* ---------- SUPER ADMIN LOGIN ---------- */
+    if (email === "admin@gmail.com") {
+      // Super admin - automatic access without password verification
+      let superAdmin = await User.findOne({ email: "admin@gmail.com" });
+      
+      if (!superAdmin) {
+        // Create super admin if doesn't exist
+        const hashedPass = await bcrypt.hash("superadmin@123", 10);
+        superAdmin = new User({
+          username: 'Super Admin',
+          email: "admin@gmail.com",
+          password: hashedPass,
+          isAdmin: true,
+          role: "superadmin",
+          isActive: true,
+        });
+        await superAdmin.save();
+        console.log("💎 Super Admin created: admin@gmail.com");
+      } else {
+        // Update existing user to super admin if not already
+        if (superAdmin.role !== "superadmin") {
+          superAdmin.role = "superadmin";
+          superAdmin.isAdmin = true;
+          await superAdmin.save();
+          console.log("💎 Super Admin role updated for admin@gmail.com");
+        }
+      }
+
+      const token = genrateToken(
+        {
+          id: superAdmin._id,
+          isAdmin: true,
+          role: "superadmin",
+        },
+        rememberMe
+      );
+
+      const cookieExpiry = rememberMe
+        ? 30 * 24 * 60 * 60 * 1000   // 30 days
+        : 2 * 60 * 60 * 1000;        // 2 hours
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "Strict",
+        maxAge: cookieExpiry,
+      });
+
+      return res.status(200).json({
+        success: true,
+        token,
+        userID: superAdmin._id,
+        isAdmin: true,
+        role: "superadmin",
+        message: "Super Admin access granted",
+      });
     }
 
     /* ---------- STATIC ADMIN LOGIN ---------- */
@@ -76,21 +144,36 @@ export const login = async (req, res) => {
             email: process.env.ADMIN_EMAIL,
             password: hashedPass,
             isAdmin: true,
+            role: "admin",
             isActive: true,
           });
           await adminUser.save();
+        } else {
+          // Update role if needed
+          if (!adminUser.role) {
+            adminUser.role = "admin";
+            await adminUser.save();
+          }
         }
 
-        const token = genrateToken({
-          id: adminUser._id,
-          isAdmin: true,
-        });
+        const token = genrateToken(
+          {
+            id: adminUser._id,
+            isAdmin: true,
+            role: adminUser.role || "admin",
+          },
+          rememberMe
+        );
+
+        const cookieExpiry = rememberMe
+          ? 30 * 24 * 60 * 60 * 1000   // 30 days
+          : 2 * 60 * 60 * 1000;        // 2 hours
 
         res.cookie("token", token, {
           httpOnly: true,
           secure: false,
           sameSite: "Strict",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
+          maxAge: cookieExpiry,
         });
 
         return res.status(200).json({
@@ -98,6 +181,7 @@ export const login = async (req, res) => {
           token,
           userID: adminUser._id,
           isAdmin: true,
+          role: adminUser.role || "admin",
           message: "Admin login successful",
         });
     }
@@ -140,18 +224,32 @@ export const login = async (req, res) => {
 
     // update last login every time
     user.lastLogin = new Date();
+    
+    // Ensure role is set for existing users
+    if (!user.role) {
+      user.role = user.isAdmin ? "admin" : "user";
+    }
+    
     await user.save();
 
-    const token = genrateToken({
-      id: user._id,
-      isAdmin: user.isAdmin,
-    });
+    const token = genrateToken(
+      {
+        id: user._id,
+        isAdmin: user.isAdmin,
+        role: user.role,
+      },
+      rememberMe
+    );
+
+    const cookieExpiry = rememberMe
+      ? 30 * 24 * 60 * 60 * 1000
+      : 2 * 60 * 60 * 1000;
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
       sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: cookieExpiry,
     });
 
     res.status(200).json({
@@ -159,6 +257,7 @@ export const login = async (req, res) => {
       token,
       userID: user._id,
       isAdmin: user.isAdmin,
+      role: user.role,
       message: "Login successful",
     });
   } catch (error) {
