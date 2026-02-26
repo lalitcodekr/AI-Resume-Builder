@@ -1,8 +1,8 @@
 // ✅ COMPLETE CoverLetterBuilder.jsx - ALL FIXES APPLIED (Feb 19, 2026)
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   ArrowLeft, ArrowRight, Building2, Briefcase, FileText, User,
-  Download, AlertTriangle, FileText as FileTextIcon
+  Download, Upload, AlertTriangle, FileText as FileTextIcon, ChevronDown
 } from 'lucide-react';
 import CoverLetterFormTabs from "./CoverLetterFormTabs";
 import RecipientInfoForm from "./forms/RecipientInfoForm";
@@ -50,6 +50,28 @@ const CoverLetterBuilder = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("professional");
   const [activeSection, setActiveSection] = useState("recipient");
   const [isExporting, setIsExporting] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+
+  const uploadInputRef = useRef(null);
+  const downloadDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (downloadDropdownRef.current && !downloadDropdownRef.current.contains(e.target)) {
+        setShowDownloadMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleUploadFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    // File selected — extend this handler to parse / pre-fill form as needed
+    console.log('Uploaded file:', file.name);
+    e.target.value = '';
+  };
 
 
   const handleInputChange = (field, value) => {
@@ -548,20 +570,58 @@ ${(formData.jobSummary || formData.jobDescription) ? `
             Create Cover Letter
           </h1>
           <div className="flex gap-2 flex-shrink-0">
+            {/* Upload button */}
             <button
-              onClick={exportToPDF}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 disabled:opacity-60 transition-all font-medium text-sm"
+              onClick={() => uploadInputRef.current?.click()}
+              className="flex items-center gap-2 py-2 px-3 sm:px-5 bg-black text-white rounded-lg text-sm transition-all duration-200 hover:bg-black/80 whitespace-nowrap"
             >
-              <Download size={16}/> PDF
+              <Upload size={18}/>
+              <span className="hidden sm:inline">Upload</span>
             </button>
-            <button
-              onClick={exportToWord}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 disabled:opacity-60 transition-all font-medium text-sm"
-            >
-              <Download size={16}/> Word
-            </button>
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx"
+              className="hidden"
+              onChange={handleUploadFile}
+            />
+
+            {/* Download dropdown */}
+            <div className="relative" ref={downloadDropdownRef}>
+              <button
+                onClick={() => setShowDownloadMenu((v) => !v)}
+                disabled={isExporting}
+                className="flex items-center gap-2 py-2 px-3 sm:px-5 bg-indigo-600 text-white rounded-lg text-sm transition-all duration-200 hover:bg-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {isExporting ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Download size={18}/>
+                )}
+                <span className="hidden sm:inline">Download</span>
+                <ChevronDown size={14} className={`transition-transform duration-200 ${showDownloadMenu ? 'rotate-180' : ''}`}/>
+              </button>
+
+              {showDownloadMenu && (
+                <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                  <button
+                    onClick={() => { setShowDownloadMenu(false); exportToPDF(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <Download size={15} className="text-red-500"/>
+                    Download PDF
+                  </button>
+                  <div className="border-t border-gray-100" />
+                  <button
+                    onClick={() => { setShowDownloadMenu(false); exportToWord(); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <Download size={15} className="text-blue-500"/>
+                    Download Word
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4 shadow-sm px-2">
