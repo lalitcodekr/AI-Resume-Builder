@@ -4,10 +4,13 @@ import mongoose from "mongoose";
 import Resume from "../Models/resume.js";
 import AtsScans from "../Models/atsScan.js";
 
+
 // AI Service
 import {
   generateResumeAI,
   generateCoverLetterAI,
+  refineExperienceDescription,
+  refineProjectDescription
 } from "../ai/aiService.js";
 
 // Resume Parsing Services
@@ -174,7 +177,6 @@ export const saveResume = async (req, res) => {
 };
 
 /* =====================================================
-/* =====================================================
    GET ALL USER RESUMES
 ===================================================== */
 export const getAllUserResumes = async (req, res) => {
@@ -277,7 +279,6 @@ export const generateCoverLetter = async (req, res) => {
 };
 
 /* =====================================================
-/* =====================================================
    GET RESUME BY ID
 ===================================================== */
 export const getResumeById = async (req, res) => {
@@ -326,23 +327,15 @@ export const uploadAndAnalyzeResume = async (req, res) => {
     const extractedData = extractResumeData(resumeText);
 
     // ATS analysis
-    const { jobTitle, templateId, resumeprofileId } = req.body;
-    const jobDescription =
-      typeof req.body.jobDescription === "string"
-        ? req.body.jobDescription.trim()
-        : "";
-
-    const analysis = analyzeATSCompatibility(
-      resumeText, extractedData,
-      jobDescription,
-      file.originalname.split(".").pop());
-
+    const analysis = analyzeATSCompatibility(resumeText, extractedData);
     const misspelledWords = await getMisspelledWords(resumeText);
     analysis.misspelledWords = misspelledWords;
+
     const passes = passesATSThreshold(analysis.overallScore);
     const recommendations = generateRecommendations(analysis);
 
     // Validate required fields from frontend
+    const { jobTitle, templateId, resumeprofileId } = req.body;
     if (!jobTitle || !templateId || !resumeprofileId) {
       return res.status(400).json({
         success: false,
@@ -369,10 +362,6 @@ export const uploadAndAnalyzeResume = async (req, res) => {
       templateId: new mongoose.Types.ObjectId(templateId),
       resumeprofileId: new mongoose.Types.ObjectId(resumeprofileId),
       jobTitle,
-    });
-    console.log("✅ ATS RESPONSE DATA:", {
-      overallScore: analysis.overallScore,
-      sectionScores: analysis.sectionScores.length,
     });
 
     await atsScan.save();
@@ -632,6 +621,135 @@ export const getLatestScan = async (req, res) => {
       success: false,
       message: "Failed to fetch latest scan",
       error: error.message,
+    });
+  }
+};
+
+// ==========================================
+// ENHANCE WORK EXPERIENCE + SAVE TO MONGODB
+// ==========================================
+export const enhanceWorkExperience = async (req, res) => {
+  try {
+    console.log("Received AI generation request:", req.body);
+    // 1. Generate AI professional summary
+    const aiResponse = await refineExperienceDescription(req.body);
+    console.log(aiResponse);
+
+    console.log("AI Summary generated successfully");
+    const aiText = JSON.parse(aiResponse);
+    // 2. Try to save to MongoDB (optional - won't fail if DB is down)
+    if (aiText.status === "success") {
+      try {
+        await Resume.findOneAndUpdate(
+          {
+            "experience.id": req.body.id,
+          },
+          {
+            $set: {
+              "experience.$.description": aiText,
+            },
+          },
+          { new: true }
+        );
+        console.log("Experience description updated in database");
+
+      } catch (dbError) {
+        console.log("Database save skipped (MongoDB not connected)", dbError);
+      }
+
+      // 3. Send AI summary back to frontend
+      return res.json({
+        message: "Experience description enhanced successfully",
+        aiResume: aiText.text
+      });
+    }
+    throw new Error(aiText.text || "AI generation failed without specific error message");
+  } catch (error) {
+    console.error("AI ERROR:", error);
+    res.status(500).json({
+      error: "AI generation failed: " + error.message
+    });
+  }
+};
+
+// ==============================================
+// ENHANCE PROJECT DESCRIPTION + SAVE TO MONGODB
+// ==============================================
+export const enhanceProjectDescription = async (req, res) => {
+  try {
+    console.log("Received AI generation request:", req.body);
+    // 1. Generate AI professional summary
+    const aiResponse = await refineProjectDescription(req.body);
+    console.log(aiResponse);
+
+    console.log("AI Summary generated successfully");
+    const projectDescription = JSON.parse(aiResponse);
+    // 2. Try to save to MongoDB (optional - won't fail if DB is down)
+    if (projectDescription.status === "success") {
+      try {
+        await Resume.findOneAndUpdate(
+          {
+            "project.id": req.body.id,
+          },
+          {
+            $set: {
+              "project.$.description": projectDescription,
+            },
+          },
+          { new: true }
+        );
+        console.log("Project description updated in database");
+
+      } catch (dbError) {
+        console.log("Database save skipped (MongoDB not connected)", dbError);
+      }
+
+      // 3. Send AI summary back to frontend
+      return res.json({
+        message: "Project Description enhanced successfully",
+        projectDescription: projectDescription.text
+      });
+    }
+    throw new Error(projectDescription.text || "AI generation failed without specific error message");
+  } catch (error) {
+    console.error("AI ERROR:", error);
+    res.status(500).json({
+      error: "AI generation failed: " + error.message
+    });
+  }
+};
+
+/* =====================================================
+   GENERATE AI COVER LETTER SECTION
+===================================================== */
+export const generateAICoverLetter = async (req, res) => {
+  try {
+    const { sectionType, jobDetails } = req.body;
+
+    if (!sectionType || !jobDetails) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing sectionType or jobDetails"
+      });
+    }
+
+    console.log(`📥 Generating Cover Letter AI for: ${sectionType}`);
+    console.log("📊 Request Body:", req.body);
+
+    const content = await generateCoverLetterAI(jobDetails, sectionType);
+
+    console.log("✅ AI Content Generated Length:", content?.length);
+
+    res.json({
+      success: true,
+      result: content
+    });
+
+  } catch (error) {
+    console.error("❌ COVER LETTER AI ERROR:", error);
+    res.status(500).json({
+      success: false,
+      error: "AI generation failed: " + error.message
     });
   }
 };

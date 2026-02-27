@@ -20,54 +20,79 @@ export default function Security() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+
+  // ✅ Popup state
+  const [popup, setPopup] = useState({
+    show: false,
+    type: "",
+    message: "",
+  });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const updatePassword = async () => {
-  if (loading) return;
+    if (loading) return;
 
-  if (!form.currentPassword || !form.newPassword || !form.confirmPassword) {
-    alert("All fields are required");
-    return;
-  }
+    if (!form.currentPassword || !form.newPassword || !form.confirmPassword) {
+      return setPopup({
+        show: true,
+        type: "error",
+        message: "All fields are required",
+      });
+    }
 
-  if (form.newPassword.length < 8) {
-    alert("Password must be at least 8 characters");
-    return;
-  }
+    if (form.newPassword.length < 8) {
+      return setPopup({
+        show: true,
+        type: "error",
+        message: "Password must be at least 8 characters",
+      });
+    }
 
-  if (form.newPassword !== form.confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
+    if (form.newPassword !== form.confirmPassword) {
+      return setPopup({
+        show: true,
+        type: "error",
+        message: "Passwords do not match",
+      });
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    await axios.put("/api/user/password", {
-      currentPassword: form.currentPassword,
-      newPassword: form.newPassword,
-    });
+      await axios.put("/api/user/password", {
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
 
-    // ✅ POPUP ALERT
-    alert("Password changed successfully");
+      // ✅ Success popup
+      setPopup({
+        show: true,
+        type: "success",
+        message: "Password changed successfully",
+      });
 
-    // ✅ CLEAR FIELDS
-    setForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+      // ✅ Clear fields
+      setForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
 
-  } catch (err) {
-    alert("Something went wrong. Try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+    } catch (error) {
+      setPopup({
+        show: true,
+        type: "error",
+        message:
+          error?.response?.data?.message || "Something went wrong.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-full min-h-screen bg-[#f4f6f8]">
 
@@ -98,13 +123,6 @@ export default function Security() {
               <X size={22} />
             </button>
           </div>
-
-          {/* ✅ SUCCESS MESSAGE */}
-          {success && (
-            <div className="mb-6 p-3 rounded-lg bg-green-100 text-green-700 border border-green-300">
-              Password changed successfully
-            </div>
-          )}
 
           {/* FORM */}
           <div className="space-y-6">
@@ -155,9 +173,72 @@ export default function Security() {
               Update Password
             </button>
           </div>
-
         </div>
       </div>
+
+      {/* ✅ POPUP MODAL */}
+      {popup.show && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-sm relative">
+
+            <button
+              onClick={() => {
+                setPopup({ ...popup, show: false });
+                if (popup.type === "success") {
+                  navigate("/user/edit-profile");
+                }
+              }}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex justify-center mb-4">
+              {popup.type === "success" ? (
+                <div className="bg-green-100 p-4 rounded-full">
+                  <svg
+                    className="w-8 h-8 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              ) : (
+                <div className="bg-red-100 p-4 rounded-full">
+                  <svg
+                    className="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            <p className="text-center text-lg font-medium text-slate-800">
+              {popup.message}
+            </p>
+
+            <button
+              onClick={() => {
+                setPopup({ ...popup, show: false });
+                if (popup.type === "success") {
+                  navigate("/user/edit-profile");
+                }
+              }}
+              className="mt-6 w-full bg-[#0f172a] text-white py-2 rounded-xl hover:bg-[#020617]"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

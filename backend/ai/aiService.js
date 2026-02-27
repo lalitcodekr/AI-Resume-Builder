@@ -16,11 +16,19 @@ function getGroqClient() {
   return groq;
 }
 
+async function getAIResponse(prompt, temperature) {
+  let groq = getGroqClient();
+  if (!groq) return "AI Service Unavailable";
+  const response = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant",   // WORKING MODEL
+    messages: [{ role: "user", content: prompt }],
+    temperature: temperature ?? 0.6
+  });
+  return response.choices[0].message.content?.trim() || "No Response from AI";
+}
+
 export async function generateResumeAI(data) {
   try {
-    let groq = getGroqClient();
-    if (!groq) return "AI Service Unavailable";
-
     console.log("AI FUNCTION CALLED");
     console.log("INPUT DATA:", data);
     const formatEducation = (education = []) =>
@@ -93,15 +101,8 @@ export async function generateResumeAI(data) {
 
       Example format: "I am a skilled software developer with expertise in..."
     `;
-
-    const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",   // WORKING MODEL
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.6
-    });
-
-    return response.choices[0].message.content;
-
+    const response = await getAIResponse(prompt);
+    return response;
   } catch (error) {
     console.error("AI SERVICE ERROR:", error);
     throw error;
@@ -110,9 +111,6 @@ export async function generateResumeAI(data) {
 
 export async function refineExperienceDescription(data) {
   try {
-    let groq = getGroqClient();
-    if (!groq) throw new Error("AI Service Unavailable");
-
     console.log("AI FUNCTION CALLED");
     console.log("INPUT DATA:", data);
     const prompt = `
@@ -158,15 +156,8 @@ export async function refineExperienceDescription(data) {
       EXPERIENCE DESCRIPTION (rewrite ONLY this text):
       <<<${data.description}>>>
     `;
-
-    const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",   // WORKING MODEL
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.6
-    });
-
-    return response.choices[0].message.content;
-
+    const response = await getAIResponse(prompt);
+    return response;
   } catch (error) {
     console.error("AI SERVICE ERROR:", error);
     throw error;
@@ -175,9 +166,6 @@ export async function refineExperienceDescription(data) {
 
 export async function refineProjectDescription(data) {
   try {
-    let groq = getGroqClient();
-    if (!groq) throw new Error("AI Service Unavailable");
-
     console.log("AI FUNCTION CALLED");
     console.log("INPUT DATA:", data);
     const prompt = `
@@ -223,15 +211,8 @@ export async function refineProjectDescription(data) {
       EXPERIENCE DESCRIPTION (rewrite ONLY this text):
       <<<${data.description}>>>
     `;
-
-    const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",   // WORKING MODEL
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.6
-    });
-
-    return response.choices[0].message.content;
-
+    const response = await getAIResponse(prompt);
+    return response;
   } catch (error) {
     console.error("AI SERVICE ERROR:", error);
     throw error;
@@ -250,116 +231,85 @@ export const generateCoverLetterAI = async (jobDetails, sectionType) => {
       throw new Error("AI Service unavailable (Missing API Key)");
     }
 
-    // Helper to format missing data for the prompt context
-    const getField = (val, fieldName) => val ? val : `[${fieldName} NOT PROVIDED]`;
-
-    const baseContext = `
-      Target Role: ${getField(jobDetails.jobTitle, "Job Title")}
-      Target Company: ${getField(jobDetails.companyName, "Company Name")}
-      Candidate Name: ${getField(jobDetails.fullName, "Candidate Name")}
-      Recipient Name: ${getField(jobDetails.recipientName, "Recipient Name")}
-      
-      Candidate Context:
-      - Skills: ${jobDetails.skills ? jobDetails.skills : "(No specific skills provided)"}
-      - Experience: ${jobDetails.experience ? jobDetails.experience : "(No specific experience details provided)"}
-      - Email: ${jobDetails.email || "Not provided"}
-      - Phone: ${jobDetails.phone || "Not provided"}
-      - LinkedIn: ${jobDetails.linkedin || "Not provided"}
-    `;
-
-    // Shared rules for ALL sections to prevent hallucinations
-    const antiHallucinationRules = `
-      CRITICAL RULES:
-      1. DO NOT invent experience, years of experience, or specific skills not listed in the "Candidate Context".
-      2. If experience/skills are missing, write in a general, professional manner expressing interest and willingness to learn/contribute, without claiming specific past achievements.
-      3. Use the provided "Target Role" and "Target Company" names exactly. If they are "[Job Title NOT PROVIDED]" or similar, use generic terms like "this role" or "your company".
-      4. DO NOT use placeholders like "[City]" or "[Date]".
-      5. DO NOT output any conversational text like "Here is the paragraph". Output ONLY the content.
-    `;
-
     let prompt = "";
+    const baseContext = `
+      Job Title: ${jobDetails.jobTitle || 'Role'}
+      Company: ${jobDetails.companyName || 'Company'}
+      Candidate Name: ${jobDetails.fullName || 'Candidate'}
+      Skills/Context: ${jobDetails.skills || ''}
+      Experience: ${jobDetails.experience || ''}
+    `;
 
     switch (sectionType) {
       case 'openingParagraph':
         prompt = `
-          Write a professional opening paragraph for a cover letter.
-          
+          Write a professional opening paragraph for a cover letter for the position of ${jobDetails.jobTitle} at ${jobDetails.companyName}.
           Context:
           ${baseContext}
           
-          Instructions:
-          - Express enthusiasm for the position and company.
-          - Mention why the candidate is interested.
+          Rules:
+          - Write in first person ("I").
+          - Express enthusiasm for the role and company.
+          - Mention why you are a great fit briefly.
           - Keep it under 4 lines.
+          - STRICTLY NO placeholders like [Role] or [Company]. Use the provided details.
+          - STRICTLY NO meta-commentary like "Here is the paragraph". Just the text.
           - Tone: Professional, Confident, Engaging.
-          
-          ${antiHallucinationRules}
         `;
         break;
 
       case 'bodyParagraph1':
         prompt = `
-          Write the first body paragraph of a cover letter focusing on qualifications.
-          
+          Write the first body paragraph of a cover letter focusing on key qualifications.
           Context:
           ${baseContext}
           
-          Instructions:
-          - Focus on why the candidate is a good fit based ONLY on the provided Skills and Experience.
-          - IF NO SKILLS/EXPERIENCE ARE PROVIDED: Focus on soft skills like work ethic, adaptability, and eagerness to contribute. Do NOT invent technical skills.
+          Rules:
+          - Focus on the candidate's skills and experience relevant to ${jobDetails.jobTitle}.
+          - Use specific examples if available in the context.
+          - STRICTLY NO placeholders. If specific numbers aren't known, use qualitative descriptors (e.g., "significant increase", "led a team").
+          - STRICTLY NO meta-commentary. Just the paragraph text.
           - Keep it under 6 lines.
-          
-          ${antiHallucinationRules}
         `;
         break;
 
       case 'bodyParagraph2':
         prompt = `
-          Write the second body paragraph of a cover letter focusing on cultural fit and values.
-          
+          Write the second body paragraph of a cover letter focusing on cultural fit and additional value.
           Context:
           ${baseContext}
           
-          Instructions:
-          - Explain why the candidate is passionate about the company or industry.
-          - Highlight soft skills like leadership, collaboration, or problem-solving if applicable.
+          Rules:
+          - Explain why the candidate is passionate about ${jobDetails.companyName} or the industry.
+          - Mention soft skills like leadership, collaboration, or problem-solving.
+          - STRICTLY NO placeholders.
+          - STRICTLY NO meta-commentary. Just the paragraph text.
           - Keep it under 6 lines.
-          
-          ${antiHallucinationRules}
         `;
         break;
 
       case 'closingParagraph':
         prompt = `
           Write a strong closing paragraph for a cover letter.
-          
           Context:
           ${baseContext}
           
-          Instructions:
-          - Reiterate interest in the role.
-          - Request an interview or next steps.
+          Rules:
+          - Reiterate interest in the ${jobDetails.jobTitle} role.
+          - Include a call to action (requesting an interview).
           - Thank the reader.
-          - DO NOT sign off with "Sincerely, Name". Just write the paragraph text.
+          - Do NOT include the signature ("Sincerely, Name"). JUST the paragraph.
+          - STRICTLY NO placeholders.
+          - STRICTLY NO meta-commentary.
           - Keep it under 3 lines.
-          
-          ${antiHallucinationRules}
         `;
         break;
 
       default:
         throw new Error("Invalid section type");
     }
-
-    const response = await client.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.5, // Lower temperature for more deterministic/factual output
-      max_tokens: 300,
-    });
-
-    return response.choices[0].message.content.trim();
-
+    const response = await getAIResponse(prompt, 0.7);
+    return response;
   } catch (error) {
     console.error("❌ AI COVER LETTER ERROR:", error);
     throw error;
@@ -370,7 +320,6 @@ export const generateCoverLetterAI = async (jobDetails, sectionType) => {
 // ✅ 4. Extract Data from Resume Text (FIX #1)
 export async function extractResumeData(resumeText) {
   try {
-    const groq = getGroqClient();
     console.log("Extracting resume data from text...");
 
     const prompt = `
@@ -385,14 +334,8 @@ export async function extractResumeData(resumeText) {
       }
       Resume: ${resumeText.substring(0, 4000)}
     `;
-
-    const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.1
-    });
-
-    return JSON.parse(response.choices[0].message.content);
+    const response = await getAIResponse(prompt, 0.1);
+    return JSON.parse(response);
   } catch (error) {
     console.error("Resume extraction failed:", error);
     return {
@@ -431,12 +374,6 @@ export async function parseResume(resumeFilePath) {
 
 export async function chatBotAPIResponse(userQuestion, history, isLoggedin) {
   try {
-    const groq = getGroqClient();
-    if (!groq) {
-      console.warn("⚠️ AI Service unavailable (Missing API Key)");
-      throw new Error("AI Service unavailable (Missing API Key)");
-    }
-
     function formatChatHistory(history) {
       return history
         .map(msg => {
@@ -645,14 +582,8 @@ export async function chatBotAPIResponse(userQuestion, history, isLoggedin) {
 
       Respond strictly following all rules above.
     `;
-
-    const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.6
-    });
-
-    return response.choices[0].message.content;
+    const response = await getAIResponse(prompt);
+    return response;
   } catch (error) {
     console.error("AI SERVICE ERROR:", error);
     throw error;

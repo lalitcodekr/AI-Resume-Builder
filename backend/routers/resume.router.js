@@ -7,10 +7,11 @@ import {
   downloadResume,
   getScanStatistics,
   getLatestScan,
-  generateAIResume,
-  generateCoverLetter
-}
-  from "../controllers/Resume.controller.js";
+  generateCoverLetter,
+  enhanceWorkExperience,
+  enhanceProjectDescription,
+  generateAICoverLetter
+} from "../controllers/Resume.controller.js";
 import isAuth from "../middlewares/isAuth.js";
 import {
   uploadSingleResume,
@@ -45,11 +46,19 @@ resumeRouter.get("/download/:filename", isAuth, downloadResume);
 
 // Get latest scan after refreshing the page
 resumeRouter.get("/latest", isAuth, getLatestScan);
-
 // Generate AI Resume Summary
 resumeRouter.post("/generate-summary", generateAIResume);
 
 // Generate AI Cover Letter
 resumeRouter.post("/cover-letter/generate", generateCoverLetter);
+
+//To enhance the work experience with the help of ai
+resumeRouter.post("/enhance-work-experience", isAuth, enhanceWorkExperience);
+
+//To enhance the project description with the help of ai
+resumeRouter.post("/enhance-project-description", isAuth, enhanceProjectDescription);
+
+//TO generate cover letter professional summary
+resumeRouter.post("/cover-letter/generate-ai", isAuth, generateAICoverLetter);
 
 export default resumeRouter;
