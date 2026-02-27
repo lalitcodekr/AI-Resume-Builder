@@ -195,7 +195,7 @@ export const updateUser = async (req, res) => {
 
     if (username) user.username = username;
     if (email) user.email = email;
-    if (typeof isAdmin === "boolean") user.isAdmin = isAdmin;
+    // if (typeof isAdmin === "boolean") user.isAdmin = isAdmin; // REMOVED: Moving this below to detect changes correctly
     if (typeof isActive === "boolean") {
       console.log(
         `Updating user ${user.email} isActive from ${user.isActive} to ${isActive}`,
@@ -205,9 +205,9 @@ export const updateUser = async (req, res) => {
     if (plan) user.plan = plan;
     if (req.body.createdAt) user.createdAt = req.body.createdAt;
 
-    await user.save();
+    // await user.save(); // REMOVED: Saving at the end instead
 
-    /* 🔔 ADMIN NOTIFICATION (USER ACTION) */
+    // 🔔 ADMIN NOTIFICATION (USER ACTION)
     if (typeof isActive === "boolean") {
       // 🔔 USER
       await Notification.create({
@@ -229,8 +229,47 @@ export const updateUser = async (req, res) => {
       });
     }
 
+    // 🔔 ROLE CHANGE NOTIFICATION & UPDATE
+    if (req.body.isAdmin !== undefined) {
+      const oldRole = user.isAdmin;
+      const newRole = typeof req.body.isAdmin === 'string' ? req.body.isAdmin === 'true' : !!req.body.isAdmin;
+
+      if (oldRole !== newRole) {
+        console.log(`[RoleChange] ${user.email}: ${oldRole} -> ${newRole}`);
+
+        // Fetch performing admin's name
+        const performer = await User.findById(req.userId);
+        const performerName = performer?.username || "an administrator";
+
+        // 1. Notification for the affected user
+        await Notification.create({
+          type: "ROLE_CHANGED",
+          message: `Your account role has been updated to ${newRole ? "Admin" : "User"} by ${performerName}.`,
+          userId: user._id,
+          actor: "system",
+        });
+
+        // 2. Notification for the Admin panel feed
+        await Notification.create({
+          type: "USER_ROLE_UPDATED",
+          message: `${user.username}'s role was changed to ${newRole ? "Admin" : "User"} by ${performerName}`,
+          userId: user._id,
+          actor: "user",
+          fromAdmin: true,
+        });
+
+        user.isAdmin = newRole;
+      } else {
+        // Even if no change for notification, ensure it's set if provided
+        user.isAdmin = newRole;
+      }
+    }
+
+    // Save final state
+    await user.save();
+
     console.log(
-      `User ${user.email} updated - isActive is now: ${user.isActive}`,
+      `User ${user.email} updated - role: ${user.isAdmin}, isActive: ${user.isActive}`,
     );
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {

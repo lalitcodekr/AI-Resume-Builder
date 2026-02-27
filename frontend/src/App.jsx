@@ -122,7 +122,7 @@ function App() {
             <Route path="/WritingCoverLetter" element={<WritingCoverLetter />} />
           </Route>
           {/* ================= USER DASHBOARD ROUTES ================= */}
-          <Route path="/user/*" element={<RequireAuth allowedRoles={['user']}><UserRoutes /></RequireAuth>} />
+          <Route path="/user/*" element={<RequireAuth allowedRoles={['user', 'admin']}><UserRoutes /></RequireAuth>} />
 
           {/* ================= ADMIN ROUTES ================= */}
           <Route path="/admin" element={<RequireAuth allowedRoles={['admin']}><AdminLayout /></RequireAuth>}>

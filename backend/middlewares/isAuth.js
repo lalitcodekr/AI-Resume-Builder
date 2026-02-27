@@ -4,12 +4,12 @@ import mongoose from "mongoose";
 // lazy import User to avoid circular requires at module load
 const getUserModel = async () => {
   const mod = await import("../Models/User.js");
-  return mod.default || mod.User || mod.User;
+  return mod.default || mod.User;
 };
 
 const isAuth = async (req, res, next) => {
   try {
-    let token = req.cookies.token;
+    let token = req.cookies?.token;
 
     // If cookie is just stringified null/undefined, treat it as missing to allow fallback
     if (token === "null" || token === "undefined") {
@@ -17,7 +17,7 @@ const isAuth = async (req, res, next) => {
     }
 
     // Fallback to Authorization header
-    if (!token && req.headers.authorization) {
+    if (!token && req.headers?.authorization) {
       if (req.headers.authorization.startsWith("Bearer ")) {
         token = req.headers.authorization.split(" ")[1];
       } else {
@@ -46,27 +46,27 @@ const isAuth = async (req, res, next) => {
 
     let tokenId = verifyToken.id;
 
-    // If tokenId is not a valid ObjectId (e.g., legacy 'admin-id'), try to map it to a real admin user id
     if (!mongoose.Types.ObjectId.isValid(tokenId)) {
-      try {
-        const User = await getUserModel();
-        const admin = await User.findOne({ isAdmin: true });
-        if (admin) {
-          tokenId = admin._id;
-        } else {
-          return res.status(401).json({ message: "Admin user not found" });
-        }
-      } catch (e) {
-        console.warn('isAuth: failed to map token id to admin user', e.message);
-        return res.status(401).json({ message: "Authentication mapping failed" });
-      }
+      return res.status(401).json({ message: "Invalid token format" });
     }
 
-    req.userId = tokenId;
+    const User = await getUserModel();
+    const user = await User.findById(tokenId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User no longer exists" });
+    }
+
+    if (user.isActive === false) {
+      return res.status(403).json({ message: "Account is deactivated" });
+    }
+
+    req.userId = user._id;
+    req.userIsAdmin = user.isAdmin;
     next();
   } catch (error) {
-    console.error("isAuth unexpected error:", error);
-    return res.status(500).json({ message: "Internal server error during authentication" });
+    console.error("isAuth middleware error:", error);
+    return res.status(401).json({ message: "Authentication Failed" });
   }
 };
 
