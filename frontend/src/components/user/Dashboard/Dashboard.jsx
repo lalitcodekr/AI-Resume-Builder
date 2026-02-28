@@ -5,12 +5,7 @@ import { useEffect, useState } from "react";
 import UserNavBar from "../UserNavBar/UserNavBar";
 import axiosInstance from "../../../api/axios"; // Use the configured axios instance
 
-import {
-  FaFileAlt,
-  FaEye,
-  FaChartLine,
-  FaShieldAlt,
-} from "react-icons/fa";
+import { FaFileAlt, FaEye, FaChartLine, FaShieldAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 import "./Dashboard.css";
@@ -29,9 +24,9 @@ const Dashboard = ({ setActivePage }) => {
       const res = await axiosInstance.post("/api/user/request-admin");
       toast.success(res.data?.message || "Admin request submitted");
       // update local state so UI reflects pending status
-      setDashboardData(prev => ({
+      setDashboardData((prev) => ({
         ...prev,
-        user: { ...prev.user, adminRequestStatus: 'pending' }
+        user: { ...prev.user, adminRequestStatus: "pending" },
       }));
     } catch (err) {
       console.error(err);
@@ -66,7 +61,9 @@ const Dashboard = ({ setActivePage }) => {
         <div className="dashboard-content-container flex items-center justify-center min-h-[60vh]">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-500 font-medium">Loading your dashboard...</p>
+            <p className="text-gray-500 font-medium">
+              Loading your dashboard...
+            </p>
           </div>
         </div>
       </div>
@@ -146,7 +143,8 @@ const Dashboard = ({ setActivePage }) => {
 
           <div className="ai-right">
             <div className="ai-tip">
-              💡 Tip: {avgAtsScore < 70
+              💡 Tip:{" "}
+              {avgAtsScore < 70
                 ? "Try adding more strong action verbs to your 'Experience' section to increase impact."
                 : "Optimize your skills section with keywords from specific job descriptions."}
             </div>
@@ -191,26 +189,32 @@ const Dashboard = ({ setActivePage }) => {
                 <FaShieldAlt size={22} />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 text-lg mb-1">Upgrade to Admin</h3>
+                <h3 className="font-semibold text-gray-900 text-lg mb-1">
+                  Upgrade to Admin
+                </h3>
                 <p className="text-gray-500 text-sm">
-                  Request administrator privileges to moderate templates, manage users, and view platform analytics.
+                  Request administrator privileges to moderate templates, manage
+                  users, and view platform analytics.
                 </p>
               </div>
             </div>
 
             <button
               onClick={handleRequestAdmin}
-              disabled={adminRequestStatus === 'pending' || requestLoading}
-              className={`px-6 py-2.5 rounded-lg font-medium transition-all shrink-0 whitespace-nowrap ${adminRequestStatus === 'pending'
-                ? 'bg-amber-100 text-amber-700 cursor-not-allowed'
-                : adminRequestStatus === 'rejected'
-                  ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm'
-                }`}
+              disabled={adminRequestStatus === "pending" || requestLoading}
+              className={`px-6 py-2.5 rounded-lg font-medium transition-all shrink-0 whitespace-nowrap ${
+                adminRequestStatus === "pending"
+                  ? "bg-amber-100 text-amber-700 cursor-not-allowed"
+                  : adminRequestStatus === "rejected"
+                    ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                    : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm"
+              }`}
             >
-              {adminRequestStatus === 'pending' ? 'Request Pending' :
-                adminRequestStatus === 'rejected' ? 'Request Rejected (Apply Again)' :
-                  'Request Admin Access'}
+              {adminRequestStatus === "pending"
+                ? "Request Pending"
+                : adminRequestStatus === "rejected"
+                  ? "Request Rejected (Apply Again)"
+                  : "Request Admin Access"}
             </button>
           </div>
         )}
@@ -221,6 +225,9 @@ const Dashboard = ({ setActivePage }) => {
             onViewAll={() => navigate("/user/my-resumes")}
           />
         </div>
+        <footer className="footer pb-6">
+          © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
+        </footer>
       </div>
     </div>
   );
