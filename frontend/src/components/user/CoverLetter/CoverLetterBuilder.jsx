@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import {
   ArrowLeft, ArrowRight, Building2, Briefcase, FileText, User,
-  Download, AlertTriangle, FileText as FileTextIcon
+  Download, AlertTriangle, FileText as FileTextIcon, X
 } from 'lucide-react';
+import { useEffect } from 'react';
 import CoverLetterFormTabs from "./CoverLetterFormTabs";
 import RecipientInfoForm from "./forms/RecipientInfoForm";
 import JobDetailsForm from "./forms/JobDetailsForm";
@@ -50,6 +51,14 @@ const CoverLetterBuilder = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("professional");
   const [activeSection, setActiveSection] = useState("recipient");
   const [isExporting, setIsExporting] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = showMobilePreview ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showMobilePreview]);
 
 
   const handleInputChange = (field, value) => {
@@ -74,7 +83,6 @@ const CoverLetterBuilder = () => {
 
     setIsExporting(true);
     const printWindow = window.open('', '_blank', 'width=850,height=1100');
-   
     printWindow.document.write(`
 <!DOCTYPE html>
 <html>
@@ -203,7 +211,7 @@ body {
 <body onload="window.print(); setTimeout(() => window.close(), 1000);">
 <div class="contact-info">
   <div class="contact-name">${formData.fullName || 'Your Name'}</div>
-  ${formData.address ? formData.address.replace(/\n/g,'<br>') : ''}
+  ${formData.address ? formData.address.replace(/\n/g, '<br>') : ''}
   <div class="contact-details">
     ${formData.email ? formData.email : ''}
     ${formData.phone ? `<br>${formData.phone}` : ''}
@@ -233,17 +241,16 @@ ${(formData.jobSummary || formData.jobDescription) ? `
   <div class="recipient-name">${formData.recipientName || 'Hiring Manager'}</div>
   ${formData.recipientTitle ? `<div>${formData.recipientTitle}</div>` : ''}
   ${formData.companyName ? `<div class="company-name">${formData.companyName}</div>` : ''}
-  ${formData.companyAddress ? formData.companyAddress.replace(/\n/g,'<br>') : ''}
+  ${formData.companyAddress ? formData.companyAddress.replace(/\n/g, '<br>') : ''}
 </div>
 
 
 <div class="salutation">Dear ${formData.recipientName || 'Hiring Manager'},</div>
 
-
-<div class="body-paragraph">${(formData.openingParagraph || "I'm excited to apply for this position...").replace(/\n/g,'<br>')}</div>
-<div class="body-paragraph">${(formData.bodyParagraph1 || "In my previous role...").replace(/\n/g,'<br>')}</div>
-<div class="body-paragraph">${(formData.bodyParagraph2 || "My technical skills include...").replace(/\n/g,'<br>')}</div>
-<div class="body-paragraph">${(formData.closingParagraph || "I'm particularly drawn to your company...").replace(/\n/g,'<br>')}</div>
+<div class="body-paragraph">${(formData.openingParagraph || "I'm excited to apply for this position...").replace(/\n/g, '<br>')}</div>
+<div class="body-paragraph">${(formData.bodyParagraph1 || "In my previous role...").replace(/\n/g, '<br>')}</div>
+<div class="body-paragraph">${(formData.bodyParagraph2 || "My technical skills include...").replace(/\n/g, '<br>')}</div>
+<div class="body-paragraph">${(formData.closingParagraph || "I'm particularly drawn to your company...").replace(/\n/g, '<br>')}</div>
 
 
 <div class="signature">
@@ -252,26 +259,21 @@ ${(formData.jobSummary || formData.jobDescription) ? `
 </div>
 </body>
 </html>`);
-   
     printWindow.document.close();
     setTimeout(() => setIsExporting(false), 1500);
   };
 
+  // Replace the ENTIRE `exportToWord` function with this corrected version:
 
-// Replace the ENTIRE `exportToWord` function with this corrected version:
+  const exportToWord = () => {
+    if (!formData.fullName || !formData.jobTitle) {
+      alert('Please fill your name and job title first');
+      return;
+    }
 
+    setIsExporting(true);
 
-const exportToWord = () => {
-  if (!formData.fullName || !formData.jobTitle) {
-    alert('Please fill your name and job title first');
-    return;
-  }
-
-
-  setIsExporting(true);
-
-
-  const html = `
+    const html = `
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:w="urn:schemas-microsoft-com:office:word"
   xmlns="http://www.w3.org/TR/REC-html40">
@@ -501,24 +503,21 @@ ${(formData.jobSummary || formData.jobDescription) ? `
 </body>
 </html>`; // ✅ END HTML
 
+    const blob = new Blob(["\ufeff", html], {
+      type: "application/msword;charset=utf-8",
+    });
 
-  const blob = new Blob(["\ufeff", html], {
-    type: "application/msword;charset=utf-8",
-  });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Cover-Letter-${formData.jobTitle.replace(/[^a-zA-Z0-9]/g, '-')}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `Cover-Letter-${formData.jobTitle.replace(/[^a-zA-Z0-9]/g, '-')}.doc`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-
-  setTimeout(() => setIsExporting(false), 800);
-};
+    setTimeout(() => setIsExporting(false), 800);
+  };
 
 
 
@@ -529,11 +528,11 @@ ${(formData.jobSummary || formData.jobDescription) ? `
 
 
   const renderFormContent = () => {
-    switch(activeSection) {
-      case "recipient": return <RecipientInfoForm formData={formData} onInputChange={handleInputChange}/>;
-      case "job": return <JobDetailsForm formData={formData} onInputChange={handleInputChange}/>;
-      case "body": return <BodyContentForm formData={formData} onInputChange={handleInputChange}/>;
-      case "closing": return <ClosingForm formData={formData} onInputChange={handleInputChange}/>;
+    switch (activeSection) {
+      case "recipient": return <RecipientInfoForm formData={formData} onInputChange={handleInputChange} />;
+      case "job": return <JobDetailsForm formData={formData} onInputChange={handleInputChange} />;
+      case "body": return <BodyContentForm formData={formData} onInputChange={handleInputChange} />;
+      case "closing": return <ClosingForm formData={formData} onInputChange={handleInputChange} />;
       default: return null;
     }
   };
@@ -553,64 +552,107 @@ ${(formData.jobSummary || formData.jobDescription) ? `
               disabled={isExporting}
               className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 disabled:opacity-60 transition-all font-medium text-sm"
             >
-              <Download size={16}/> PDF
+              <Download size={16} /> PDF
             </button>
             <button
               onClick={exportToWord}
               disabled={isExporting}
               className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 disabled:opacity-60 transition-all font-medium text-sm"
             >
-              <Download size={16}/> Word
+              <Download size={16} /> Word
             </button>
           </div>
         </div>
         <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4 shadow-sm px-2">
-          <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={18}/>
+          <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={18} />
           <span className="text-sm font-medium text-amber-800">Fill Job Summary & Description in Job Details tab for complete professional letter.</span>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-2 w-full h-[82vh] lg:h-[85vh] px-2 relative z-10">
+        <div className="flex h-[calc(100vh-[180px])] gap-[10px] w-full mt-2 lg:mt-5 p-0 sm:p-2 lg:flex-row flex-col max-w-[1920px] mx-auto overflow-hidden relative z-10">
           {/* FORM PANEL */}
-          <div className="lg:col-span-5 xl:col-span-5 order-2 lg:order-1 pr-0 lg:pr-1 relative z-20">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-3 lg:p-4 h-full flex flex-col max-h-[calc(100vh-6rem)] overflow-hidden">
-              <CoverLetterFormTabs activeSection={activeSection} setActiveSection={setActiveSection} />
-              <div className="mt-3 flex-1 overflow-y-auto py-2 pr-2">{renderFormContent()}</div>
-              <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100 px-1">
-                {currentIdx > 0 && (
-                  <button onClick={goLeft} className="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs">
-                    <ArrowLeft size={14}/> Previous
-                  </button>
-                )}
-                <div className="flex-1 text-center text-xs text-gray-500 font-medium">
-                  Step {currentIdx + 1} of {tabs.length}
-                </div>
-                <button onClick={goRight} className="flex items-center gap-1 bg-gradient-to-r from-gray-900 to-black text-white px-4 py-2 rounded-lg shadow-lg text-xs">
-                  {currentIdx === tabs.length - 1 ? "Finish" : "Next"}
-                  <ArrowRight size={14}/>
-                </button>
+          <div className="bg-white rounded-xl h-full overflow-hidden flex flex-col w-full lg:w-[520px] shrink-0 border border-slate-200 order-2 lg:order-1 relative z-20">
+            <CoverLetterFormTabs
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+              onTogglePreview={() => setShowMobilePreview(v => !v)}
+            />
+            <div className="mt-3 flex-1 overflow-y-auto py-2 pr-2">{renderFormContent()}</div>
+
+            <div className="flex justify-between items-center mt-auto p-4 border-t border-slate-100 bg-white">
+              <button
+                onClick={goLeft}
+                disabled={currentIdx === 0}
+                className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
+              >
+                <ArrowLeft size={18} /> Previous
+              </button>
+              <div className="flex-1 text-center text-xs text-gray-500 font-medium">
+                Step {currentIdx + 1} of {tabs.length}
               </div>
+              <button
+                onClick={goRight}
+                disabled={currentIdx === tabs.length - 1}
+                className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
+              >
+                {currentIdx === tabs.length - 1 ? "Finish" : "Next"}
+                <ArrowRight size={18} />
+              </button>
             </div>
           </div>
-         
+
           {/* PREVIEW PANEL */}
-          <div className="col-span-1 lg:col-span-7 xl:col-span-7 order-1 lg:order-2 pl-0 lg:pl-1 relative z-10 h-[82vh] lg:h-[85vh] flex flex-col">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 flex flex-col flex-1 overflow-hidden h-full">
-              <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-slate-50 flex-shrink-0">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <FileTextIcon size={20} className="text-blue-600"/>
-                  Live Preview
-                </h2>
-                <p className="text-xs text-gray-500 mt-1">Scroll to see full letter</p>
-              </div>
-              <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 p-6 lg:p-8 preview-scroll-container">
-                <CoverLetterPreview
-                  formData={formData}
-                  exportDate={date}
-                />
-              </div>
-            </div>
+          <div className="hidden lg:flex flex-col flex-1 min-w-0 bg-[#eef2f7] rounded-xl overflow-hidden border border-slate-200 relative order-1 lg:order-2 z-10">
+            <CoverLetterPreview
+              formData={formData}
+              exportDate={date}
+            />
           </div>
         </div>
       </div>
+
+      {/* Mobile preview overlay */}
+      {showMobilePreview && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowMobilePreview(false)}
+          />
+          <div
+            className="relative mt-auto bg-white rounded-t-2xl shadow-2xl flex flex-col"
+            style={{
+              height: "92dvh",
+              animation: "clPreviewSlideUp 0.3s cubic-bezier(0.32,0.72,0,1)",
+            }}
+          >
+            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+              <div className="w-10 h-1 rounded-full bg-slate-300" />
+            </div>
+            <div className="flex items-center justify-between px-4 pb-2 flex-shrink-0">
+              <span className="text-sm font-semibold text-slate-700">
+                Cover Letter Preview
+              </span>
+              <button
+                onClick={() => setShowMobilePreview(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
+              >
+                <X size={15} />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <CoverLetterPreview
+                formData={formData}
+                exportDate={date}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes clPreviewSlideUp {
+          from { transform: translateY(100%); opacity: 0.5; }
+          to   { transform: translateY(0);    opacity: 1;   }
+        }
+      `}</style>
     </div>
   );
 };
