@@ -6,18 +6,12 @@ import {
   Award,
   Briefcase,
   CheckCircle,
-  Download,
   FolderKanban,
   GraduationCap,
-  PenTool,
-  Upload,
   User,
   Zap,
   Search,
   FileText,
-  RefreshCw,
-  Eye,
-  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../api/axios";
@@ -39,6 +33,7 @@ import { getCompletionStatus } from "./completion";
 import { dummyData } from "./dummyData";
 
 import UserNavbar from "../UserNavBar/UserNavBar";
+import CVBuilderTopBar from "../CV/Cvbuildernavbar";
 
 const ResumeBuilder = ({ setActivePage = () => {} }) => {
   /* -------------------- CORE STATE -------------------- */
@@ -74,6 +69,8 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
 
   const [activeTab, setActiveTab] = useState("builder");
   const [activeSection, setActiveSection] = useState("personal");
+  const [isAiMode, setIsAiMode] = useState(false);
+  const [documentTitle, setDocumentTitle] = useState("");
 
   /*-----------To make the upload input functional-------------*/
 
@@ -90,14 +87,6 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
   /* -------------------- PREVIEW STATE -------------------- */
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
   const [isPreviewHidden, setIsPreviewHidden] = useState(false);
-  const [showMobilePreview, setShowMobilePreview] = useState(false);
-
-  useEffect(() => {
-    document.body.style.overflow = showMobilePreview ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [showMobilePreview]);
 
   /* -------------------- HELPERS -------------------- */
   const handleInputChange = (field, value) => {
@@ -133,6 +122,7 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const previewRef = useRef(null);
+
   const GenerateResumePDF = async (resumeHtml) => {
     try {
       setLoading(true);
@@ -154,7 +144,9 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
 
       const link = document.createElement("a");
       link.href = url;
-      link.download = "resume.pdf";
+      const sanitize = (s) => (s || "").replace(/[^a-z0-9_\- ]/gi, "").trim().replace(/\s+/g, "_");
+      const fileName = sanitize(documentTitle) || sanitize(formData.fullName) || "Resume";
+      link.download = `${fileName}.pdf`;
       link.click();
 
       window.URL.revokeObjectURL(url);
@@ -167,17 +159,30 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
   };
 
   const handleDownload = async (e) => {
-    if (exporting) return; // prevent double clicks
-
+    if (exporting) return;
     const html = await previewRef.current?.getResumeHTML();
     if (!html) return;
-
     try {
       setExporting(true);
       await GenerateResumePDF(html);
     } finally {
       setExporting(false);
     }
+  };
+
+  const handleDownloadWord = async () => {
+    const html = await previewRef.current?.getResumeHTML();
+    if (!html) return;
+    const wordHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Resume</title></head><body>${html}</body></html>`;
+    const blob = new Blob(['\uFEFF', wordHtml], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const sanitize = (s) => (s || "").replace(/[^a-z0-9_\- ]/gi, "").trim().replace(/\s+/g, "_");
+    const fileName = sanitize(documentTitle) || sanitize(formData.fullName) || "Resume";
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}.doc`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   /*------------------- PREVIOUS & NEXT BUTTON ------------*/
@@ -311,17 +316,27 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
           )}
         </div>
 
+        <div className="w-full overflow-y-hidden flex justify-center md:hidden block">
+          <LivePreview
+            formData={formData}
+            currentTemplate={currentTemplate}
+            isExpanded={isPreviewExpanded}
+            onExpand={() => setIsPreviewExpanded(true)}
+            onCollapse={() => setIsPreviewExpanded(false)}
+            onMinimize={() => setIsPreviewHidden(true)}
+          />
+        </div>
+
         {/* BUILDER + PREVIEW */}
-        <div className="flex h-[calc(100vh-[180px])] gap-[10px] w-full mt-2 lg:mt-5 p-0 sm:p-2 lg:flex-row flex-col max-w-[1920px] mx-auto overflow-hidden">
+        <div className="grid gap-14 p-1.5 ml-2 mr-2 grid-cols-1 md:grid-cols-[32%_68%]">
           {/* builder-section */}
-          <div className="bg-white rounded-xl h-full overflow-hidden flex flex-col w-full lg:w-[520px] shrink-0 border border-slate-200">
+          <div className="bg-white rounded-xl h-full pl-0.5 overflow-hidden flex-1">
             <FormTabs
               activeSection={activeSection}
               setActiveSection={setActiveSection}
-              onTogglePreview={() => setShowMobilePreview((v) => !v)}
             />
             {/* form-content */}
-            <div className="w-full mt-5 overflow-auto flex-1 px-4">
+            <div className="w-full mt-5 overflow-auto">
               {warning && (
                 <div className="text-sm text-red-700 bg-yellow-100 border border-yellow-300 px-4 py-2 my-2.5 rounded-lg">
                   Please fill in all required fields to continue.
@@ -330,13 +345,13 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
               {renderFormContent()}
             </div>
             {/* Previous & Next */}
-            <div className="w-full flex items-center justify-between mt-auto p-4 border-t border-slate-100 bg-white">
+            <div className="w-full flex items-center justify-between mt-10">
               <button
                 onClick={() => {
                   goLeft();
                 }}
                 disabled={currentIdx === 0}
-                className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition select-none"
               >
                 <ArrowLeft size={18} />
                 <span>Previous</span>
@@ -352,7 +367,7 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
                   goRight();
                 }}
                 disabled={currentIdx === tabs.length - 1}
-                className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition select-none"
               >
                 <span>Next</span>
                 <ArrowRight size={18} />
@@ -360,220 +375,88 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
             </div>
           </div>
 
-          {/* Preview Section */}
-          <div
-            className={`
-              hidden lg:flex flex-col flex-1 min-w-0
-              bg-white
-              border border-gray-200
-              shadow-sm
-              rounded-xl
-              overflow-hidden
-              relative
-            `}
-          >
-            <LivePreview
-              ref={previewRef}
-              formData={formData}
-              currentTemplate={currentTemplate}
-              isExpanded={isPreviewExpanded}
-              onExpand={() => setIsPreviewExpanded(true)}
-              onCollapse={() => setIsPreviewExpanded(false)}
-              onMinimize={() => setIsPreviewHidden(true)}
-            />
-          </div>
+        {!isPreviewHidden && !isPreviewExpanded && (
+  <div className="hidden md:block">
+    <LivePreview
+      ref={previewRef}
+      formData={formData}
+      currentTemplate={currentTemplate}
+      isExpanded={false}
+      onExpand={() => setIsPreviewExpanded(true)}
+      onCollapse={() => setIsPreviewExpanded(false)}
+      onMinimize={() => setIsPreviewHidden(true)}
+    />
+  </div>
+)}
+
         </div>
         <div className="w-full h-4"></div>
-
-        {/* Mobile preview overlay */}
-        {showMobilePreview && (
-          <div className="lg:hidden fixed inset-0 z-50 flex flex-col">
-            <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-              onClick={() => setShowMobilePreview(false)}
-            />
-            <div
-              className="relative mt-auto bg-white rounded-t-2xl shadow-2xl flex flex-col"
-              style={{
-                height: "92dvh",
-                animation:
-                  "resumePreviewSlideUp 0.3s cubic-bezier(0.32,0.72,0,1)",
-              }}
-            >
-              <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-                <div className="w-10 h-1 rounded-full bg-slate-300" />
-              </div>
-              <div className="flex items-center justify-between px-4 pb-2 flex-shrink-0">
-                <span className="text-sm font-semibold text-slate-700">
-                  Resume Preview
-                </span>
-                <button
-                  onClick={() => setShowMobilePreview(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
-                >
-                  <X size={15} />
-                </button>
-              </div>
-              <div className="flex-1 min-h-0 overflow-y-auto w-full max-w-[100vw]">
-                {/* On mobile overlay, we restrict max width to viewport width to prevent overflow */}
-                <div className="w-full h-full p-2 bg-slate-50 text-black">
-                  <LivePreview
-                    formData={formData}
-                    currentTemplate={currentTemplate}
-                    isExpanded={false}
-                    onExpand={() => {}}
-                    onCollapse={() => {}}
-                    onMinimize={() => {}}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        <style>{`
-          @keyframes resumePreviewSlideUp {
-            from { transform: translateY(100%); opacity: 0.5; }
-            to   { transform: translateY(0);    opacity: 1;   }
-          }
-        `}</style>
       </>
     );
   };
 
   return (
     <>
-      <UserNavbar />
+ {!isPreviewExpanded && <UserNavbar />}
+ {isPreviewExpanded && (
+  <div className="fixed inset-0 z-[99999] bg-white overflow-auto">
+    <LivePreview
+      ref={previewRef}
+      formData={formData}
+      currentTemplate={currentTemplate}
+      isExpanded={true}
+      onExpand={() => {}}
+      onCollapse={() => setIsPreviewExpanded(false)}
+      onMinimize={() => setIsPreviewHidden(true)}
+    />
+  </div>
+)}
       {/* resume-builder-page */}
+      <CVBuilderTopBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onDownload={handleDownload}
+        onDownloadWord={handleDownloadWord}
+        onUpload={(file) => console.log("Resume upload:", file?.name)}
+        isDownloading={loading}
+        downloadDisabled={!completion.isComplete}
+        title={documentTitle}
+        onTitleChange={(_, val) => setDocumentTitle(val)}
+        titlePlaceholder="Untitled Resume"
+        templatesLabel="Resume Templates"
+        showDesigner={false}
+        showAiToggle={true}
+        isAiMode={isAiMode}
+        onToggleAiMode={() => setIsAiMode((v) => !v)}
+        extraButtons={
+          <button
+            onClick={() => navigate("/user/cover-letter")}
+            className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 font-medium shadow-sm hover:bg-black hover:text-white transition-all duration-200 whitespace-nowrap select-none"
+          >
+            <FileText size={18} />
+            Create Cover Letter
+          </button>
+        }
+      />
+
       <div className="p-2.5 overflow-hidden font-sans tracking-[0.01em]">
-        {/* main-header */}
-        <div className="block md:flex items-center justify-between pr-5">
-          <div className="w-full flex md:flex-row justify-between items-start md:items-center p-2 min-h-[50px] gap-4">
-            {/* LEFT SIDE: Heading + Toggle */}
-            <div className="flex md:flex-row md:items-center gap-4 w-full md:w-auto">
-              {/* Title Section */}
-              <div>
-                <h1 className="text-2xl font-['Outfit']">
-                  {activeTab === "builder"
-                    ? "Create Resume"
-                    : "Resume Templates"}
-                </h1>
-                {activeTab === "templates" && (
-                  <p className="text-sm text-slate-500 mt-1 hidden md:block">
-                    Choose a professionally designed template to get started.
-                  </p>
-                )}
-              </div>
-
-              {/* Toggle Switch */}
-              <div className="bg-gray-100 gap-1 md:flex hidden rounded-2xl p-1 w-fit mx-auto md:mx-0">
-                <button
-                  className={`rounded-2xl md:py-1 py-1.5 md:px-3.5 px-4 text-sm ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
-                  onClick={() => setActiveTab("builder")}
-                >
-                  Builder
-                </button>
-                <button
-                  className={`py-1 px-2.5 rounded-2xl text-sm ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
-                  onClick={() => setActiveTab("templates")}
-                >
-                  Templates
-                </button>
-              </div>
-            </div>
-
-            {/* RIGHT SIDE: Actions or Search */}
-            <div className="md:w-auto flex items-center justify-end gap-2">
-              {activeTab === "builder" && (
-                <>
-                  <button
-                    onClick={() => navigate("/user/cover-letter")}
-                    className="items-center gap-2 px-4 py-2 rounded-lg hidden md:flex border border-gray-300 bg-white text-gray-800 font-medium shadow-sm hover:bg-black hover:text-white transition-all duration-200 select-none"
-                  >
-                    <FileText size={18} />
-                    Create Cover Letter
-                  </button>
-                  <button
-                    onClick={handleButtonClick}
-                    className="flex gap-2 text-white cursor-pointer bg-black border-0 rounded-lg text-sm transition-all duration-200 select-none md:hover:bg-black/70 py-2 px-5 md:py-2.5 md:px-5"
-                  >
-                    <Upload size={18} />
-                    <span className="hidden md:inline">Upload</span>
-                  </button>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,.doc,.docx"
-                    ref={input_file}
-                    onChange={handleFileChange}
-                  />
-                  <button
-                    className="flex gap-2 text-white cursor-pointer bg-indigo-600 border-0 rounded-lg select-none text-sm transition-all duration-200 hover:bg-indigo-700 hover:to-indigo-800 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-gray-100 py-2 px-5 md:py-2.5 md:px-5"
-                    onClick={(e) => handleDownload(e)}
-                    disabled={!completion.isComplete}
-                  >
-                    {loading ? (
-                      <RefreshCw size={18} className={`ml-1 animate-spin`} />
-                    ) : (
-                      <Download size={18} />
-                    )}
-                    <span className="hidden md:inline">Download</span>
-                  </button>
-                </>
-              )}
-            </div>
+        {activeTab !== "builder" && (
+          <div className="relative w-full md:w-80 mb-4 px-3">
+            <Search
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search templates..."
+              value={templateSearch}
+              onChange={(e) => setTemplateSearch(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full shadow-sm"
+            />
           </div>
-          {/* main-tabs */}
-          <div className="bg-gray-200 md:hidden flex gap-1 rounded-2xl p-1 w-fit my-3 mb-5 mx-auto md:mx-0">
-            <button
-              className={`flex-1 mr-1 rounded-xl py-1.5 md:px-2.5 px-4 text-sm ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
-              onClick={() => setActiveTab("builder")}
-            >
-              Builder
-            </button>
-            <button
-              className={`flex-1 py-1 px-2.5 rounded-xl text-sm ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
-              onClick={() => setActiveTab("templates")}
-            >
-              Templates
-            </button>
-          </div>
-          {activeTab !== "builder" && (
-            /* Search Bar for Templates */
-            <div className="relative w-full md:w-80">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Search templates..."
-                value={templateSearch}
-                onChange={(e) => setTemplateSearch(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none w-full shadow-sm"
-              />
-            </div>
-          )}
-        </div>
-        {/* main-tabs */}
-        <div className="bg-gray-200 md:hidden flex gap-1 rounded-2xl p-1 w-fit my-5 mx-auto md:mx-0">
-          <button
-            className={`flex-1 mr-1 rounded-xl py-1.5 md:px-2.5 px-4 text-sm ${activeTab === "builder" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
-            onClick={() => setActiveTab("builder")}
-          >
-            Builder
-          </button>
-          <button
-            className={`flex-1 py-1 px-2.5 rounded-xl text-sm ${activeTab === "templates" ? "bg-white text-slate-900 shadow-sm" : ""} select-none`}
-            onClick={() => setActiveTab("templates")}
-          >
-            Templates
-          </button>
-        </div>
+        )}
 
         {renderMainContent()}
-        <footer className="footer pb-6">
-          © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
-        </footer>
       </div>
     </>
   );

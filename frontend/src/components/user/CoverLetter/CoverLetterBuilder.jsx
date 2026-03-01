@@ -7,7 +7,6 @@ import {
   Briefcase,
   FileText,
   User,
-  Download,
   AlertTriangle,
   FileText as FileTextIcon,
   X,
@@ -20,6 +19,8 @@ import ClosingForm from "./forms/ClosingForm";
 import CoverLetterPreview from "./CoverLetterPreview";
 import CoverLetterTemplates from "./CoverLetterTemplates";
 import UserNavBar from "../UserNavBar/UserNavBar";
+import CVBuilderTopBar from "../CV/Cvbuildernavbar";
+import axiosInstance from "../../../api/axios";
 import "./CoverLetterBuilder.css";
 
 const tabs = [
@@ -56,6 +57,8 @@ const CoverLetterBuilder = () => {
   const [activeSection, setActiveSection] = useState("recipient");
   const [isExporting, setIsExporting] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [isAiMode, setIsAiMode] = useState(false);
+  const [documentTitle, setDocumentTitle] = useState("");
 
   useEffect(() => {
     document.body.style.overflow = showMobilePreview ? "hidden" : "";
@@ -132,20 +135,25 @@ const CoverLetterBuilder = () => {
   /* ======================================================
      PDF EXPORT
   ====================================================== */
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     if (!formData.fullName || !formData.jobTitle) {
       alert("Please fill your name and job title first");
       return;
     }
 
     setIsExporting(true);
-    const printWindow = window.open("", "_blank", "width=850,height=1100");
 
-    printWindow.document.write(`
+    const sanitize = (s) =>
+      (s || "").replace(/[^a-z0-9_ \-]/gi, "").trim().replace(/\s+/g, "_");
+    const fileName =
+      sanitize(documentTitle) || sanitize(formData.fullName) || "Cover-Letter";
+
+    const letterHtml = `
 <!DOCTYPE html>
 <html>
 <head>
-<title>Professional Cover Letter</title>
+<meta charset="utf-8">
+<title>${fileName}</title>
 <style>
 @page { margin: 1.25in 0.85in 0.75in 0.85in !important; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -200,10 +208,9 @@ body {
 .signature { margin-top: 24pt !important; text-align: right !important; }
 .signature-closing { margin-bottom: 2pt !important; font-size: 11pt !important; font-style: italic !important; }
 .signature-name { font-weight: bold !important; font-size: 11pt !important; }
-@media print { body { -webkit-print-color-adjust: exact !important; } }
 </style>
 </head>
-<body onload="window.print(); setTimeout(() => window.close(), 1000);">
+<body>
 <div class="contact-info">
   <div class="contact-name">${formData.fullName || "Your Name"}</div>
   ${formData.address ? formData.address.replace(/\n/g, "<br>") : ""}
@@ -252,13 +259,30 @@ ${
   <div class="signature-name">${formData.fullName || "Your Name"}</div>
 </div>
 </body>
-</html>`);
+</html>`;
 
-    const htmlContent = printWindow.document.documentElement.outerHTML;
-    saveDownloadRecord(htmlContent, "PDF");
+    try {
+      const response = await axiosInstance.post(
+        "/api/resume/generate-pdf",
+        { html: letterHtml },
+        { responseType: "blob" }
+      );
 
-    printWindow.document.close();
-    setTimeout(() => setIsExporting(false), 1500);
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${fileName}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      saveDownloadRecord(letterHtml, "PDF");
+    } catch (err) {
+      console.error("Cover letter PDF generation failed:", err);
+      alert("Failed to generate PDF. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   /* ======================================================
@@ -419,7 +443,7 @@ ${
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Cover-Letter-${formData.jobTitle.replace(/[^a-zA-Z0-9]/g, "-")}.doc`;
+    a.download = `${(() => { const s = (v) => (v || "").replace(/[^a-zA-Z0-9_ \-]/g, "").trim().replace(/\s+/g, "_"); return s(documentTitle) || s(formData.fullName) || "Cover-Letter"; })()}.doc`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -470,30 +494,24 @@ ${
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-50 relative z-0">
       <UserNavBar />
+      <CVBuilderTopBar
+        activeTab="builder"
+        setActiveTab={() => {}}
+        onDownload={exportToPDF}
+        onDownloadWord={exportToWord}
+        isDownloading={isExporting}
+        title={documentTitle}
+        onTitleChange={(_, val) => setDocumentTitle(val)}
+        titlePlaceholder="Untitled Cover Letter"
+        templatesLabel="Cover Letter Templates"
+        showTabs={false}
+        showAiToggle={true}
+        isAiMode={isAiMode}
+        onToggleAiMode={() => setIsAiMode((v) => !v)}
+        showUpload={false}
+        showDesigner={false}
+      />
       <div className="px-2 py-4 sm:px-4 lg:px-4 w-screen max-w-full mx-0">
-        {/* Page Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 lg:mb-6 gap-3 lg:gap-4 px-2">
-          <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold font-['Outfit'] text-gray-900 leading-tight">
-            Create Cover Letter
-          </h1>
-          <div className="flex gap-2 flex-shrink-0">
-            <button
-              onClick={exportToPDF}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 disabled:opacity-60 transition-all font-medium text-sm"
-            >
-              <Download size={16} /> PDF
-            </button>
-            <button
-              onClick={exportToWord}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 disabled:opacity-60 transition-all font-medium text-sm"
-            >
-              <Download size={16} /> Word
-            </button>
-          </div>
-        </div>
-
         {/* Warning Banner */}
         <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4 shadow-sm px-2">
           <AlertTriangle

@@ -11,7 +11,7 @@ router.post("/generate-pdf", async (req, res) => {
     if (!html) return res.status(400).json({ error: 'HTML required' });
 
     browser = await puppeteer.launch({ 
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });  
     
@@ -40,7 +40,7 @@ await page.setContent(wrappedHtml, { waitUntil: 'networkidle0' });
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="Cover-Letter.pdf"`
     });
-    res.send(pdfBuffer);
+    res.send(Buffer.from(pdfBuffer));
 
   } catch (error) {
     console.error('PDF Error:', error);
