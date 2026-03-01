@@ -66,7 +66,7 @@ const faqData = [
 
 function ATSDonutCard({ score = 78 }) {
   return (
-    <div className="relative w-full rounded-[2.2rem] bg-white border border-gray-100 shadow-[0_25px_60px_rgba(26,46,82,0.14)] overflow-hidden">
+    <div className="relative sm:w-full md:w-3/4 xl:w-full rounded-[2.2rem] bg-white border border-gray-100 shadow-[0_25px_60px_rgba(26,46,82,0.14)] overflow-hidden">
       <div className="px-7 pt-7 pb-5">
         <div className="flex items-start justify-between">
           <div>
@@ -177,7 +177,7 @@ const ATSCheckerFeature = () => {
       <NavBar />
 
       {/* 1) HERO SECTION */}
-      <section ref={heroRef} className="relative px-6 pt-20 pb-20 overflow-hidden bg-white">
+      <section ref={heroRef} className="relative px-6 py-24 overflow-hidden bg-white">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-3xl -z-10 opacity-60" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-50/50 rounded-full blur-3xl -z-10 opacity-60" />
 
@@ -221,7 +221,7 @@ const ATSCheckerFeature = () => {
             </div>
 
             <div className={`relative transition-all duration-700 delay-100 ${heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-              <div className="relative max-w-md mx-auto lg:mr-0">
+              <div className="relative max-w-md mx-auto lg:mr-0 lg:-left-[-5rem] xl:-left-[0rem]">
                 <img
                   src={Lady}
                   alt="Character pointing to ATS score"

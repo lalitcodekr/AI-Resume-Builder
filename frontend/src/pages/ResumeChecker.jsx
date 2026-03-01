@@ -251,7 +251,7 @@ const AIResumeChecker = () => {
             </div>
           </div>
 
-          <div className="relative p-8 bg-slate-900 rounded-[3rem] text-white overflow-hidden transition-all  border-2 border-gray-100 shadow-sm rounded-[2.5rem] hover:shadow-2xl hover:border-green-400 hover:-translate-y-2 group">
+          <div className="relative p-8 bg-slate-900 rounded-[3rem] text-white overflow-hidden transition-all  border-2 border-gray-100 shadow-sm rounded-[2.5rem] hover:shadow-2xl hover:border-blue-400 hover:-translate-y-2 group">
             <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-blue-500/20 blur-3xl"></div>
             <div className="relative space-y-6">
               <div className="flex items-center justify-between">
