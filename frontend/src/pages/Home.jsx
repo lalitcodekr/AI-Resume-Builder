@@ -19,6 +19,7 @@ import NavBar from "../components/NavBar";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
 
+
 import {
   ArrowRight,
   BarChart3,
@@ -304,11 +305,11 @@ function LandingPage() {
       ></div>
 
       {/* HERO SECTION - padding added and mobile padding reudced */}
-     <motion.section
-  variants={fadeUp}
-  initial="hidden"
-  animate="show"
-  className="relative 
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        animate="show"
+        className="relative 
   px-4 md:px-8 
   bg-white 
   ml-2 md:ml-5 
@@ -316,8 +317,7 @@ function LandingPage() {
   flex items-center lg:items-start
   pt-[100px] md:pt-[120px] lg:pt-16
   -mt-12 lg:mt-0"
->
-      
+      >
         <div className="absolute top-0 right-0 w-1/3 h-1/4 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
         <div className="absolute bottom-0 left-0 w-1/3 h-1/4 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50"></div>
 
@@ -399,12 +399,12 @@ function LandingPage() {
 
       {/* HOW IT WORKS - Reduced mobile padding and spacing */}
       <motion.section
-  variants={staggerContainer}
-  initial="hidden"
-  whileInView="show"
-  viewport={{ once: true, amount: 0.2 }}
-  className="px-4 md:px-8 py-12 md:py-24 bg-gray-50"
->
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        className="px-4 md:px-8 py-12 md:py-24 bg-gray-50"
+      >
         <div className="max-w-[1200px] mx-auto">
           <div className="mb-10 md:mb-20 text-center">
             <h2 className="mb-3 md:mb-4 text-3xl md:text-4xl lg:text-5xl font-black">
@@ -418,8 +418,8 @@ function LandingPage() {
           <div className="space-y-12 md:space-y-24">
             {howItWorksSteps.map((step, index) => (
               <motion.div
-  key={index}
-  variants={fadeUp}
+                key={index}
+                variants={fadeUp}
                 className={`flex flex-col md:flex-row items-center gap-6 md:gap-12 ${
                   index % 2 !== 0 ? "md:flex-row-reverse" : ""
                 }`}
@@ -448,15 +448,15 @@ function LandingPage() {
             ))}
           </div>
         </div>
-     </motion.section>
+      </motion.section>
 
       {/* TEMPLATE SHOWCASE - Reduced mobile padding */}
       <motion.section
-  id="free-templates"
-  variants={staggerContainer}
-  initial="hidden"
-  whileInView="show"
-  viewport={{ once: true, amount: 0.2 }}
+        id="free-templates"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
         className="px-4 md:px-8 py-12 md:py-24 overflow-hidden bg-white select-none"
       >
         <div className="max-w-[1400px] mx-auto">
@@ -485,9 +485,9 @@ function LandingPage() {
               style={{ perspective: "1000px" }}
             >
               {resumeTemplates.map((t, i) => (
-              <motion.div
-  key={t.name + i}
-  variants={fadeUp}
+                <motion.div
+                  key={t.name + i}
+                  variants={fadeUp}
                   onClick={() => handleTemplateClick(t.id)}
                   className="min-w-[220px] sm:min-w-[260px] md:min-w-[300px] snap-center cursor-pointer group/card"
                 >
@@ -532,11 +532,11 @@ function LandingPage() {
 
       {/* FEATURES GRID - Reduced mobile padding and spacing */}
       <motion.section
-  id="features"
-  variants={staggerContainer}
-  initial="hidden"
-  whileInView="show"
-  viewport={{ once: true, amount: 0.2 }}
+        id="features"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
         className="relative px-4 md:px-8 py-12 md:py-24 overflow-hidden bg-white select-none"
       >
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-100/50 rounded-full blur-[120px] pointer-events-none" />
@@ -558,9 +558,9 @@ function LandingPage() {
           <div className="grid gap-4 md:gap-8 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
               <motion.div
-  key={index}
-  variants={fadeUp}
-  onClick={() => feature.path && navigate(feature.path)}
+                key={index}
+                variants={fadeUp}
+                onClick={() => feature.path && navigate(feature.path)}
                 className="relative p-6 md:p-8 transition-all duration-500 bg-white/40 backdrop-blur-md border border-gray-100 group rounded-3xl
                      hover:bg-white hover:-translate-y-3 hover:border-blue-200 hover:shadow-[0_20px_40px_rgba(0,119,204,0.1)]"
               >
@@ -604,8 +604,8 @@ function LandingPage() {
             ))}
           </div>
         </div>
-       </motion.section>
-      <AiChatBot />
+      </motion.section>
+   
       <Footer />
     </div>
   );

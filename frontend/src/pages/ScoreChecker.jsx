@@ -152,7 +152,7 @@ const ScoreChecker = () => {
           >
             {/* LEFT: TEXT */}
             <motion.div
-              variants={fadeLeft}
+              variants={fadeUp}
               className="text-center lg:text-left"
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-orange-50 border border-orange-100 rounded-full">
@@ -178,7 +178,7 @@ const ScoreChecker = () => {
 
             {/* RIGHT: IMAGE */}
             <motion.div
-              variants={fadeRight}
+              variants={fadeUp}
               className="relative flex justify-center lg:justify-end"
             >
               <img

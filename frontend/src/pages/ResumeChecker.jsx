@@ -121,7 +121,7 @@ const AIResumeChecker = () => {
           >
             {/* LEFT SIDE: THE CONTENT (Text & Matter) */}
             <motion.div
-              variants={fadeLeft}
+              variants={fadeUp}
               className="flex flex-col items-start text-left"
             >
               <span className="inline-flex items-center gap-2 px-4 py-2 mb-8 text-sm font-bold tracking-widest text-[#0077cc] uppercase bg-blue-50 rounded-full">
@@ -178,7 +178,7 @@ const AIResumeChecker = () => {
 
             {/* RIGHT SIDE: THE PILLARS (Unchanged as requested) */}
             <motion.div
-              variants={fadeRight}
+              variants={fadeUp}
               className="grid gap-6 md:grid-cols-2 lg:max-w-[850px] ml-auto"
             >
               {/* 1. Instant Analysis */}
