@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Layers,
@@ -20,6 +20,28 @@ import NavBar from "../components/NavBar";
 import Footer from "./Footer";
 import hub from "../assets/resume-hub1.png";
 
+// Scroll animation hook
+const useInView = (threshold = 0.15) => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold }
+    );
+
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible];
+};
+
 const ResumeHubPage = () => {
   const navigate = useNavigate();
   const isLoggedIn =
@@ -34,13 +56,24 @@ const ResumeHubPage = () => {
     }
   };
 
+  const [heroRef, heroVisible] = useInView(0.2);
+const [whatRef, whatVisible] = useInView(0.15);
+const [tableRef, tableVisible] = useInView(0.15);
+const [bentoRef, bentoVisible] = useInView(0.15);
+const [ctaRef, ctaVisible] = useInView(0.2);
+
 
   return (
     <div className="min-h-screen bg-white font-['Outfit'] text-[#1a2e52] selection:bg-orange-100 overflow-x-hidden select-none">
       <NavBar />
 
       {/* --- 1. HERO SECTION --- */}
-      <section className="relative pb-8 overflow-hidden bg-white">
+     <section
+  ref={heroRef}
+  className={`relative pb-8 overflow-hidden bg-white transition-all duration-700 ${
+    heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         {/* Brand Decorative Blurs */}
         <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
@@ -95,7 +128,12 @@ const ResumeHubPage = () => {
       </section>
 
       {/* 2.--- WHAT IS RESUME HUB --- */}
-      <section className="px-8 py-20 bg-white font-['Outfit']">
+     <section
+  ref={whatRef}
+  className={`px-8 py-20 bg-white font-['Outfit'] transition-all duration-700 ${
+    whatVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="relative mx-auto w-full max-w-5xl px-4 sm:px-6">
 
           <h2 className="text-4xl font-bold text-center text-[#1a2e52] mb-12">What is Resume Hub?</h2>
@@ -132,7 +170,12 @@ const ResumeHubPage = () => {
       </section>
 
       {/* --- 3. TABLE SHOWCASE --- */}
-      <section className="px-8 py-20 bg-gray-50/50">
+     <section
+  ref={tableRef}
+  className={`px-8 py-20 bg-gray-50/50 transition-all duration-700 ${
+    tableVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="mx-auto max-w-7xl">
           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-2xl overflow-hidden transition-all duration-500">
             <div className="flex items-center justify-between p-8 border-b border-gray-50 bg-gray-50/30">
@@ -210,7 +253,12 @@ const ResumeHubPage = () => {
       </section>
 
       {/* --- 4. BENTO GRID CAPABILITIES --- */}
-      <section className="px-8 bg-white py-14">
+      <section
+  ref={bentoRef}
+  className={`px-8 bg-white py-14 transition-all duration-700 ${
+    bentoVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-xs font-black tracking-[0.3em] text-[#0077cc] uppercase">
@@ -243,7 +291,12 @@ const ResumeHubPage = () => {
       </section>
 
       {/* --- RESUME HUB CTA --- */}
-      <section className="relative px-8 pt-12 pb-24 overflow-hidden bg-white">
+     <section
+  ref={ctaRef}
+  className={`relative px-8 pt-12 pb-24 overflow-hidden bg-white transition-all duration-700 ${
+    ctaVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="absolute top-0 right-0 w-1/3 h-full bg-orange-50 rounded-full blur-[120px] -z-10 opacity-60" />
         <div className="absolute bottom-0 left-0 w-1/3 h-full bg-blue-50 rounded-full blur-[120px] -z-10 opacity-60" />
 

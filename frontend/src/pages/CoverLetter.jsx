@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import { 
   Sparkles, 
   FileCheck, 
@@ -18,6 +18,28 @@ import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import cover from "../assets/cover1.png";
 
+const useInView = (threshold = 0.15) => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold }
+    );
+
+    observer.observe(ref.current);
+
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible];
+};
+
 const SimpleCoverLetterPage = () => {
   const navigate = useNavigate();
 
@@ -25,12 +47,24 @@ const SimpleCoverLetterPage = () => {
     navigate("/?scrollTo=features");
   };
 
+  const [heroRef, heroVisible] = useInView(0.2);
+const [whatRef, whatVisible] = useInView(0.15);
+const [differenceRef, differenceVisible] = useInView(0.15);
+const [processRef, processVisible] = useInView(0.15);
+const [featureRef, featureVisible] = useInView(0.15);
+const [ctaRef, ctaVisible] = useInView(0.2);
+
   return (
     <div className="min-h-screen bg-white font-['Outfit'] text-[#1a2e52] selection:bg-blue-100 overflow-x-hidden">
       <NavBar />
 
       {/* --- 1. HERO SECTION --- */}
-      <section className="relative px-8 pt-4 pb-12 overflow-hidden bg-white">
+     <section
+  ref={heroRef}
+  className={`relative px-8 pt-4 pb-12 overflow-hidden bg-white transition-all duration-700 ${
+    heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+  }`}
+>
         {/* Brand Decorative Blurs */}
         <div className="absolute top-0 right-0 w-1/3 h-1/2 bg-orange-50 rounded-full blur-[120px] -z-10 opacity-50" />
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-blue-50 rounded-full blur-[120px] -z-10 opacity-50" />
@@ -87,7 +121,12 @@ const SimpleCoverLetterPage = () => {
       </section>
 
       {/* --- WHAT IS A COVER LETTER --- */}
-      <section className="px-8 py-20 bg-white font-['Outfit']">
+     <section
+  ref={whatRef}
+  className={`px-8 py-20 bg-white transition-all duration-700 ${
+    whatVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-[#1a2e52] mb-12">
             What is a Cover Letter?
@@ -131,7 +170,12 @@ const SimpleCoverLetterPage = () => {
       </section>
 
       {/* --- 2. THE DIFFERENCE --- */}
-      <section className="px-8 py-24 group/section">
+      <section
+  ref={differenceRef}
+  className={`px-8 py-24 transition-all duration-700 ${
+    differenceVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="mx-auto max-w-7xl">
           <h2 className="mb-16 text-4xl font-black tracking-tight text-center">
             The AI Difference
@@ -186,7 +230,12 @@ const SimpleCoverLetterPage = () => {
       </section>
 
       {/* --- 3. SIMPLE 3-STEP PROCESS (ICON-ONLY DARK BUTTONS) --- */}
-      <section className="px-8 py-24 bg-white font-['Outfit']">
+      <section
+  ref={processRef}
+  className={`px-8 py-24 bg-white transition-all duration-700 ${
+    processVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-4xl md:text-5xl font-black text-[#1a2e52]">
@@ -247,7 +296,12 @@ const SimpleCoverLetterPage = () => {
       </section>
 
       {/* --- 4. BENTO FEATURES --- */}
-      <section className="px-8 pt-4 mx-auto pb-14 max-w-7xl">
+     <section
+  ref={featureRef}
+  className={`px-8 pt-4 mx-auto pb-14 max-w-7xl transition-all duration-700 ${
+    featureVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+  }`}
+>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {[
             { icon: Zap, color: "blue", title: "Instant Generation", desc: "Drafts ready in seconds, not hours." },
@@ -272,7 +326,12 @@ const SimpleCoverLetterPage = () => {
       </section>
 
       {/* --- 5. FINAL CTA --- */}
-      <section className="relative px-8 pt-4 pb-24 overflow-hidden bg-white">
+      <section
+  ref={ctaRef}
+  className={`relative px-8 pt-4 pb-24 overflow-hidden bg-white transition-all duration-1000 ${
+    ctaVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+  }`}
+>
         <div className="absolute top-0 right-0 w-1/3 h-full bg-orange-50 rounded-full blur-[120px] -z-10 opacity-60" />
         <div className="absolute bottom-0 left-0 w-1/3 h-full bg-blue-50 rounded-full blur-[120px] -z-10 opacity-60" />
 
