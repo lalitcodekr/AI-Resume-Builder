@@ -77,8 +77,7 @@ function Footer() {
         {/* Mobile: 2 columns, Tablet: 3 columns, Desktop: 5 columns */}
         <div className="grid grid-cols-1 gap-6 mb-8 sm:gap-10 sm:mb-12 md:grid-cols-3 lg:grid-cols-5">
           {/* 1. BRAND & NEWSLETTER - Full width on mobile */}
-          <div className="flex flex-col items-center md:items-start text-center md:text-left col-span-1 md:row-span-2 lg:row-span-1 h-full">
-            <img
+          <div className="flex flex-col items-center md:items-start text-center md:text-left col-span-1 md:row-span-2 lg:row-span-1 h-full">  <img
               src={UpToSkillsImg}
               alt="Logo"
               className="w-24 sm:w-32 mb-3 sm:mb-4 transition-opacity cursor-pointer hover:opacity-80"
@@ -228,121 +227,121 @@ function Footer() {
           </div>
           {/* 3. COVER LETTER - NEW CATEGORY */}
           <div className="flex flex-col h-full">
-            <div
-              onClick={() => toggleSection("cover")}
-              className={`${headerStyle} flex justify-between items-center cursor-pointer md:cursor-default`}
-            >
-              <span>Cover Letter</span>
-              <ChevronDown
-                size={18}
-                className={`transition-transform duration-300 md:hidden ${
-                  openSection === "cover" ? "rotate-180" : ""
-                }`}
-              />
-            </div>
+  <div
+    onClick={() => toggleSection("cover")}
+    className={`${headerStyle} flex justify-between items-center cursor-pointer md:cursor-default`}
+  >
+    <span>Cover Letter</span>
+    <ChevronDown
+      size={18}
+      className={`transition-transform duration-300 md:hidden ${
+        openSection === "cover" ? "rotate-180" : ""
+      }`}
+    />
+  </div>
 
-            <div
-              className={`
+  <div
+    className={`
       overflow-hidden transition-all duration-300
       md:overflow-visible md:max-h-full md:opacity-100
       ${openSection === "cover" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}
     `}
-            >
-              <ul className="space-y-2 sm:space-y-4 pt-2">
-                <li className={linkStyle}>
-                  <Link to="/cover-letter-examples">Cover Letter Examples</Link>
-                </li>
-                <li className={linkStyle}>
-                  <Link to="/cover-letter">Cover Letter Builder</Link>
-                </li>
-                {/*added cover letter builder to footer*/}
-                <li className={linkStyle}>
-                  <Link to="/WritingCoverLetter">Writing A Cover Letter</Link>
-                </li>
-              </ul>
-            </div>
+  >
+    <ul className="space-y-2 sm:space-y-4 pt-2">
+              <li className={linkStyle}>
+                <Link to="/cover-letter-examples">Cover Letter Examples</Link>
+              </li>
+              <li className={linkStyle}>
+                <Link to="/cover-letter">Cover Letter Builder</Link>
+              </li>
+              {/*added cover letter builder to footer*/}
+              <li className={linkStyle}>
+                <Link to="/WritingCoverLetter">Writing A Cover Letter</Link>
+              </li>
+            </ul>
           </div>
+</div>
           {/* 4. OUR COMPANY - UPDATED */}
           <div className="flex flex-col h-full">
-            <div
-              onClick={() => toggleSection("company")}
-              className={`${headerStyle} flex justify-between items-center cursor-pointer md:cursor-default`}
-            >
-              <span>Our Company</span>
-              <ChevronDown
-                size={18}
-                className={`transition-transform duration-300 md:hidden ${
-                  openSection === "company" ? "rotate-180" : ""
-                }`}
-              />
-            </div>
+           <div
+  onClick={() => toggleSection("company")}
+  className={`${headerStyle} flex justify-between items-center cursor-pointer md:cursor-default`}
+>
+  <span>Our Company</span>
+  <ChevronDown
+    size={18}
+    className={`transition-transform duration-300 md:hidden ${
+      openSection === "company" ? "rotate-180" : ""
+    }`}
+  />
+</div>
 
-            <div
-              className={`
+<div
+  className={`
     overflow-hidden transition-all duration-300
     md:overflow-visible md:max-h-full md:opacity-100
     ${openSection === "company" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}
   `}
-            >
-              <ul className="space-y-2 sm:space-y-4 pt-2">
-                <li className={linkStyle}>
-                  <Link to="/about">About Us</Link>
-                </li>
-                {/* <li className={linkStyle}><Link to={`${isLoggedIn ? "/pricing" : "/login"}`}>Pricing</Link></li> */}
-                <li className={linkStyle}>
-                  {" "}
-                  <Link to="/pricing">Pricing</Link>
-                </li>
-                <li className={linkStyle}>
-                  <Link to="/blog">Blog</Link>
-                </li>
-                <li className={linkStyle}>
-                  <Link to="/careers">Careers</Link>
-                </li>
-              </ul>
-            </div>
+>
+  <ul className="space-y-2 sm:space-y-4 pt-2">
+              <li className={linkStyle}>
+                <Link to="/about">About Us</Link>
+              </li>
+              {/* <li className={linkStyle}><Link to={`${isLoggedIn ? "/pricing" : "/login"}`}>Pricing</Link></li> */}
+              <li className={linkStyle}>
+                {" "}
+                <Link to="/pricing">Pricing</Link>
+              </li>
+              <li className={linkStyle}>
+                <Link to="/blog">Blog</Link>
+              </li>
+              <li className={linkStyle}>
+                <Link to="/careers">Careers</Link>
+              </li>
+            </ul>
+          </div>
           </div>
 
           {/* 5. SUPPORT - UPDATED */}
           <div className="flex flex-col h-full">
-            <div
-              onClick={() => toggleSection("support")}
-              className={`${headerStyle} flex justify-between items-center cursor-pointer md:cursor-default`}
-            >
-              <span>Support</span>
-              <ChevronDown
-                size={18}
-                className={`transition-transform duration-300 md:hidden ${
-                  openSection === "support" ? "rotate-180" : ""
-                }`}
-              />
-            </div>
+           <div
+  onClick={() => toggleSection("support")}
+  className={`${headerStyle} flex justify-between items-center cursor-pointer md:cursor-default`}
+>
+  <span>Support</span>
+  <ChevronDown
+    size={18}
+    className={`transition-transform duration-300 md:hidden ${
+      openSection === "support" ? "rotate-180" : ""
+    }`}
+  />
+</div>
 
-            <div
-              className={`
+<div
+  className={`
     overflow-hidden transition-all duration-300
     md:overflow-visible md:max-h-full md:opacity-100
     ${openSection === "support" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}
   `}
-            >
-              <ul className="space-y-2 sm:space-y-4 pt-2">
-                <li className={linkStyle}>
-                  <Link to="/faq">FAQ</Link>
-                </li>
-                <li className={linkStyle}>
-                  <Link to="/contact">Contact Us</Link>
-                </li>
-                <li className={linkStyle}>
-                  <Link to="/terms">Terms Of Service</Link>
-                </li>
-                <li className={linkStyle}>
-                  <Link to="/privacy-policy">Privacy Policy</Link>
-                </li>
-                <li className={linkStyle}>
-                  <Link to="/help-center">Help Center</Link>
-                </li>
-              </ul>
-            </div>
+>
+  <ul className="space-y-2 sm:space-y-4 pt-2">
+              <li className={linkStyle}>
+                <Link to="/faq">FAQ</Link>
+              </li>
+              <li className={linkStyle}>
+                <Link to="/contact">Contact Us</Link>
+              </li>
+              <li className={linkStyle}>
+                <Link to="/terms">Terms Of Service</Link>
+              </li>
+              <li className={linkStyle}>
+                <Link to="/privacy-policy">Privacy Policy</Link>
+              </li>
+              <li className={linkStyle}>
+                <Link to="/help-center">Help Center</Link>
+              </li>
+            </ul>
+          </div>
           </div>
         </div>
 
@@ -364,3 +363,5 @@ function Footer() {
 }
 
 export default Footer;
+
+
