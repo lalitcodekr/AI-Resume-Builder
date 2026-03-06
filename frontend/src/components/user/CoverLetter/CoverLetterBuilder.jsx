@@ -23,6 +23,7 @@ import CVBuilderTopBar from "../CV/Cvbuildernavbar";
 import axiosInstance from "../../../api/axios";
 import "./CoverLetterBuilder.css";
 
+
 /* ─────────────────────────────────────────────────────────
    FLOATING FORM PANEL (mirrors CV & Resume behavior)
    Anchors to its container's DOM position so the panel
@@ -33,6 +34,7 @@ const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
   const rafRef = useRef(null);
   const currentY = useRef(0);
   const targetY = useRef(0);
+
 
   useEffect(() => {
     const STIFFNESS = 0.12;
@@ -46,6 +48,7 @@ const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
+
 
   useEffect(() => {
     const onScroll = () => {
@@ -63,6 +66,7 @@ const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, [topOffset, containerRef]);
 
+
   return (
     <div
       ref={panelRef}
@@ -77,12 +81,14 @@ const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
   );
 };
 
+
 const tabs = [
   { id: "recipient", label: "Recipient", icon: Building2 },
   { id: "job", label: "Job Details", icon: Briefcase },
   { id: "body", label: "Content", icon: FileText },
   { id: "closing", label: "Closing", icon: User },
 ];
+
 
 const CoverLetterBuilder = () => {
   const headerRef = useRef(null);
@@ -111,6 +117,7 @@ const CoverLetterBuilder = () => {
     customSalutation: "",
   });
 
+
   const [selectedTemplate, setSelectedTemplate] = useState("professional");
   const [activeSection, setActiveSection] = useState("recipient");
   const [isExporting, setIsExporting] = useState(false);
@@ -118,12 +125,61 @@ const CoverLetterBuilder = () => {
   const [isAiMode, setIsAiMode] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("");
 
+  const date = new Date().toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+
   useEffect(() => {
     document.body.style.overflow = showMobilePreview ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [showMobilePreview]);
+
+  useEffect(() => {
+
+  const saveEditActivity = async () => {
+
+    const TemplateComponent = CoverLetterTemplates[selectedTemplate];
+    if (!TemplateComponent) return;
+
+    const container = document.createElement("div");
+
+    Object.assign(container.style, {
+      position: "fixed",
+      top: "0",
+      left: "-9999px",
+      width: "794px",
+      background: "#ffffff",
+    });
+
+    document.body.appendChild(container);
+
+    const { createRoot } = await import("react-dom/client");
+
+    await new Promise((resolve) => {
+      const root = createRoot(container);
+      root.render(
+        <TemplateComponent formData={formData} exportDate={date} />
+      );
+      setTimeout(resolve, 300);
+    });
+
+    const html = container.innerHTML;
+
+    await saveRecentActivity(html, "visited");
+
+    document.body.removeChild(container);
+  };
+
+  const timer = setTimeout(saveEditActivity, 5000);
+
+  return () => clearTimeout(timer);
+
+}, [formData, selectedTemplate]);
 
   // Measure sticky navbar height for floating offset
   useEffect(() => {
@@ -136,20 +192,19 @@ const CoverLetterBuilder = () => {
     return () => ro.disconnect();
   }, []);
 
+
   // Scroll current step form back to top when section changes
   useEffect(() => {
     formContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeSection]);
 
+
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const date = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+
+ 
 
   /* ======================================================
      SAVE DOWNLOAD RECORD
@@ -169,6 +224,111 @@ const CoverLetterBuilder = () => {
     }
   };
 
+
+  /* ======================================================
+   SAVE RECENT ACTIVITY (visited / preview / download)
+====================================================== */
+const saveRecentActivity = async (html, action = "visited") => {
+  try {
+    const sanitize = (s) =>
+      (s || "")
+        .replace(/[^a-z0-9_\- ]/gi, "")
+        .trim()
+        .replace(/\s+/g, "_");
+
+
+    const nameToUse =
+      sanitize(documentTitle) || sanitize(formData.fullName) || "Document";
+
+
+    await axiosInstance.post("/api/downloads", {
+      name: `Cover Letter - ${nameToUse}`,
+      type: "cover-letter",
+      action,
+      format: "PDF",
+      html,
+      template: selectedTemplate,
+      size: "150 KB",
+    });
+  } catch (err) {
+    console.error("Failed to save cover letter activity:", err);
+  }
+};
+
+
+/* ======================================================
+   SAVE ACTIVITY WHEN BUILDER OPENS
+====================================================== */
+ useEffect(() => {
+
+
+  // prevent duplicate visit records in same session
+  if (sessionStorage.getItem("coverletter-builder-visited")) return;
+
+
+  const saveVisit = async () => {
+
+
+    const TemplateComponent = CoverLetterTemplates[selectedTemplate];
+    if (!TemplateComponent) return;
+
+
+    const container = document.createElement("div");
+
+
+    Object.assign(container.style, {
+      position: "fixed",
+      top: "0",
+      left: "-9999px",
+      width: "794px",
+      background: "#ffffff",
+    });
+
+
+    document.body.appendChild(container);
+
+
+    const { createRoot } = await import("react-dom/client");
+
+
+    await new Promise((resolve) => {
+      const root = createRoot(container);
+      root.render(
+        <TemplateComponent formData={formData} exportDate={date} />
+      );
+      setTimeout(resolve, 400);
+    });
+
+
+    const html = container.innerHTML;
+
+
+    await saveRecentActivity(html, "visited");
+
+
+    document.body.removeChild(container);
+
+
+    // mark as visited in this session
+    sessionStorage.setItem("coverletter-builder-visited", "true");
+  };
+
+
+  const timer = setTimeout(saveVisit, 2000);
+
+
+  return () => clearTimeout(timer);
+
+
+}, []);
+
+
+
+
+
+
+
+
   /* ======================================================
      SAVE COVER LETTER TO DOWNLOADS COLLECTION
   ====================================================== */
@@ -176,6 +336,7 @@ const CoverLetterBuilder = () => {
     try {
       const TemplateComponent = CoverLetterTemplates[selectedTemplate];
       if (!TemplateComponent) return;
+
 
       const container = document.createElement("div");
       Object.assign(container.style, {
@@ -187,7 +348,9 @@ const CoverLetterBuilder = () => {
       });
       document.body.appendChild(container);
 
+
       const { createRoot } = await import("react-dom/client");
+
 
       await new Promise((resolve) => {
         const root = createRoot(container);
@@ -197,14 +360,17 @@ const CoverLetterBuilder = () => {
         setTimeout(resolve, 400);
       });
 
+
       const html = container.innerHTML;
       await saveDownloadRecord(html, "PDF");
+
 
       document.body.removeChild(container);
     } catch (err) {
       console.error("Failed to save cover letter to downloads:", err);
     }
   };
+
 
   /* ======================================================
      PDF EXPORT
@@ -215,7 +381,9 @@ const CoverLetterBuilder = () => {
       return;
     }
 
+
     setIsExporting(true);
+
 
     const sanitize = (s) =>
       (s || "")
@@ -224,6 +392,7 @@ const CoverLetterBuilder = () => {
         .replace(/\s+/g, "_");
     const fileName =
       sanitize(documentTitle) || sanitize(formData.fullName) || "Cover-Letter";
+
 
     const letterHtml = `
 <!DOCTYPE html>
@@ -299,6 +468,7 @@ body {
   <div class="letter-date">${date}</div>
 </div>
 
+
 ${
   formData.jobTitle || formData.jobReference
     ? `<div class="job-reference">
@@ -307,6 +477,7 @@ ${
 </div>`
     : ""
 }
+
 
 ${
   formData.jobSummary || formData.jobDescription
@@ -317,6 +488,7 @@ ${
     : ""
 }
 
+
 <div class="recipient-info">
   <div class="recipient-name">${formData.recipientName || "Hiring Manager"}</div>
   ${formData.recipientTitle ? `<div>${formData.recipientTitle}</div>` : ""}
@@ -324,12 +496,15 @@ ${
   ${formData.companyAddress ? formData.companyAddress.replace(/\n/g, "<br>") : ""}
 </div>
 
+
 <div class="salutation">Dear ${formData.recipientName || "Hiring Manager"},</div>
+
 
 <div class="body-paragraph">${(formData.openingParagraph || "I'm excited to apply for this position...").replace(/\n/g, "<br>")}</div>
 <div class="body-paragraph">${(formData.bodyParagraph1 || "In my previous role...").replace(/\n/g, "<br>")}</div>
 <div class="body-paragraph">${(formData.bodyParagraph2 || "My technical skills include...").replace(/\n/g, "<br>")}</div>
 <div class="body-paragraph">${(formData.closingParagraph || "I'm particularly drawn to your company...").replace(/\n/g, "<br>")}</div>
+
 
 <div class="signature">
   <div class="signature-closing">${formData.customSalutation || formData.salutation || "Sincerely"}</div>
@@ -338,12 +513,14 @@ ${
 </body>
 </html>`;
 
+
     try {
       const response = await axiosInstance.post(
         "/api/resume/generate-pdf",
         { html: letterHtml },
         { responseType: "blob" },
       );
+
 
       const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
@@ -352,8 +529,7 @@ ${
       link.download = `${fileName}.pdf`;
       link.click();
       window.URL.revokeObjectURL(url);
-
-      saveDownloadRecord(letterHtml, "PDF");
+      await saveRecentActivity(letterHtml, "download");
     } catch (err) {
       console.error("Cover letter PDF generation failed:", err);
       alert("Failed to generate PDF. Please try again.");
@@ -362,16 +538,19 @@ ${
     }
   };
 
+
   /* ======================================================
      WORD EXPORT
   ====================================================== */
-  const exportToWord = () => {
+  const exportToWord = async () => {
     if (!formData.fullName || !formData.jobTitle) {
       alert("Please fill your name and job title first");
       return;
     }
 
+
     setIsExporting(true);
+
 
     const html = `
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -466,6 +645,7 @@ p, div, span { font-family: inherit !important; font-size: 11pt !important; line
   <div class="letter-date">${date}</div>
 </div>
 
+
 ${
   formData.jobTitle || formData.jobReference
     ? `<div class="job-reference">
@@ -475,6 +655,7 @@ ${
     : ""
 }
 
+
 ${
   formData.jobSummary || formData.jobDescription
     ? `<div class="job-details-section">
@@ -483,6 +664,7 @@ ${
 </div>`
     : ""
 }
+
 
 <div class="recipient-info">
   <div class="recipient-name">${formData.recipientName || "Hiring Manager"}</div>
@@ -499,12 +681,15 @@ ${
   }
 </div>
 
+
 <div class="salutation">Dear ${formData.recipientName || "Hiring Manager"},</div>
+
 
 <div class="body-paragraph">${(formData.openingParagraph || "I'm excited to apply for this position...").replace(/\n/g, "<br>")}</div>
 <div class="body-paragraph">${(formData.bodyParagraph1 || "In my previous role...").replace(/\n/g, "<br>")}</div>
 <div class="body-paragraph">${(formData.bodyParagraph2 || "My technical skills include...").replace(/\n/g, "<br>")}</div>
 <div class="body-paragraph">${(formData.closingParagraph || "I'm particularly drawn to your company...").replace(/\n/g, "<br>")}</div>
+
 
 <div class="signature">
   <div class="signature-closing">${formData.customSalutation || formData.salutation || "Sincerely"}</div>
@@ -513,9 +698,11 @@ ${
 </body>
 </html>`;
 
+
     const blob = new Blob(["\ufeff", html], {
       type: "application/msword;charset=utf-8",
     });
+
 
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -533,15 +720,18 @@ ${
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    saveDownloadRecord(html, "DOCX");
+
+   await saveRecentActivity(html, "download");
     setTimeout(() => setIsExporting(false), 800);
   };
+
 
   const currentIdx = tabs.findIndex((t) => t.id === activeSection);
   const goLeft = () =>
     currentIdx > 0 && setActiveSection(tabs[currentIdx - 1].id);
   const goRight = () =>
     currentIdx < tabs.length - 1 && setActiveSection(tabs[currentIdx + 1].id);
+
 
   const renderFormContent = () => {
     switch (activeSection) {
@@ -575,6 +765,7 @@ ${
     }
   };
 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-50 relative z-0">
       {/* Sticky navbar, same behavior as CV/Resume */}
@@ -584,6 +775,7 @@ ${
       >
         <UserNavBar />
       </div>
+
 
       <CVBuilderTopBar
         activeTab="builder"
@@ -603,6 +795,7 @@ ${
         showDesigner={false}
       />
 
+
       <div className="px-2 py-4 sm:px-4 lg:px-4 w-screen max-w-full mx-0">
         {/* Warning Banner */}
         <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4 shadow-sm px-2">
@@ -615,6 +808,7 @@ ${
             professional letter.
           </span>
         </div>
+
 
         {/* Main Layout – desktop floating form + preview (matches CV/Resume) */}
         <div className="flex gap-[10px] w-full mt-2 lg:mt-5 p-0 sm:p-2 lg:flex-row flex-col max-w-[1920px] mx-auto relative z-10">
@@ -629,11 +823,57 @@ ${
               containerRef={leftColRef}
             >
               <div className="bg-white rounded-xl h-full overflow-hidden flex flex-col border border-slate-200">
-                <CoverLetterFormTabs
-                  activeSection={activeSection}
-                  setActiveSection={setActiveSection}
-                  onTogglePreview={() => setShowMobilePreview((v) => !v)}
-                />
+                             <CoverLetterFormTabs
+  activeSection={activeSection}
+  setActiveSection={setActiveSection}
+  onTogglePreview={async () => {
+
+
+    const TemplateComponent = CoverLetterTemplates[selectedTemplate];
+    if (!TemplateComponent) {
+      setShowMobilePreview((v) => !v);
+      return;
+    }
+
+
+    const container = document.createElement("div");
+
+
+    Object.assign(container.style, {
+      position: "fixed",
+      top: "0",
+      left: "-9999px",
+      width: "794px",
+    });
+
+
+    document.body.appendChild(container);
+
+
+    const { createRoot } = await import("react-dom/client");
+
+
+    await new Promise((resolve) => {
+      const root = createRoot(container);
+      root.render(
+        <TemplateComponent formData={formData} exportDate={date} />
+      );
+      setTimeout(resolve, 300);
+    });
+
+
+    const html = container.innerHTML;
+
+
+    await saveRecentActivity(html, "preview");
+
+
+    document.body.removeChild(container);
+
+
+    setShowMobilePreview((v) => !v);
+  }}
+/>
                 <div
                   ref={formContainerRef}
                   className="mt-3 flex-1 overflow-y-auto py-2 pr-2"
@@ -668,37 +908,95 @@ ${
             </FloatingFormPanel>
           </div>
 
+
           {/* Mobile form card (full-width, scrollable, with bottom controls) */}
-          <div className="w-full lg:hidden bg-white rounded-xl overflow-hidden flex flex-col border border-slate-200">
-            <CoverLetterFormTabs
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-              onTogglePreview={() => setShowMobilePreview((v) => !v)}
-            />
-            <div className="mt-3 flex-1 overflow-y-auto py-2 pr-2">
-              {renderFormContent()}
-            </div>
-            <div className="flex justify-between items-center mt-auto p-4 border-t border-slate-100 bg-white">
-              <button
-                onClick={goLeft}
-                disabled={currentIdx === 0}
-                className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-              >
-                <ArrowLeft size={18} /> Previous
-              </button>
-              <div className="flex-1 text-center text-xs text-gray-500 font-medium">
-                Step {currentIdx + 1} of {tabs.length}
-              </div>
-              <button
-                onClick={goRight}
-                disabled={currentIdx === tabs.length - 1}
-                className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-              >
-                {currentIdx === tabs.length - 1 ? "Finish" : "Next"}
-                <ArrowRight size={18} />
-              </button>
-            </div>
-          </div>
+<div className="w-full lg:hidden bg-white rounded-xl overflow-hidden flex flex-col border border-slate-200">
+  <CoverLetterFormTabs
+    activeSection={activeSection}
+    setActiveSection={setActiveSection}
+    onTogglePreview={async () => {
+
+
+      const TemplateComponent = CoverLetterTemplates[selectedTemplate];
+
+
+      if (!TemplateComponent) {
+        setShowMobilePreview((v) => !v);
+        return;
+      }
+
+
+      const container = document.createElement("div");
+
+
+      Object.assign(container.style, {
+        position: "fixed",
+        top: "0",
+        left: "-9999px",
+        width: "794px",
+      });
+
+
+      document.body.appendChild(container);
+
+
+      const { createRoot } = await import("react-dom/client");
+
+
+      await new Promise((resolve) => {
+        const root = createRoot(container);
+        root.render(
+          <TemplateComponent formData={formData} exportDate={date} />
+        );
+        setTimeout(resolve, 300);
+      });
+
+
+      const html = container.innerHTML;
+
+
+      await saveRecentActivity(html, "preview");
+
+
+      document.body.removeChild(container);
+
+
+      setShowMobilePreview((v) => !v);
+    }}
+  />
+
+
+  <div className="mt-3 flex-1 overflow-y-auto py-2 pr-2">
+    {renderFormContent()}
+  </div>
+
+
+  <div className="flex justify-between items-center mt-auto p-4 border-t border-slate-100 bg-white">
+    <button
+      onClick={goLeft}
+      disabled={currentIdx === 0}
+      className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
+    >
+      <ArrowLeft size={18} /> Previous
+    </button>
+
+
+    <div className="flex-1 text-center text-xs text-gray-500 font-medium">
+      Step {currentIdx + 1} of {tabs.length}
+    </div>
+
+
+    <button
+      onClick={goRight}
+      disabled={currentIdx === tabs.length - 1}
+      className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
+    >
+      {currentIdx === tabs.length - 1 ? "Finish" : "Next"}
+      <ArrowRight size={18} />
+    </button>
+  </div>
+</div>
+
 
           {/* PREVIEW PANEL */}
           <div className="hidden lg:flex flex-col flex-1 min-w-0 bg-[#eef2f7] rounded-xl overflow-hidden border border-slate-200 relative order-1 lg:order-2 z-10">
@@ -706,6 +1004,7 @@ ${
           </div>
         </div>
       </div>
+
 
       {/* Mobile Preview Overlay (already CV-like) */}
       {showMobilePreview && (
@@ -742,9 +1041,11 @@ ${
         </div>
       )}
 
+
       <footer className="mt-auto text-center py-4 bg-white border-t text-sm text-gray-600">
         © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
       </footer>
+
 
       <style>{`
         @keyframes clPreviewSlideUp {
@@ -756,4 +1057,8 @@ ${
   );
 };
 
+
 export default CoverLetterBuilder;
+
+
+
