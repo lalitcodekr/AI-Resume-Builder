@@ -1,6 +1,6 @@
-// REDESIGNED DOWNLOADS PAGE v3 - Compact Stats, Type Filter Pills, ATS Button
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../api/axios";
+import { useNavigate } from "react-router-dom";
 import {
   FiDownload,
   FiFile,
@@ -16,13 +16,38 @@ import {
   FiChevronRight,
   FiX,
   FiMoreVertical,
-  FiZap,
-  FiArrowRight,
+  FiMinus,
+  FiPlus,
+  FiRotateCcw,
+  FiMaximize,
+  FiMinimize,
 } from "react-icons/fi";
+
+import {
+  Eye,
+  Maximize2,
+  Minimize2,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Printer,
+  Layers,
+  CheckCircle2,
+  Circle,
+  Menu,
+  X,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import UserNavBar from "../UserNavBar/UserNavBar";
 
 const Downloads = () => {
+  const navigate = useNavigate();
+  const [zoomLevel, setZoomLevel] = useState(100); 
+  const [isFullscreen, setIsFullscreen] = useState(false); 
   const [downloads, setDownloads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,6 +61,38 @@ const Downloads = () => {
   const [previewDocument, setPreviewDocument] = useState(null);
   const [activeFormat, setActiveFormat] = useState("All");
   const [activeType, setActiveType] = useState("All");
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewContent, setPreviewContent] = useState(null);
+
+  useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (!previewDocument) return;
+    
+    // Zoom in/out with Ctrl/Cmd + +/-
+    if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-')) {
+      e.preventDefault();
+      if (e.key === '+') setZoomLevel(Math.min(200, zoomLevel + 10));
+      if (e.key === '-') setZoomLevel(Math.max(50, zoomLevel - 10));
+    }
+    
+    // Reset zoom with Ctrl/Cmd + 0
+    if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+      e.preventDefault();
+      setZoomLevel(100);
+    }
+    
+    // Page navigation with arrow keys
+    if (e.key === 'ArrowLeft' && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+    if (e.key === 'ArrowRight' && currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  window.addEventListener('keydown', handleKeyDown);
+  return () => window.removeEventListener('keydown', handleKeyDown);
+}, [previewDocument, zoomLevel, currentPage, totalPages]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -74,7 +131,6 @@ const Downloads = () => {
         views: d.views || 0,
         downloadDate: d.downloadDate,
         template: d.template,
-        atsScore: d.atsScore || Math.floor(Math.random() * 30) + 65,
       }));
       setDownloads(mapped);
     } catch (err) {
@@ -93,14 +149,28 @@ const Downloads = () => {
     setTotalPages(Math.ceil(getFilteredDownloads().length / itemsPerPage));
   }, [searchTerm, sortBy, downloads, activeFormat, activeType]);
 
-  const handleView = async (download) => {
-    try {
-      const res = await axiosInstance.get(`/api/downloads/${download.id}`);
-      setPreviewDocument({ ...download, html: res.data.html });
-    } catch {
-      setPreviewDocument(download);
-    }
-  };
+ const handleView = async (download) => {
+  try {
+    setPreviewLoading(true);
+    setOpenMenuId(null);
+    
+    // ✅ Use your EXISTING endpoint that returns HTML
+    const response = await axiosInstance.get(`/api/downloads/${download.id}`);
+    
+    setPreviewDocument({
+      ...download,
+      html: response.data.html // ✅ HTML is already in the response!
+    });
+    
+  } catch (err) {
+    console.error('Preview error:', err);
+    // Fallback: just show the document metadata
+    setPreviewDocument(download);
+  } finally {
+    setPreviewLoading(false);
+  }
+};
+
 
   const handleDownload = async (download) => {
     try {
@@ -139,10 +209,6 @@ const Downloads = () => {
     }
   };
 
-  const handleAtsClick = (download) => {
-    window.location.href = `/user/ats-score/${download.id}`;
-  };
-
   const formatDate = (ds) => {
     const date = new Date(ds);
     const diff = Date.now() - date;
@@ -173,8 +239,6 @@ const Downloads = () => {
     if (sortBy === "recent")
       f.sort((a, b) => new Date(b.downloadDate) - new Date(a.downloadDate));
     else if (sortBy === "name") f.sort((a, b) => a.name.localeCompare(b.name));
-    else if (sortBy === "ats")
-      f.sort((a, b) => (b.atsScore || 0) - (a.atsScore || 0));
     return f;
   };
 
@@ -195,29 +259,6 @@ const Downloads = () => {
 
   const filteredDownloads = getCurrentPageItems();
   const filteredTotal = getFilteredDownloads().length;
-
-  const getAtsStyle = (score) => {
-    if (score >= 80)
-      return {
-        bg: "#f0fdf4",
-        text: "#16a34a",
-        bar: "linear-gradient(90deg,#4ade80,#16a34a)",
-        label: "Excellent",
-      };
-    if (score >= 65)
-      return {
-        bg: "#fffbeb",
-        text: "#d97706",
-        bar: "linear-gradient(90deg,#fbbf24,#d97706)",
-        label: "Good",
-      };
-    return {
-      bg: "#fef2f2",
-      text: "#dc2626",
-      bar: "linear-gradient(90deg,#f87171,#dc2626)",
-      label: "Low",
-    };
-  };
 
   const TYPE_META = {
     resume: { icon: "#2563eb", bg: "#eff6ff", label: "Resume" },
@@ -247,7 +288,7 @@ const Downloads = () => {
     );
   }
 
-  /* ─── STAT CARDS (also act as filter) ─── */
+  /* ─── STAT CARDS ─── */
   const StatCards = () => {
     const items = [
       {
@@ -341,193 +382,167 @@ const Downloads = () => {
   const DocumentCard = ({ download }) => {
     const isDeleting = deletingId === download.id;
     const isMenuOpen = openMenuId === download.id;
-    const ats = getAtsStyle(download.atsScore || 0);
     const tc = getTypeMeta(download.type);
-    const showAts = download.type !== "cover-letter";
+
+    const templateLabel = download.template
+      ? download.template.length > 24
+        ? download.template.slice(0, 24) + "…"
+        : download.template
+      : null;
 
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -2 }}
-        transition={{ duration: 0.16 }}
-        className="bg-white rounded-2xl border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-200 relative flex flex-col"
+        whileHover={{ y: -3, boxShadow: "0 12px 32px rgba(0,0,0,0.09)" }}
+        transition={{ duration: 0.18 }}
+        className="bg-white rounded-2xl border border-gray-100 overflow-hidden group transition-all duration-200 relative flex flex-col"
         style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
       >
-        {/* Top accent strip */}
+        {/* Coloured header band */}
         <div
-          className="h-0.5 w-full"
+          className="px-4 pt-4 pb-3 flex items-start gap-3"
           style={{
-            background: `linear-gradient(90deg,${tc.icon},${tc.icon}44)`,
+            background: `linear-gradient(135deg, ${tc.bg} 0%, #fff 100%)`,
+            borderBottom: `1px solid ${tc.icon}18`,
           }}
-        />
-
-        <div className="p-4 flex flex-col flex-1">
-          {/* Header */}
-          <div className="flex items-start gap-2.5 mb-3">
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-              style={{ backgroundColor: tc.bg, color: tc.icon }}
-            >
-              <TypeIcon type={download.type} />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <h3
-                className="font-semibold text-gray-900 text-sm leading-tight truncate"
-                title={download.name}
-              >
-                {download.name}
-              </h3>
-              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                <span
-                  className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                  style={{
-                    backgroundColor:
-                      download.format === "PDF" ? "#fef2f2" : "#eff6ff",
-                    color: download.format === "PDF" ? "#ef4444" : "#3b82f6",
-                  }}
-                >
-                  {download.format}
-                </span>
-                <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-                  <FiClock size={9} />
-                  {formatDate(download.downloadDate)}
-                </span>
-                <span className="text-[10px] text-gray-300">·</span>
-                <span className="text-[10px] text-gray-400">
-                  {download.size}
-                </span>
-              </div>
-            </div>
-
-            {/* Three-dot menu */}
-            <div className="relative">
-              <button
-                onClick={() => setOpenMenuId(isMenuOpen ? null : download.id)}
-                className="menu-trigger w-6 h-6 rounded-lg flex items-center justify-center text-gray-300 hover:text-gray-600 hover:bg-gray-50 transition-colors"
-              >
-                <FiMoreVertical size={13} />
-              </button>
-              <AnimatePresence>
-                {isMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.93, y: -4 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.93, y: -4 }}
-                    transition={{ duration: 0.1 }}
-                    className="menu-dropdown absolute right-0 top-7 bg-white rounded-xl border border-gray-100 z-20 py-1 w-32"
-                    style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}
-                  >
-                    <button
-                      onClick={() => {
-                        handleView(download);
-                        setOpenMenuId(null);
-                      }}
-                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <FiEye size={11} /> Preview
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleDownload(download);
-                        setOpenMenuId(null);
-                      }}
-                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <FiDownload size={11} /> Download
-                    </button>
-                    <div className="h-px bg-gray-100 my-0.5" />
-                    <button
-                      onClick={() => handleDelete(download.id)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-red-500 hover:bg-red-50 flex items-center gap-2"
-                    >
-                      <FiTrash2 size={11} /> Delete
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+        >
+          {/* Large type icon */}
+          <div
+            className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
+            style={{
+              backgroundColor: "#fff",
+              color: tc.icon,
+              border: `1.5px solid ${tc.icon}22`,
+            }}
+          >
+            <TypeIcon type={download.type} size={17} />
           </div>
 
-          {/* ATS Score — clickable button */}
-          {showAts && (
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleAtsClick(download)}
-              className="w-full mb-3 rounded-xl px-3 py-2.5 text-left transition-all group/ats cursor-pointer"
-              style={{
-                backgroundColor: ats.bg,
-                border: `1px solid ${ats.text}22`,
-              }}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+              <span
+                className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md"
+                style={{ backgroundColor: tc.icon + "18", color: tc.icon }}
+              >
+                {tc.label}
+              </span>
+              <span
+                className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
+                style={{
+                  backgroundColor:
+                    download.format === "PDF" ? "#fef2f2" : "#eff6ff",
+                  color: download.format === "PDF" ? "#ef4444" : "#3b82f6",
+                }}
+              >
+                {download.format}
+              </span>
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm leading-snug break-words">
+              {download.name}
+            </h3>
+          </div>
+
+          {/* Three-dot menu */}
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={() => setOpenMenuId(isMenuOpen ? null : download.id)}
+              className="menu-trigger w-6 h-6 rounded-lg flex items-center justify-center text-gray-300 hover:text-gray-600 hover:bg-white/80 transition-colors"
             >
-              <div className="flex items-center justify-between mb-1.5">
-                <span
-                  className="text-[11px] font-semibold flex items-center gap-1"
-                  style={{ color: ats.text }}
-                >
-                  <FiZap size={10} /> ATS Score
-                </span>
-                <span
-                  className="flex items-center gap-1 text-[11px] font-bold"
-                  style={{ color: ats.text }}
-                >
-                  {download.atsScore}%
-                  <span className="text-[10px] font-medium opacity-60">
-                    · {ats.label}
-                  </span>
-                  <FiArrowRight
-                    size={10}
-                    className="transition-all duration-150 opacity-0 group-hover/ats:opacity-100 -translate-x-1 group-hover/ats:translate-x-0"
-                  />
-                </span>
-              </div>
-              <div className="h-1.5 bg-white/60 rounded-full overflow-hidden">
+              <FiMoreVertical size={13} />
+            </button>
+            <AnimatePresence>
+              {isMenuOpen && (
                 <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${download.atsScore}%` }}
-                  transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-                  className="h-full rounded-full"
-                  style={{ background: ats.bar }}
-                />
-              </div>
-            </motion.button>
-          )}
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* Action Row: Preview + Delete */}
-          <div className="flex gap-2 mt-1">
-            <button
-              onClick={() => handleView(download)}
-              className="flex-1 py-2 text-[11px] font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-gray-100"
-            >
-              <FiEye size={11} /> Preview
-            </button>
-            <button
-              onClick={() => handleDelete(download.id)}
-              disabled={isDeleting}
-              className="flex-1 py-2 text-[11px] font-semibold rounded-xl transition-all flex items-center justify-center gap-1.5 border disabled:opacity-50"
-              style={{
-                backgroundColor: "#fff1f2",
-                color: "#ef4444",
-                borderColor: "#fee2e2",
-              }}
-            >
-              {isDeleting ? (
-                <>
-                  <div className="w-3 h-3 border border-red-300 border-t-transparent rounded-full animate-spin" />{" "}
-                  Deleting...
-                </>
-              ) : (
-                <>
-                  <FiTrash2 size={11} /> Delete
-                </>
+                  initial={{ opacity: 0, scale: 0.93, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.93, y: -4 }}
+                  transition={{ duration: 0.1 }}
+                  className="menu-dropdown absolute right-0 top-7 bg-white rounded-xl border border-gray-100 z-20 py-1 w-32"
+                  style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}
+                >
+                  <button
+                    onClick={() => {
+                      handleView(download);
+                      setOpenMenuId(null);
+                    }}
+                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <FiEye size={11} /> Preview
+                  </button>
+                  <div className="h-px bg-gray-100 my-0.5" />
+                  <button
+                    onClick={() => handleDelete(download.id)}
+                    className="w-full text-left px-3 py-1.5 text-xs text-red-500 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <FiTrash2 size={11} /> Delete
+                  </button>
+                </motion.div>
               )}
-            </button>
+            </AnimatePresence>
           </div>
+        </div>
+
+        {/* Meta strip */}
+        <div className="px-4 py-2.5 flex items-center gap-3 border-b border-gray-50 flex-wrap">
+          <span className="flex items-center gap-1 text-[11px] text-gray-400">
+            <FiClock size={10} className="text-gray-300" />
+            {formatDate(download.downloadDate)}
+          </span>
+          <span className="w-px h-3 bg-gray-100" />
+          <span className="text-[11px] text-gray-400">{download.size}</span>
+          {download.views > 0 && (
+            <>
+              <span className="w-px h-3 bg-gray-100" />
+              <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                <FiEye size={10} className="text-gray-300" />
+                {download.views} view{download.views !== 1 ? "s" : ""}
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Template label */}
+        <div className="px-4 py-3 flex-1">
+          {templateLabel ? (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-100">
+              <FiFolder size={11} className="text-gray-300 flex-shrink-0" />
+              <span className="text-[11px] text-gray-500 font-medium truncate">
+                {templateLabel}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-dashed border-gray-200 bg-gray-50/50">
+              <FiFile size={11} className="text-gray-200 flex-shrink-0" />
+              <span className="text-[11px] text-gray-300 italic">
+                No template info
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Action Row */}
+        <div className="px-4 pb-4 flex gap-2">
+          {/* Preview — full width */}
+          <button
+            onClick={() => handleView(download)}
+            className="flex-1 py-2 text-[11px] font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-gray-100"
+          >
+            <FiEye size={11} /> Preview
+          </button>
+
+          {/* Delete icon only */}
+          <button
+            onClick={() => handleDelete(download.id)}
+            disabled={isDeleting}
+            className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl border border-gray-100 text-gray-300 hover:text-red-400 hover:bg-red-50 hover:border-red-100 transition-all disabled:opacity-40"
+          >
+            {isDeleting ? (
+              <div className="w-3 h-3 border border-red-300 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <FiTrash2 size={12} />
+            )}
+          </button>
         </div>
 
         {isDeleting && (
@@ -544,6 +559,7 @@ const Downloads = () => {
 
   return (
     <>
+   
       <UserNavBar />
       <div className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
         <div className="w-full px-4 sm:px-6 lg:px-10 py-8">
@@ -568,7 +584,6 @@ const Downloads = () => {
             </button>
           </div>
 
-          {/* Stat Cards */}
           <StatCards />
 
           {/* Search + Format + Sort */}
@@ -597,8 +612,6 @@ const Downloads = () => {
                 </button>
               )}
             </div>
-
-            {/* Format pills */}
             <div className="flex items-center gap-1 bg-gray-50 rounded-xl p-1 border border-gray-100 self-start sm:self-auto">
               {["All", "PDF", "DOCX"].map((fmt) => (
                 <button
@@ -614,8 +627,6 @@ const Downloads = () => {
                 </button>
               ))}
             </div>
-
-            {/* Sort */}
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -623,7 +634,6 @@ const Downloads = () => {
             >
               <option value="recent">Latest first</option>
               <option value="name">A → Z</option>
-              <option value="ats">ATS Score</option>
             </select>
           </div>
 
@@ -755,7 +765,11 @@ const Downloads = () => {
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-xl text-xs font-bold transition-all ${currentPage === p ? "bg-gray-900 text-white" : "bg-white border border-gray-100 text-gray-500 hover:bg-gray-50"}`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
+                      currentPage === p
+                        ? "bg-gray-900 text-white"
+                        : "bg-white border border-gray-100 text-gray-500 hover:bg-gray-50"
+                    }`}
                   >
                     {p}
                   </button>
@@ -773,99 +787,275 @@ const Downloads = () => {
             </div>
           )}
 
-          <footer className="footer pb-6">
+          <footer className="mt-auto text-center py-4 bg-white border-t text-sm text-gray-600">
             © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
           </footer>
         </div>
       </div>
 
-      {/* Preview Modal */}
-      <AnimatePresence>
-        {previewDocument && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{
-              backgroundColor: "rgba(0,0,0,0.45)",
-              backdropFilter: "blur(6px)",
-            }}
-            onClick={() => setPreviewDocument(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.96, opacity: 0, y: 12 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.96, opacity: 0, y: 12 }}
-              transition={{ type: "spring", stiffness: 320, damping: 32 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[88vh] overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <div>
-                  <h2 className="font-semibold text-gray-900 text-sm truncate max-w-sm">
-                    {previewDocument.name}
-                  </h2>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {previewDocument.format} · {previewDocument.size} ·{" "}
-                    {formatDate(previewDocument.downloadDate)}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setPreviewDocument(null)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  <FiX size={16} />
-                </button>
-              </div>
-              <div
-                className="p-5 overflow-y-auto max-h-[58vh]"
-                style={{ backgroundColor: "#f8f9fb" }}
+      
+{/* ========== PREVIEW MODAL (EXACT HEADER REPLICA) ========== */}
+<AnimatePresence>
+  {previewDocument && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[10000] bg-white flex flex-col"
+      onClick={() => setPreviewDocument(null)}
+    >
+      {/* Top Toolbar - Exact Replica */}
+      {/* Top Toolbar - Exact Replica */}
+<div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200">
+  {/* LEFT SECTION */}
+  <div className="flex items-center gap-3">
+    {/* Eye Icon + Preview Text */}
+    <div className="flex items-center gap-1.5">
+      <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+      </svg>
+      <span className="text-sm font-semibold text-gray-800">Preview</span>
+    </div>
+    
+    {/* Template Name */}
+    <span className="text-sm text-gray-500">{previewDocument.template || 'professional'}</span>
+    
+    {/* Sample Badge */}
+    <span className="text-[10px] px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium border border-blue-200">
+      {previewDocument.type === 'cover-letter' ? 'Your data' : 'Sample'}
+    </span>
+    
+    {/* Pages Count */}
+    <div className="flex items-center gap-1 text-gray-400">
+      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+      <span className="text-xs">2p</span>
+    </div>
+  </div>
+
+
+ 
+
+  {/* RIGHT SECTION - Fullscreen Button (DARK) */}
+  <div className="flex items-center gap-2">
+   
+    {/* Page Navigation */}
+    <div className="flex items-center gap-0.5">
+       <button 
+    onClick={(e) => {
+      e.stopPropagation();
+      if (currentPage > 1) setCurrentPage(currentPage - 1);
+    }}
+    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+  >
+    <FiChevronLeft size={14} />
+  </button>
+      <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-100 rounded">
+        <span className="text-xs font-medium text-gray-700">1</span>
+        <span className="text-xs text-gray-400">/</span>
+        <span className="text-xs font-medium text-gray-700">2</span>
+      </div>
+      <button 
+    onClick={(e) => {
+      e.stopPropagation();
+      if (currentPage < 2) setCurrentPage(currentPage + 1);
+    }}
+    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+  >
+    <FiChevronRight size={14} />
+  </button>
+    </div>
+    
+    {/* Divider */}
+    <div className="h-4 w-px bg-gray-300" />
+    
+    {/* Zoom Controls */}
+    <div className="flex items-center gap-2">
+      {/* Zoom Out */}
+      <button 
+    onClick={(e) => {
+      e.stopPropagation(); // ✅ Prevent modal close
+      setZoomLevel(Math.max(50, zoomLevel - 10)); // ✅ Zoom out
+    }}
+    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+  >
+    <ZoomOut size={14} />
+  </button>
+      
+      {/* Zoom Slider - BLUE COLOR */}
+       <div className="flex items-center gap-2 px-2">
+    <input
+      type="range"
+      min="50"
+      max="200"
+      value={zoomLevel}
+      onChange={(e) => {
+        e.stopPropagation(); // ✅ Prevent modal close
+        setZoomLevel(Number(e.target.value));
+      }}
+      onClick={(e) => e.stopPropagation()} // ✅ Prevent modal close
+      className="w-24 h-1 cursor-pointer"
+      style={{
+        accentColor: '#3b82f6',
+        background: 'transparent'
+      }}
+    />
+  </div>
+     
+      
+      {/* Zoom In */}
+       <button 
+    onClick={(e) => {
+      e.stopPropagation(); // ✅ Prevent modal close
+      setZoomLevel(Math.min(200, zoomLevel + 10)); // ✅ Zoom in
+    }}
+    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+  >
+    <ZoomIn size={14} /> {/* ✅ Use react-icons instead of inline SVG */}
+  </button>
+      
+      {/* Zoom Percentage */}
+      <span className="text-xs text-gray-600 font-medium bg-gray-100 px-2 py-1 rounded">
+        {zoomLevel}%
+      </span>
+      
+      {/* Reset Zoom */}
+     <button
+    onClick={(e) => {
+      e.stopPropagation(); // ✅ Prevent modal close
+      setZoomLevel(100); // ✅ Reset to 100%
+    }}
+    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+  >
+    <FiRotateCcw size={14} />
+  </button>
+      
+      {/* Divider */}
+      <div className="h-4 w-px bg-gray-300" />
+      
+      {/* Download Icon */}
+     <button
+    onClick={(e) => {
+      e.stopPropagation(); // ✅ Prevent modal close
+      handleDownload(previewDocument);
+      setPreviewDocument(null);
+    }}
+    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+  >
+    <FiDownload size={16} />
+  </button>
+    </div>
+  
+
+    <button
+      onClick={() => setIsFullscreen(!isFullscreen)}
+      className="p-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-colors"
+    >
+      {isFullscreen ? <Minimize2 size={14}/>:<Maximize2 size={16}/>}
+    </button>
+    
+  
+  
+  </div>
+</div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Preview Content */}
+        <div className="flex-1 overflow-auto bg-gray-50 p-8">
+          {previewLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="w-10 h-10 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+            </div>
+          ) : previewDocument?.html ? (
+            <div className="flex justify-center">
+              <div 
+                className="bg-white shadow-lg"
+                style={{ 
+                  width: '210mm',
+                  minHeight: '297mm',
+                  padding: '25mm 20mm',
+                  fontFamily: "'Times New Roman', Times, serif",
+                  fontSize: '11pt',
+                  lineHeight: '1.6',
+                  color: '#1f2937',
+                  boxSizing: 'border-box',
+                  transform: `scale(${zoomLevel / 100})`,
+                  transformOrigin: 'top center',
+                  marginBottom: '40px'
+                }}
+                onClick={(e) => e.stopPropagation()}
               >
-                <div className="bg-white rounded-xl shadow-sm p-8 min-h-48">
-                  {previewDocument.html ? (
-                    <div
-                      style={{
-                        fontFamily: "Georgia, serif",
-                        fontSize: "11pt",
-                        lineHeight: "1.6",
-                        color: "#1f2937",
-                      }}
-                      dangerouslySetInnerHTML={{ __html: previewDocument.html }}
-                    />
-                  ) : (
-                    <div className="text-center py-10 text-gray-300">
-                      <FiFile size={36} className="mx-auto mb-3" />
-                      <p className="text-sm">
-                        Preview unavailable — download to view.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <div dangerouslySetInnerHTML={{ __html: previewDocument.html }} />
               </div>
-              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 bg-white">
-                <button
-                  onClick={() => setPreviewDocument(null)}
-                  className="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-100 transition-colors"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => handleDownload(previewDocument)}
-                  className="px-4 py-2 text-xs font-semibold text-white rounded-xl flex items-center gap-1.5"
-                  style={{
-                    background: "linear-gradient(135deg,#1a1a2e,#16213e)",
-                  }}
-                >
-                  <FiDownload size={12} /> Download
-                </button>
+            </div>
+          ) : (
+            <div className="text-center text-gray-400 py-20">
+              <FiFile size={64} className="mx-auto mb-4" />
+              <p>Preview not available</p>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT SIDEBAR - Page Thumbnails */}
+        <div className="w-20 bg-white border-l border-gray-200 p-3 overflow-y-auto">
+          <div className="space-y-3">
+            {/* Page 1 (Active) */}
+            <div className="cursor-pointer rounded-lg overflow-hidden border-2 border-blue-500 shadow-sm">
+              <div className="bg-gray-900 text-white text-xs font-medium text-center py-8">
+                1
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+            
+            {/* Page 2 */}
+            <div className="cursor-pointer rounded-lg overflow-hidden border border-gray-200 hover:border-gray-300">
+              <div className="bg-white text-gray-400 text-xs font-medium text-center py-8">
+                2
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* BOTTOM STATUS BAR */}
+      <div className="px-4 py-1.5 bg-white border-t border-gray-200 flex items-center justify-between text-[10px] text-gray-400">
+        <div className="flex items-center gap-3">
+          <span>A4</span>
+          <span>•</span>
+          <span>210 × 297 mm</span>
+          <span>•</span>
+          <span>PDF ready</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="hover:text-gray-600 cursor-pointer">show grid</span>
+          <span>|</span>
+          <span className="hover:text-gray-600 cursor-pointer">{zoomLevel}%</span>
+        </div>
+      </div>
+
+      {/* Escape Key Handler */}
+      <FullScreenEscape onClose={() => setPreviewDocument(null)} />
+    </motion.div>
+  )}
+</AnimatePresence>
+
+
     </>
   );
 };
 
 export default Downloads;
+
+/* ========== HELPER: Escape Key Listener ========== */
+const FullScreenEscape = ({ onClose }) => {
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+  return null;
+};

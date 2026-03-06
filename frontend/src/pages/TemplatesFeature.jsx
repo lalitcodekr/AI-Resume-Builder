@@ -36,7 +36,9 @@ const TemplatesFeature = () => {
   const [howRef, howVisible] = useInView(0.15);
   const [ctaRef, ctaVisible] = useInView(0.2);
 
- 
+  const handleBackHome = () => {
+    navigate("/?scrollTo=features");
+  };
 
   return (
     <div className="min-h-screen bg-white font-['Outfit']">
@@ -47,7 +49,6 @@ const TemplatesFeature = () => {
   ref={heroRef}
   className="relative px-6 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50"
 >
- 
 
   {/* Background blobs */}
   <div className="absolute rounded-full -top-24 -left-24 w-72 h-72 bg-blue-200/30 blur-3xl animate-pulse" />
@@ -55,7 +56,7 @@ const TemplatesFeature = () => {
 
   <div className="mx-auto max-w-7xl">
     {/* HERO GRID */}
-    <div className="grid items-center min-h-[85vh] gap-12 pt-20  md:pt-40 pb-16 lg:grid-cols-2">
+    <div className="grid items-center min-h-[85vh] gap-12 pt-36 pb-16 lg:grid-cols-2">
 
       {/* LEFT CONTENT */}
       <div
@@ -63,7 +64,7 @@ const TemplatesFeature = () => {
           heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         }`}
       >
-        <div className="inline-block pt-4 px-5 py-4 mb-5 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
+        <div className="inline-block mt-4 px-5 py-2 mb-5 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
           Professional Resume Templates
         </div>
 
@@ -84,7 +85,7 @@ const TemplatesFeature = () => {
 
       {/* RIGHT IMAGE */}
       <div
-        className={`relative flex justify-center hidden md:block lg:justify-end transition-all duration-700 ${
+        className={`relative flex justify-center lg:justify-end transition-all duration-700 ${
           heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
       >
