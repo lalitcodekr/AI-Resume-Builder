@@ -282,7 +282,7 @@ useEffect(() => {
       setExporting(true);
       await GenerateResumePDF(html);
       // Save to downloads page
-      await saveDownloadRecord(html, "download");
+      await saveDownloadRecord(html, "PDF");
     } finally {
       setExporting(false);
     }
@@ -308,7 +308,7 @@ useEffect(() => {
     URL.revokeObjectURL(url);
     
     // Save to downloads page
-    await saveDownloadRecord(html, "download");
+    await saveDownloadRecord(html, "DOCX");
   };
 
   /* ======================================================
