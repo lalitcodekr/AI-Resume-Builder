@@ -30,49 +30,12 @@ import "./CoverLetterBuilder.css";
    stays pinned beneath the sticky navbar while scrolling.
 ───────────────────────────────────────────────────────── */
 const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
-  const panelRef = useRef(null);
-  const rafRef = useRef(null);
-  const currentY = useRef(0);
-  const targetY = useRef(0);
-
-
-  useEffect(() => {
-    const STIFFNESS = 0.12;
-    const tick = () => {
-      currentY.current += (targetY.current - currentY.current) * STIFFNESS;
-      if (panelRef.current) {
-        panelRef.current.style.transform = `translateY(${currentY.current}px)`;
-      }
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, []);
-
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (!containerRef?.current) {
-        targetY.current = Math.max(0, window.scrollY - topOffset);
-        return;
-      }
-      const containerTop =
-        containerRef.current.getBoundingClientRect().top + window.scrollY;
-      const desired = window.scrollY + topOffset - containerTop;
-      targetY.current = Math.max(0, desired);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [topOffset, containerRef]);
-
-
   return (
     <div
-      ref={panelRef}
       style={{
-        willChange: "transform",
-        height: `calc(100vh - ${topOffset}px)`,
+        position: 'sticky',
+        top: `${topOffset}px`,
+        height: `calc(100vh - ${topOffset}px - 80px)`,
       }}
       className="flex flex-col"
     >
@@ -589,7 +552,6 @@ ${formData.jobSummary || formData.jobDescription
 <![endif]-->
 <style>
 @page { margin: 1.25in 0.85in 0.75in 0.85in !important; size: A4 portrait !important; }
-* { margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
 body {
   font-family: 'Times New Roman', 'Times', serif !important;
   font-size: 11pt !important;
@@ -761,7 +723,7 @@ ${formData.jobSummary || formData.jobDescription
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-50 relative z-0">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-50 relative z-0 flex flex-col">
       {/* Sticky navbar, same behavior as CV/Resume */}
       <div
         ref={headerRef}
@@ -993,7 +955,7 @@ ${formData.jobSummary || formData.jobDescription
 
 
           {/* PREVIEW PANEL */}
-          <div className="hidden lg:flex flex-col flex-1 min-w-0 bg-[#eef2f7] rounded-xl overflow-hidden border border-slate-200 relative order-1 lg:order-2 z-10">
+          <div className="hidden lg:flex flex-col flex-1 min-w-0 bg-[#eef2f7] rounded-xl overflow-hidden border border-slate-200 relative order-1 lg:order-2 z-10" style={{ minHeight: 'calc(100vh - 80px)' }}>
             <CoverLetterPreview formData={formData} exportDate={date} />
           </div>
         </div>
