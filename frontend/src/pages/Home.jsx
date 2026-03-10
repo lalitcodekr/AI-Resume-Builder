@@ -7,7 +7,8 @@ import featureImage3 from "../assets/solve.png";
 import featureImage4 from "../assets/get.png";
 import quick from "../assets/customize1.png";
 import work2 from "../assets/analysis3.png";
-import work1 from "../assets/goodResume.png";
+import work1 from "../assets/GoodResume.png";
+
 import work4 from "../assets/oneClick1.png";
 import work5 from "../assets/win4.png";
 import template1 from "../assets/template_thumnail/JessicaClaire1.png";

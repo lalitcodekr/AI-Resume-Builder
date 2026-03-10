@@ -105,7 +105,7 @@ const AdminSubscription = () => {
       const [usersResponse, plansResponse, statsResponse] = await Promise.all([
         axiosInstance.get("/api/user"),
         axiosInstance.get("/api/plans"),
-        axiosInstance.get("/api/user/dashboard-stat"),
+        axiosInstance.get("/api/admin/dashboard-stat"),
       ]);
 
       const allUsers = usersResponse.data;
@@ -114,7 +114,7 @@ const AdminSubscription = () => {
       const paidPlanNames = allPlans.filter(p => p.price > 0).map(p => p.name.toLowerCase());
 
       const pro = allUsers.filter(user => user.plan && paidPlanNames.includes(user.plan.toLowerCase()));
-      const free = allUsers.filter(user => !user.plan || !paidPlanNames.includes(user.plan.toLowerCase()));
+      const free = allUsers.filter(user => user.plan === "Free" && user.isAdmin === false);
 
       setPaidUsers(pro);
       setFreeUsersCount(free.length);
