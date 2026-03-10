@@ -802,7 +802,7 @@ const Downloads = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-1 sm:p-4"
+            className="fixed inset-0 z-[10000] bg-white flex items-center justify-center"
             onClick={() => {
               setPreviewDocument(null);
               setIsFullscreen(false);
@@ -818,14 +818,7 @@ const Downloads = () => {
               exit={{ scale: 0.98, opacity: 0 }}
               transition={{ duration: 0.12 }}
               onClick={(e) => e.stopPropagation()}
-              className={[
-                "bg-white flex flex-col overflow-hidden border border-gray-200 shadow-2xl",
-                "w-screen h-screen rounded-none sm:w-[min(1100px,calc(100vw-16px))] sm:h-[min(90vh,900px)] sm:rounded-2xl",
-                "sm:w-[min(1200px,calc(100vw-32px))] sm:h-[min(92vh,920px)]",
-                isFullscreen
-                  ? "fixed inset-0 w-screen h-screen rounded-none"
-                  : "",
-              ].join(" ")}
+              className="fixed inset-0 w-screen h-screen bg-white flex flex-col overflow-hidden z-[10001]"
             >
               <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 bg-white border-b border-gray-200">
                 {/* LEFT SECTION */}
@@ -1000,22 +993,6 @@ const Downloads = () => {
                       <FiDownload size={16} />
                     </button>
                   </div>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsFullscreen((v) => !v);
-                    }}
-                    className="p-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-colors"
-                    title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-                    aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-                  >
-                    {isFullscreen ? (
-                      <Minimize2 size={14} />
-                    ) : (
-                      <Maximize2 size={16} />
-                    )}
-                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
