@@ -1,5 +1,6 @@
 import "./ATSChecker.css";
 import ATSPdfPreview from "./ATSPdfPreview";
+import ATSDocPreview from "./ATSDocPreview";
 import UserNavBar from "../UserNavBar/UserNavBar";
 import {
   Upload,
@@ -340,6 +341,7 @@ const ATSChecker = ({ onSidebarToggle }) => {
   const [pdfInstance, setPdfInstance] = useState(null);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [previewType, setPreviewType] = useState('pdf');
 
   /* ── Score animation ── */
   useEffect(() => {
@@ -436,96 +438,100 @@ const handleFileChange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
   
-  const isValidFormat = file.type === "application/pdf" || 
+  const fileExtension = file.name.split('.').pop()?.toLowerCase();
+  const isValidFormat = ['pdf', 'doc', 'docx'].includes(fileExtension) || 
+                        file.type === "application/pdf" || 
                         file.type === "application/msword" || 
-                        file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-                        file.name.endsWith('.pdf') || 
-                        file.name.endsWith('.doc') || 
-                        file.name.endsWith('.docx');
+                        file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   
   setUploadedFile(file);
   setIsAnalyzing(true);
 
-  if (file.type === "application/pdf" || file.name.endsWith('.pdf')) {
+  // Support PDF, DOC, and DOCX
+  if (file.type === "application/pdf" || fileExtension === 'pdf') {
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    setPreviewType('pdf');
     sessionStorage.setItem(SESSION_KEY, url);
+  } else if (['doc', 'docx'].includes(fileExtension)) {
+    // For DOC/DOCX, we'll show text preview after analysis
+    setPreviewType('doc');
+    setPreviewUrl(null); // Will use text from backend
+  }
 
-    const formData = new FormData();
-    formData.append("resume", file);
-    formData.append("jobTitle", "Placeholder title");
-    formData.append("templateId", "63f1c4e2a3b4d5f678901234");
-    formData.append("resumeprofileId", "63f1c4e2a3b4d5f678901235");
+  const formData = new FormData();
+  formData.append("resume", file);
+  formData.append("jobTitle", "Placeholder title");
+  formData.append("templateId", "63f1c4e2a3b4d5f678901234");
+  formData.append("resumeprofileId", "63f1c4e2a3b4d5f678901235");
 
-    try {
-      const token =
-        localStorage.getItem("token") || sessionStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/resume/upload", {
-        method: "POST",
-        body: formData,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+  try {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const res = await fetch("http://localhost:5000/api/resume/upload", {
+      method: "POST",
+      body: formData,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
 
-      const rawText = await res.text();
+    const rawText = await res.text();
 
-      if (!res.ok) {
-        console.error(`Server error [${res.status}]:`, rawText.slice(0, 500));
-        return;
-      }
-
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch {
-        console.error("Expected JSON but got:", rawText.slice(0, 300));
-        return;
-      }
-
-      if (data.success) {
-        // Fix: Ensure File Format Compatibility shows full score for valid PDF
-        const updatedData = { ...data.data };
-        if (updatedData.sectionScores) {
-          updatedData.sectionScores = updatedData.sectionScores.map(section => {
-            if (section.sectionName === "File Format Compatibility") {
-              return {
-                ...section,
-                score: isValidFormat ? section.maxScore : 0,
-                status: isValidFormat ? "ok" : "error",
-                suggestions: isValidFormat ? [] : ["Upload resume in PDF or DOC/DOCX format."]
-              };
-            }
-            return section;
-          });
-        }
-        
-        setAnalysisResult(updatedData);
-        if (updatedData.pronounAnalysis?.detected)
-          setPronounErrors(updatedData.pronounAnalysis.detected);
-        setResumeText(updatedData?.text || "");
-        sessionStorage.setItem(
-          "ats_analysis_result",
-          JSON.stringify(updatedData),
-        );
-      } else {
-        console.error("API returned success: false →", data?.message || data);
-      }
-    } catch (err) {
-      console.error(
-        "ATS fetch failed — is the backend running on port 5000?",
-        err,
-      );
-    } finally {
-      setIsAnalyzing(false);
+    if (!res.ok) {
+      console.error(`Server error [${res.status}]:`, rawText.slice(0, 500));
+      return;
     }
-  } else {
-    setPreviewUrl(null);
-    sessionStorage.removeItem(SESSION_KEY);
-    setAnalysisResult(null);
-    sessionStorage.removeItem("ats_analysis_result");
+
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      console.error("Expected JSON but got:", rawText.slice(0, 300));
+      return;
+    }
+
+    if (data.success) {
+      const updatedData = { ...data.data };
+      
+      if (updatedData.sectionScores) {
+        updatedData.sectionScores = updatedData.sectionScores.map(section => {
+          if (section.sectionName === "File Format Compatibility") {
+            return {
+              ...section,
+              score: isValidFormat ? section.maxScore : 0,
+              status: isValidFormat ? "ok" : "error",
+              suggestions: isValidFormat ? [] : ["Upload resume in PDF or DOC/DOCX format."]
+            };
+          }
+          return section;
+        });
+        
+        const totalScore = updatedData.sectionScores.reduce(
+          (sum, section) => sum + (section.score || 0),
+          0
+        );
+        const maxTotal = updatedData.sectionScores.reduce(
+          (sum, section) => sum + (section.maxScore || 0),
+          0
+        );
+        
+        updatedData.overallScore = maxTotal > 0 
+          ? Math.round((totalScore / maxTotal) * 100) 
+          : 0;
+      }
+      
+      setAnalysisResult(updatedData);
+      if (updatedData.pronounAnalysis?.detected)
+        setPronounErrors(updatedData.pronounAnalysis.detected);
+      setResumeText(updatedData?.text || "");
+      sessionStorage.setItem("ats_analysis_result", JSON.stringify(updatedData));
+    } else {
+      console.error("API returned success: false →", data?.message || data);
+    }
+  } catch (err) {
+    console.error("ATS fetch failed — is the backend running on port 5000?", err);
+  } finally {
     setIsAnalyzing(false);
   }
 };
-
   const buildErrorLocationsFromPdf = async (pdf, wrongWords) => {
     if (!pdf || !wrongWords?.length) return [];
     const errors = [];
@@ -558,7 +564,7 @@ const handleFileChange = async (e) => {
       <UserNavBar onMenuClick={onSidebarToggle || (() => {})} />
 
       {/* ── Page Header ── */}
-      <div className="max-w-none mx-auto px-2 sm:px-4 pt-4 pb-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-2">
         <div className="flex items-center justify-between">
           <div>
             <h1
@@ -588,16 +594,16 @@ const handleFileChange = async (e) => {
         </div>
       </div>
 
-      {/* ── Full Screen Two-column layout ── */}
-      <div className="max-w-none mx-auto px-2 sm:px-4 py-2 flex flex-col md:flex-row gap-3 items-stretch h-[calc(100vh-120px)]">
-        {/* ── LEFT PANEL: Analysis (40%) ── */}
+      {/* ── Two-column layout ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row gap-5 items-stretch">
+        {/* ── LEFT PANEL: Analysis ── */}
         <div
-          className="w-full md:w-[45%] lg:w-[40%] flex-shrink-0 flex flex-col gap-3 order-2 md:order-1"
-          style={{ minHeight: "calc(100vh - 140px)" }}
+          className="w-full md:w-[340px] flex-shrink-0 flex flex-col gap-4 order-2 md:order-1"
+          style={{ minHeight: PANEL_HEIGHT }}
         >
           <div
             className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col"
-            style={{ minHeight: "calc(100vh - 140px)" }}
+            style={{ minHeight: PANEL_HEIGHT }}
           >
             {/* Panel header */}
             <div className="px-5 pt-5 pb-4 border-b border-slate-100 flex-shrink-0">
@@ -723,24 +729,26 @@ const handleFileChange = async (e) => {
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col"
-                style={{ minHeight: "calc(100vh - 140px)" }}
+                style={{ minHeight: PANEL_HEIGHT }}
               >
-                {previewUrl ? (
-                  <div
-                    className="w-full flex-1"
-                    style={{ minHeight: "calc(100vh - 140px)" }}
-                  >
-                    <ATSPdfPreview
-                      pdfUrl={previewUrl}
-                      onLoadSuccess={(pdf) => {
-                        setNumPages(pdf.numPages);
-                        setPdfInstance(pdf);
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <UploadZone onFileChange={handleFileChange} />
-                )}
+               {previewUrl ? (
+  <div className="w-full flex-1" style={{ minHeight: PANEL_HEIGHT }}>
+    <ATSPdfPreview
+      pdfUrl={previewUrl}
+      onLoadSuccess={(pdf) => {
+        setNumPages(pdf.numPages);
+        setPdfInstance(pdf);
+      }}
+    />
+  </div>
+) : previewType === 'doc' && resumeText ? (
+  // Show DOC preview with extracted text
+  <div className="w-full flex-1" style={{ minHeight: PANEL_HEIGHT }}>
+    <ATSDocPreview text={resumeText} />
+  </div>
+) : (
+  <UploadZone onFileChange={handleFileChange} />
+)}
               </motion.div>
             )}
           </AnimatePresence>
