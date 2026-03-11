@@ -16,13 +16,16 @@ import templateRouter from "./routers/template.router.js";
 import resumeRouter from "./routers/resume.router.js";
 import templateVisibilityRouter from "./routers/templateVisibility.router.js";
 import planRouter from "./routers/plan.router.js";
+import blogRouter from "./routers/blog.router.js";
 
 import downloadsRouter from "./routers/downloads.router.js";
 import coverLetterRouter from "./routers/coverletter.js";  // ✅ NEW
 import dashboardRouter from "./routers/dashboard.router.js";
+import analyticsRouter from "./routes/analytics.routes.js";
 
 import chatbotRouter from "./routers/chatbot.router.js";
 
+import adminRouter from "./routers/admin.router.js";
 
 // Config
 import connectDB from "./config/db.js";
@@ -70,8 +73,11 @@ app.use("/api/resume", resumeRouter);
 app.use("/api/coverletter", coverLetterRouter);  // ✅ NEW
 app.use("/api/template-visibility", templateVisibilityRouter);
 app.use("/api/plans", planRouter);
+app.use("/api/blog", blogRouter);
 app.use("/api/chatbot", chatbotRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api", analyticsRouter);
 
 // Serve uploads directory (for images/resumes)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
