@@ -336,11 +336,18 @@ export const uploadAndAnalyzeResume = async (req, res) => {
 
     // Validate required fields from frontend
     const { jobTitle, templateId, resumeprofileId } = req.body;
-    if (!jobTitle || !templateId || !resumeprofileId) {
+    if (!jobTitle || !templateId) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields"
+        message: "Missing required fields: jobTitle and templateId are required"
       });
+    }
+
+    // Handle resumeprofileId - use default if not provided or invalid
+    let profileId = resumeprofileId;
+    if (!profileId || profileId === "000000000000000000000000") {
+      // Create a default ObjectId or use the user's ID
+      profileId = userId;
     }
 
     // ✅ FIX 1: Ensure File Format Compatibility score is correct for valid formats
@@ -396,7 +403,7 @@ export const uploadAndAnalyzeResume = async (req, res) => {
       extractedData,
       passThreshold: passes,
       templateId: new mongoose.Types.ObjectId(templateId),
-      resumeprofileId: new mongoose.Types.ObjectId(resumeprofileId),
+      resumeprofileId: new mongoose.Types.ObjectId(profileId),
       jobTitle,
     });
 

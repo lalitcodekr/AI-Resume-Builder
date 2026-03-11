@@ -558,7 +558,7 @@ const handleFileChange = async (e) => {
       <UserNavBar onMenuClick={onSidebarToggle || (() => {})} />
 
       {/* ── Page Header ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-2">
+      <div className="max-w-none mx-auto px-2 sm:px-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
           <div>
             <h1
@@ -588,16 +588,16 @@ const handleFileChange = async (e) => {
         </div>
       </div>
 
-      {/* ── Two-column layout ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row gap-5 items-stretch">
-        {/* ── LEFT PANEL: Analysis ── */}
+      {/* ── Full Screen Two-column layout ── */}
+      <div className="max-w-none mx-auto px-2 sm:px-4 py-2 flex flex-col md:flex-row gap-3 items-stretch h-[calc(100vh-120px)]">
+        {/* ── LEFT PANEL: Analysis (40%) ── */}
         <div
-          className="w-full md:w-[340px] flex-shrink-0 flex flex-col gap-4 order-2 md:order-1"
-          style={{ minHeight: PANEL_HEIGHT }}
+          className="w-full md:w-[45%] lg:w-[40%] flex-shrink-0 flex flex-col gap-3 order-2 md:order-1"
+          style={{ minHeight: "calc(100vh - 140px)" }}
         >
           <div
             className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col"
-            style={{ minHeight: PANEL_HEIGHT }}
+            style={{ minHeight: "calc(100vh - 140px)" }}
           >
             {/* Panel header */}
             <div className="px-5 pt-5 pb-4 border-b border-slate-100 flex-shrink-0">
@@ -723,12 +723,12 @@ const handleFileChange = async (e) => {
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col"
-                style={{ minHeight: PANEL_HEIGHT }}
+                style={{ minHeight: "calc(100vh - 140px)" }}
               >
                 {previewUrl ? (
                   <div
                     className="w-full flex-1"
-                    style={{ minHeight: PANEL_HEIGHT }}
+                    style={{ minHeight: "calc(100vh - 140px)" }}
                   >
                     <ATSPdfPreview
                       pdfUrl={previewUrl}
