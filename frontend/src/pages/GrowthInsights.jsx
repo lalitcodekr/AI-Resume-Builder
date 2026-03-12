@@ -7,9 +7,7 @@ import {
   Compass,
   Briefcase,
   CheckCircle2,
-  Cpu,
-  ArrowLeft,
-  Sparkles
+  Cpu
 } from "lucide-react";
 import NavBar from "../components/NavBar";
 import Footer from "./Footer";
@@ -36,10 +34,10 @@ const useInView = (threshold = 0.15) => {
 
   return [ref, visible];
 };
-const StrategicInsightsPage = () => {<section className="py-12"></section>
-  const navigate = useNavigate();<div className="mt-1 grid gap-10 lg:grid-cols-3"></div>
-  const isLoggedIn =
-    typeof window !== "undefined" && !!localStorage.getItem("token");
+
+const StrategicInsightsPage = () => {
+  const navigate = useNavigate();
+  const isLoggedIn = typeof window !== "undefined" && !!localStorage.getItem("token");
 
   const handleFeatureClick = (path) => {
     if (isLoggedIn) {
@@ -51,12 +49,10 @@ const StrategicInsightsPage = () => {<section className="py-12"></section>
   };
 
   const [heroRef, heroVisible] = useInView(0.2);
-const [whatRef, whatVisible] = useInView(0.15);
-const [pillarRef, pillarVisible] = useInView(0.15);
-const [roadmapRef, roadmapVisible] = useInView(0.15);
-const [ctaRef, ctaVisible] = useInView(0.2);
-
-  
+  const [whatRef, whatVisible] = useInView(0.15);
+  const [pillarRef, pillarVisible] = useInView(0.15);
+  const [roadmapRef, roadmapVisible] = useInView(0.15);
+  const [ctaRef, ctaVisible] = useInView(0.2);
 
   return (
     <div className="min-h-[80vh] bg-white font-['Outfit'] text-[#1a2e52] selection:bg-orange-100 overflow-x-hidden select-none">
@@ -76,7 +72,7 @@ const [ctaRef, ctaVisible] = useInView(0.2);
         <div className="relative z-10 pt-10 mx-auto max-w-7xl">
          
 
-<div className="grid items-center gap-2 lg:gap-1 lg:grid-cols-2">
+<div className="grid items-center gap-2 lg:grid-cols-2">
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full shadow-sm bg-blue-50">
                 <Cpu size={16} className="text-[#0077cc]" />

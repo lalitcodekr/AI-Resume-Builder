@@ -1,4 +1,4 @@
-import React from "react";
+import { useRef } from "react";
 import { 
   Sparkles, 
   Cpu, 
@@ -11,8 +11,7 @@ import {
   Wand2 
 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import { motion, useInView } from "framer-motion"; // Added useInView here
-import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
 // Components
 import Footer from "./Footer";
