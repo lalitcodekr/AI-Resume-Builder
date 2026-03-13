@@ -35,6 +35,10 @@ const useInView = (threshold = 0.15) => {
   return [ref, isVisible];
 };
 
+
+
+
+
 /** ✅ ATS donut chart data */
 const atsBreakdown = [
   { name: "Keyword Match", value: 52 },
@@ -158,7 +162,10 @@ function ATSDonutCard({ score = 78 }) {
 }
 
 const ATSCheckerFeature = () => {
-  const navigate = useNavigate();
+ const navigate = useNavigate();
+
+  const isLoggedIn =
+  localStorage.getItem("token") || sessionStorage.getItem("token");
   
   /** ✅ Updated: Changed to navigate to login page */
   const handleCTA = () => {
@@ -203,12 +210,17 @@ const ATSCheckerFeature = () => {
               </p>
 
               <button
-                onClick={handleCTA}
-                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#1a2e52] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-xl hover:bg-[#0077cc] hover:-translate-y-1"
-              >
-                <span>Run Free Scan</span>
-                <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
-              </button>
+  onClick={() => {
+    if (!isLoggedIn) {
+      navigate("/login", { state: { from: "/user/ats-checker" } });
+    } else {
+      navigate("/user/ats-checker");
+    }
+  }}
+  className="px-6 py-3 bg-[#1a2e52] text-white rounded-xl"
+>
+  Run Free Scan →
+</button>
 
               <div className="flex items-center gap-4 mt-8 text-sm font-medium text-gray-400">
                 <div className="flex -space-x-2">
