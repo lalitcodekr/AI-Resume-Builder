@@ -190,7 +190,7 @@ const PaginatedPreview = ({
               left: PAGE_PADDING,
               right: PAGE_PADDING,
               height: USABLE_HEIGHT,
-              overflow: "hidden",
+              overflow: "visible",
             }}
           >
             <div

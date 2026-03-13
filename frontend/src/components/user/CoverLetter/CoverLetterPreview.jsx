@@ -965,7 +965,7 @@ const CoverLetterPreview = ({
         display: "flex",
         flexDirection: "column",
         minWidth: 0,
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <div
@@ -1044,7 +1044,7 @@ const CoverLetterPreview = ({
         background: "#ffffff",
         border: "1px solid #e8edf3",
         borderRadius: "inherit",
-        overflow: "hidden",
+        overflow: "visible",
         boxShadow: "inset 0 1px 4px rgba(0,0,0,0.02)",
       }}
     >
