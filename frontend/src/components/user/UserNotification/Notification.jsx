@@ -121,11 +121,11 @@ const Notification = () => {
                 My Notifications
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <motion.button
                 onClick={markAllAsRead}
                 disabled={unreadCount === 0}
-                className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-1 text-sm font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -134,7 +134,7 @@ const Notification = () => {
               <motion.button
                 onClick={clearAll}
                 disabled={notifications.length === 0}
-                className="px-4 py-2 text-sm font-semibold text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-1 text-sm font-semibold text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -178,7 +178,7 @@ const Notification = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 pb-16">
         {filteredNotifications.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -379,7 +379,7 @@ const Notification = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      <footer className="mt-auto text-center py-4 bg-white border-t text-sm text-gray-600">
+      <footer className="fixed bottom-0 left-0 right-0 text-center py-4 bg-white border-t text-sm text-gray-600 z-10">
         © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
       </footer>
     </div>
