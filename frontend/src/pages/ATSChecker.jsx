@@ -34,6 +34,10 @@ const useInView = (threshold = 0.15) => {
   return [ref, isVisible];
 };
 
+
+
+
+
 /** ✅ ATS donut chart data */
 const atsBreakdown = [
   { name: "Keyword Match", value: 52 },
@@ -157,7 +161,10 @@ function ATSDonutCard({ score = 78 }) {
 }
 
 const ATSCheckerFeature = () => {
-  const navigate = useNavigate();
+ const navigate = useNavigate();
+
+  const isLoggedIn =
+  localStorage.getItem("token") || sessionStorage.getItem("token");
   
   /** ✅ Updated: Changed to navigate to login page */
   const handleCTA = () => {
