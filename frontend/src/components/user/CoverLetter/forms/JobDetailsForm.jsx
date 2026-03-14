@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Briefcase } from "lucide-react";
 
 const JobDetailsForm = ({ formData, onInputChange }) => {
   const whereFoundOptions = [
@@ -35,35 +36,50 @@ const JobDetailsForm = ({ formData, onInputChange }) => {
   };
 
   return (
-    <div className="form-section p-4">
-      <h3 className="form-section-title">Job Details</h3>
-      <p className="form-description">
+    <div className="p-2 animate-in fade-in duration-300">
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+        <Briefcase className="text-blue-600" size={20} />
+        <h3 className="text-lg font-bold text-slate-800">Job Details</h3>
+      </div>
+
+      <p className="text-sm text-slate-500 mb-5">
         Provide details about the position you're applying for.
       </p>
 
-      <div className="form-grid">
-        <div className="form-group">
-          <label>Job Title *</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Job Title <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             placeholder="Software Engineer"
+            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
             value={localData.jobTitle}
             onChange={(e) => handleChange("jobTitle", e.target.value)}
           />
         </div>
-        <div className="form-group">
-          <label>Job Reference Number</label>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Job Reference Number
+          </label>
           <input
             type="text"
             placeholder="REF-12345"
+            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
             value={localData.jobReference}
             onChange={(e) => handleChange("jobReference", e.target.value)}
           />
-          <small className="form-hint">If provided in the job listing</small>
+          <small className="text-xs text-slate-400">If provided in the job listing</small>
         </div>
-        <div className="form-group">
-          <label>Where did you find this job?</label>
+
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="block text-sm font-semibold text-slate-700">
+            Where did you find this job?
+          </label>
           <select
+            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
             value={localData.whereFound}
             onChange={(e) => handleChange("whereFound", e.target.value)}
           >
@@ -77,10 +93,13 @@ const JobDetailsForm = ({ formData, onInputChange }) => {
         </div>
       </div>
 
-      <div className="form-group full-width" style={{ marginTop: "24px" }}>
-        <label>Job Description (Optional)</label>
+      <div className="flex flex-col gap-1.5 mt-6">
+        <label className="block text-sm font-semibold text-slate-700">
+          Job Description <span className="text-slate-400 font-normal">(Optional)</span>
+        </label>
         <textarea
           placeholder="Paste job description for better AI suggestions..."
+          className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[140px] leading-relaxed"
           value={localData.jobDescription}
           onChange={(e) => handleChange("jobDescription", e.target.value)}
           rows={6}

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { Search, ChevronDown, Calendar, Sparkles } from "lucide-react";
-import { Loader2, Check, AlertCircle, Mail } from "lucide-react";
-import NavBar from "../components/NavBar";
+import { useEffect, useState } from 'react';
+import { Search, ChevronDown, Calendar, Sparkles, Loader2, Check, AlertCircle, Mail } from 'lucide-react';
+import NavBar from '../components/NavBar';
 import Footer from "./Footer";
 import { motion } from "framer-motion";
 

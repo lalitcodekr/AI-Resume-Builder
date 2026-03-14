@@ -1,135 +1,63 @@
-import { useState } from "react";
+import { Building2 } from "lucide-react";
 
 const RecipientInfoForm = ({ formData, onInputChange }) => {
-  const [emailError, setEmailError] = useState(false);
-  const [phoneError, setPhoneError] = useState(false);
-
-  const handleEmailChange = (e) => {
-    const val = e.target.value;
-    onInputChange("email", val);
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (val && !emailRegex.test(val)) {
-      setEmailError(true);
-    } else {
-      setEmailError(false);
-    }
-  };
-
-  const handlePhoneChange = (e) => {
-    const val = e.target.value;
-    const cleanVal = val.replace(/[^0-9+]/g, "");
-    onInputChange("phone", cleanVal);
-
-    if (cleanVal && cleanVal.replace(/[^0-9]/g, "").length < 10) {
-      setPhoneError(true);
-    } else {
-      setPhoneError(false);
-    }
-  };
-
   return (
-    <div className="form-section p-4">
-      <h3 className="form-section-title">Your Information</h3>
-      <div className="form-grid">
-        <div className="form-group">
-          <label>Full Name *</label>
-          <input
-            type="text"
-            placeholder="John Doe"
-            value={formData.fullName}
-            onChange={(e) => onInputChange("fullName", e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label>Email *</label>
-          <input
-            type="email"
-            placeholder="john.doe@example.com"
-            value={formData.email}
-            onChange={handleEmailChange}
-            style={{ borderColor: emailError ? "red" : "" }}
-          />
-          {emailError && (
-            <span style={{ color: "red", fontSize: "12px" }}>
-              Please enter a valid email
-            </span>
-          )}
-        </div>
-        <div className="form-group">
-          <label>Phone</label>
-          <input
-            type="tel"
-            placeholder="+1 (555) 123-4567"
-            value={formData.phone}
-            maxLength={15}
-            onChange={handlePhoneChange}
-            style={{ borderColor: phoneError ? "red" : "" }}
-          />
-          {phoneError && (
-            <span style={{ color: "red", fontSize: "12px" }}>
-              Please enter a valid phone number
-            </span>
-          )}
-        </div>
-        <div className="form-group">
-          <label>Address</label>
-          <input
-            type="text"
-            placeholder="123 Main St, City, State ZIP"
-            value={formData.address}
-            onChange={(e) => onInputChange("address", e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label>LinkedIn (optional)</label>
-          <input
-            type="text"
-            placeholder="linkedin.com/in/johndoe"
-            value={formData.linkedin}
-            onChange={(e) => onInputChange("linkedin", e.target.value)}
-          />
-        </div>
+    <div className="p-2 animate-in fade-in duration-300">
+      {/* Recipient Information */}
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+        <Building2 className="text-blue-600" size={20} />
+        <h3 className="text-lg font-bold text-slate-800">Recipient Information</h3>
       </div>
 
-      <h3 className="form-section-title" style={{ marginTop: "32px" }}>
-        Recipient Information
-      </h3>
-      <div className="form-grid">
-        <div className="form-group">
-          <label>Hiring Manager's Name</label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Hiring Manager's Name
+          </label>
           <input
             type="text"
             placeholder="Jane Smith"
+            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
             value={formData.recipientName}
             onChange={(e) => onInputChange("recipientName", e.target.value)}
           />
-          <small className="form-hint">
-            Leave blank to use "Hiring Manager"
-          </small>
+          <small className="text-xs text-slate-400">Leave blank to use "Hiring Manager"</small>
         </div>
-        <div className="form-group">
-          <label>Hiring Manager's Title</label>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Hiring Manager's Title
+          </label>
           <input
             type="text"
             placeholder="HR Director"
+            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
             value={formData.recipientTitle}
             onChange={(e) => onInputChange("recipientTitle", e.target.value)}
           />
         </div>
-        <div className="form-group">
-          <label>Company Name *</label>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Company Name <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             placeholder="Acme Corporation"
+            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
             value={formData.companyName}
             onChange={(e) => onInputChange("companyName", e.target.value)}
           />
         </div>
-        <div className="form-group">
-          <label>Company Address</label>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Company Address
+          </label>
           <input
             type="text"
             placeholder="456 Business Ave, City, State ZIP"
+            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
             value={formData.companyAddress}
             onChange={(e) => onInputChange("companyAddress", e.target.value)}
           />

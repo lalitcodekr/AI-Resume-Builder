@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../api/axios";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import images from "../assets";
@@ -14,28 +14,21 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const location = useLocation();
-   const redirectPath = location.state?.from || "/user/dashboard";
   // Auto login (checks both localStorage & sessionStorage)
   // Auto login ONLY for Remember Me users
 useEffect(() => {
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   if (token) {
-    const isAdmin = JSON.parse(
-      localStorage.getItem("isAdmin") ||
-      sessionStorage.getItem("isAdmin") ||
-      "false"
-    );
+    const isAdmin = JSON.parse(localStorage.getItem("isAdmin") || "false");
 
     if (isAdmin) {
       navigate("/admin");
     } else {
-      navigate(redirectPath);
+      navigate("/user/dashboard");
     }
   }
-}, [navigate, redirectPath]);
+}, [navigate]);
 
   const validate = () => {
     if (!emailtext) {
@@ -86,7 +79,7 @@ useEffect(() => {
       } else {
         const username = emailtext.split("@")[0];
         toast.success(`Welcome back, ${username}!`);
-        navigate(redirectPath);
+        navigate("/user/dashboard");
       }
     }, 150);
 

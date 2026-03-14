@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Briefcase,
   Trash2,
   EditIcon,
   Plus,
@@ -51,18 +52,8 @@ const ExperienceForm = ({ formData, setFormData }) => {
     if (!value) return "";
     const [year, month] = value.split("-");
     const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ];
     return `${months[Number(month) - 1]} ${year}`;
   };
@@ -70,7 +61,6 @@ const ExperienceForm = ({ formData, setFormData }) => {
   const handleAIEnhance = async (id) => {
     try {
       setGeneratingId(id);
-      // Convert experience and projects objects to strings
       const experienceStr = formData.experience.find((e) => e.id === id);
       const data = {
         id,
@@ -88,20 +78,14 @@ const ExperienceForm = ({ formData, setFormData }) => {
         setGeneratingId(null);
         return;
       }
-      console.log("Data sent:", data);
 
       const response = await axiosInstance.post(
         "/api/resume/enhance-work-experience",
         data,
       );
-      console.log("Response received:", response);
-      console.log("Description generated:", response.data.aiResume);
-      console.log("Updating experience with ID:", id);
-      console.log("Updating experience with data:", formData.experience);
       updateExperience(id, "description", response.data.aiResume);
     } catch (error) {
       console.error("Failed to generate description:", error);
-      console.error("Error details:", error.response?.data || error.message);
       alert(
         `Failed to generate description: ${error.response?.data?.error || error.message}`,
       );
@@ -115,12 +99,11 @@ const ExperienceForm = ({ formData, setFormData }) => {
       {(formData?.experience ?? []).map((exp, index) => (
         <div
           key={exp.id}
-          className="shadow-sm border border-gray-300 rounded-lg p-2"
+          className="shadow-sm border border-gray-300 rounded-md p-2"
         >
-          {/* ================= CARD MODE ================= */}
+          {/* Card UI */}
           {editingId !== exp.id && (
             <div className="rounded-lg p-3 flex flex-col justify-between items-center">
-              {/* Header */}
               <div className="w-full flex justify-between items-center">
                 <span className="font-medium">Experience {index + 1}</span>
                 <div className="flex gap-4 items-center">
@@ -139,7 +122,6 @@ const ExperienceForm = ({ formData, setFormData }) => {
                 </div>
               </div>
 
-              {/* Preview */}
               <div className="w-full mt-2 text-left">
                 <div className="flex justify-between items-center gap-4 flex-wrap">
                   <div className="text-md font-semibold break-all">
@@ -152,15 +134,12 @@ const ExperienceForm = ({ formData, setFormData }) => {
                     </span>
                   )}
                 </div>
-
                 {exp.title && (
                   <div className="text-sm font-medium mt-1">{exp.title}</div>
                 )}
-
                 {exp.location && (
                   <div className="text-sm text-slate-600">{exp.location}</div>
                 )}
-
                 {exp.description && (
                   <p className="text-sm text-slate-500 mt-2 line-clamp-3">
                     {exp.description}
@@ -170,110 +149,128 @@ const ExperienceForm = ({ formData, setFormData }) => {
             </div>
           )}
 
-          {/* ================= EDIT MODE ================= */}
+          {/* Edit Mode */}
           {editingId === exp.id && (
             <>
-              <div className="px-3 py-4">
-                <div className="flex flex-col gap-2 mb-3">
-                  <label>Job Title *</label>
-                  <input
-                    type="text"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
-                    placeholder="Software Engineer"
-                    value={exp.title}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "title", e.target.value)
-                    }
-                  />
+              <div className="p-3 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                  <Briefcase className="text-blue-600" size={18} />
+                  <h4 className="font-semibold text-slate-800">Edit Experience</h4>
                 </div>
 
-                <div className="flex flex-col gap-2 mb-3">
-                  <label>Company *</label>
-                  <input
-                    type="text"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
-                    placeholder="Tech Company Inc."
-                    value={exp.company}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "company", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 mb-3">
-                  <label>Location</label>
-                  <input
-                    type="text"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
-                    placeholder="City, Country"
-                    value={exp.location}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "location", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 mb-3">
-                  <label>Start Date</label>
-                  <input
-                    type="month"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
-                    value={exp.startDate}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "startDate", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 mb-3">
-                  <label>End Date</label>
-                  <input
-                    type="month"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
-                    value={exp.endDate}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "endDate", e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 mb-3">
-                  <div className="w-full flex items-center justify-between">
-                    <label>Description *</label>
-                    <button
-                      className="flex gap-2 ml-2 p-2 rounded-lg text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-800"
-                      onClick={() => handleAIEnhance(exp.id)}
-                    >
-                      {generatingId === exp.id ? (
-                        <RefreshCw size={15} className={`ml-1 animate-spin`} />
-                      ) : (
-                        <Sparkles size={14} />
-                      )}
-                      Enhance with AI
-                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 pr-1 mb-2">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Job Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      placeholder="Software Engineer"
+                      value={exp.title}
+                      onChange={(e) =>
+                        updateExperience(exp.id, "title", e.target.value)
+                      }
+                    />
                   </div>
-                  <textarea
-                    rows={4}
-                    placeholder="Describe your responsibilities and achievements..."
-                    className="px-2.5 py-2 border text-sm resize-none rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
-                    value={exp.description}
-                    onChange={(e) =>
-                      updateExperience(exp.id, "description", e.target.value)
-                    }
-                  />
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Company <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      placeholder="Tech Company Inc."
+                      value={exp.company}
+                      onChange={(e) =>
+                        updateExperience(exp.id, "company", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      placeholder="City, Country"
+                      value={exp.location}
+                      onChange={(e) =>
+                        updateExperience(exp.id, "location", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="month"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={exp.startDate}
+                      onChange={(e) =>
+                        updateExperience(exp.id, "startDate", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      End Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="month"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={exp.endDate}
+                      onChange={(e) =>
+                        updateExperience(exp.id, "endDate", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <div className="w-full flex items-center justify-between">
+                      <label className="text-sm font-semibold text-slate-700">
+                        Description <span className="text-red-500">*</span>
+                      </label>
+                      <button
+                        className="flex gap-2 items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                        onClick={() => handleAIEnhance(exp.id)}
+                      >
+                        {generatingId === exp.id ? (
+                          <RefreshCw size={14} className="animate-spin" />
+                        ) : (
+                          <Sparkles size={14} />
+                        )}
+                        Enhance with AI
+                      </button>
+                    </div>
+                    <textarea
+                      rows={4}
+                      placeholder="Describe your responsibilities and achievements..."
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[100px] leading-relaxed"
+                      value={exp.description}
+                      onChange={(e) =>
+                        updateExperience(exp.id, "description", e.target.value)
+                      }
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Done Button */}
               <div className="flex justify-end items-center gap-2 px-2 pb-4">
                 <button
-                  className="text-sm font-medium bg-red-500 py-2 px-4 rounded-lg text-white flex gap-2 items-center hover:bg-red-700"
+                  className="text-sm font-medium bg-red-500 py-2 px-4 rounded-lg text-white flex gap-2 items-center hover:bg-red-800"
                   onClick={() => removeExperience(exp.id)}
                 >
                   <Trash2 size={18} />
                   Delete
                 </button>
-
                 <button
                   className="text-sm font-medium bg-black py-2 px-4 rounded-lg text-white flex gap-2 items-center hover:bg-black/70"
                   onClick={() => setEditingId(null)}
@@ -287,7 +284,6 @@ const ExperienceForm = ({ formData, setFormData }) => {
         </div>
       ))}
 
-      {/* Add Button */}
       <button
         onClick={addExperience}
         className="flex items-center gap-2 text-sm font-medium"

@@ -361,11 +361,6 @@ const CareersPage = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    const slug = job.title
-                      .toLowerCase()
-                      .replace(/[()]/g, "")
-                      .replace(/\s+/g, "-");
-
                     window.open(
                       `https://uptoskills.com/homeJobs#${job.title.replace(/\s+/g, "-").toLowerCase()}`,
                       "_blank",

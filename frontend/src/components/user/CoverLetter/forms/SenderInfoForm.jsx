@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { User } from "lucide-react";
 
 const SenderInfoForm = ({ formData, onInputChange }) => {
   const [emailError, setEmailError] = useState(false);
@@ -7,7 +8,6 @@ const SenderInfoForm = ({ formData, onInputChange }) => {
   const handleEmailChange = (e) => {
     const val = e.target.value;
     onInputChange("email", val);
-    // Simple regex to check for @ and domain pattern
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (val && !emailRegex.test(val)) {
       setEmailError(true);
@@ -18,12 +18,9 @@ const SenderInfoForm = ({ formData, onInputChange }) => {
 
   const handlePhoneChange = (e) => {
     const val = e.target.value;
-    // Strip out any non-digit characters to only allow numbers, we might still want the user to type "+" for country code though, let's allow basic numeric/space/plus/dash or just strict numbers. Let's do strict numbers and plus sign as they might type +1
     const cleanVal = val.replace(/[^0-9+]/g, "");
     onInputChange("phone", cleanVal);
 
-    // Validation: just check length if we want, or if it has invalid chars, but since we restrict input, it's mostly safe.
-    // Let's also set an error if it's less than 10 digits and they started typing.
     if (cleanVal && cleanVal.replace(/[^0-9]/g, "").length < 10) {
       setPhoneError(true);
     } else {
@@ -32,12 +29,17 @@ const SenderInfoForm = ({ formData, onInputChange }) => {
   };
 
   return (
-    <div className="p-4">
-      <h3 className="mb-3 text-sm font-semibold">Personal Information</h3>
-      <div className="pl-0.5">
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Full Name
+    <div className="p-2 animate-in fade-in duration-300">
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+        <User className="text-blue-600" size={20} />
+        <h3 className="text-lg font-bold text-slate-800">Personal Information</h3>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+        {/* Full Name */}
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="block text-sm font-semibold text-slate-700">
+            Full Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -47,9 +49,11 @@ const SenderInfoForm = ({ formData, onInputChange }) => {
             onChange={(e) => onInputChange("fullName", e.target.value)}
           />
         </div>
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Email
+
+        {/* Email */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Email <span className="text-red-500">*</span>
           </label>
           <input
             type="email"
@@ -58,14 +62,12 @@ const SenderInfoForm = ({ formData, onInputChange }) => {
             value={formData.email}
             onChange={handleEmailChange}
           />
-          {emailError && (
-            <span className="text-xs text-red-500">
-              Please enter a valid email address
-            </span>
-          )}
+          {emailError && <span className="text-xs text-red-500 font-medium">Please enter a valid email address</span>}
         </div>
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+
+        {/* Phone */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
             Phone
           </label>
           <input
@@ -76,14 +78,12 @@ const SenderInfoForm = ({ formData, onInputChange }) => {
             value={formData.phone}
             onChange={handlePhoneChange}
           />
-          {phoneError && (
-            <span className="text-xs text-red-500">
-              Please enter a valid phone number (at least 10 digits)
-            </span>
-          )}
+          {phoneError && <span className="text-xs text-red-500 font-medium">Please enter a valid phone number</span>}
         </div>
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+
+        {/* Address */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
             Address
           </label>
           <input
@@ -94,9 +94,11 @@ const SenderInfoForm = ({ formData, onInputChange }) => {
             onChange={(e) => onInputChange("address", e.target.value)}
           />
         </div>
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            LinkedIn
+
+        {/* LinkedIn */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            LinkedIn <span className="text-slate-400 font-normal">(Optional)</span>
           </label>
           <input
             type="text"

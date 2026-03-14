@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { RefreshCw, Sparkles } from "lucide-react";
+import { RefreshCw, Sparkles, User } from "lucide-react";
 import { getCompletionStatus } from "./../completion";
 import axiosInstance from "../../../../api/axios";
 
@@ -94,13 +94,17 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
   };
 
   return (
-    <div className="p-1">
-      <h3 className="mb-3 text-sm font-semibold">Personal Information</h3>
+    <div className="p-2 animate-in fade-in duration-300">
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+        <User className="text-blue-600" size={20} />
+        <h3 className="text-lg font-bold text-slate-800">Personal Information</h3>
+      </div>
 
-      <div className="pl-0.5">
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Full Name *
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+        {/* Full Name */}
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="block text-sm font-semibold text-slate-700">
+            Full Name <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -111,9 +115,10 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Email *
+        {/* Email */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Email <span className="text-red-500">*</span>
           </label>
           <input
             type="email"
@@ -122,12 +127,13 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
             placeholder="john.doe@example.com"
             onChange={handleEmailChange}
           />
-          {emailError && <span className="text-xs text-red-500">Please enter a valid email address</span>}
+          {emailError && <span className="text-xs text-red-500 font-medium">Please enter a valid email address</span>}
         </div>
 
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Phone *
+        {/* Phone */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Phone <span className="text-red-500">*</span>
           </label>
           <input
             type="tel"
@@ -137,12 +143,13 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
             placeholder="1234567890"
             onChange={handlePhoneChange}
           />
-          {phoneError && <span className="text-xs text-red-500">Please enter a valid phone number</span>}
+          {phoneError && <span className="text-xs text-red-500 font-medium">Please enter a valid phone number</span>}
         </div>
 
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Location *
+        {/* Location */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            Location <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -153,9 +160,10 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            LinkedIn *
+        {/* LinkedIn */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            LinkedIn
           </label>
           <input
             type="text"
@@ -166,9 +174,10 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            GitHub *
+        {/* GitHub */}
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-semibold text-slate-700">
+            GitHub
           </label>
           <input
             type="text"
@@ -179,9 +188,10 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5 mb-4">
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Website / Portfolio *
+        {/* Website/Portfolio */}
+        <div className="flex flex-col gap-1.5 md:col-span-2">
+          <label className="block text-sm font-semibold text-slate-700">
+            Website / Portfolio
           </label>
           <input
             type="text"
@@ -193,33 +203,31 @@ const PersonalInfoForm = ({ formData, onInputChange }) => {
         </div>
       </div>
 
-      {/* ================= SUMMARY ================= */}
-      <div className="flex flex-col gap-1.5 mb-4 full-width">
-        <label className="flex gap-2 text-sm font-semibold text-slate-700 mb-1.5">
-          Professional Summary (Optional)
+      {/* Summary */}
+      <div className="flex flex-col gap-1.5 mt-6 mb-4">
+        <label className="flex gap-2 text-sm font-semibold text-slate-700 mb-1">
+          Professional Summary <span className="text-slate-400 font-normal">(Optional)</span>
           <RefreshCw
-            size={15}
-            className={`ml-1 ${isGenerating ? "animate-spin" : "hidden"}`}
+            size={16}
+            className={`ml-1 text-slate-400 ${isGenerating ? "animate-spin text-blue-500" : "hidden"}`}
           />
         </label>
-
         <textarea
-          className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[120px] scrollbar-hide"
+          className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[140px] leading-relaxed"
           value={formData?.summary || ""}
           maxLength={1000}
-          placeholder="Brief professional summary highlighting your key skills and experience..."
+          placeholder="Write a brief professional summary highlighting your key skills and experience..."
           onChange={(e) => onInputChange("summary", e.target.value)}
         />
-
-        <span className="ml-2 text-xs text-slate-500">
-          {formData?.summary?.length || 0}/1000 Characters
-        </span>
-
-        <span className="flex gap-2 ml-2 text-xs text-slate-500">
-          <Sparkles size={17} />
-          Any summary you type here will be analyzed by AI to generate a
-          stronger resume summary.
-        </span>
+        <div className="flex justify-between items-start mt-1">
+          <span className="flex gap-1.5 items-center text-xs text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded-md">
+            <Sparkles size={14} />
+            AI suggestions enabled
+          </span>
+          <span className="text-xs text-slate-400 font-medium">
+            {formData?.summary?.length || 0} / 1000
+          </span>
+        </div>
       </div>
     </div>
   );

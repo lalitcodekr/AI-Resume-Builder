@@ -162,90 +162,96 @@ const ProjectsForm = ({ formData, setFormData }) => {
           {/* ===== EDIT MODE ===== */}
           {editingId === project.id && (
             <>
-              <div className="px-3 py-4">
-                <div className="flex flex-col gap-[6px] mb-[10px] mt-2">
-                  <label>Project Name *</label>
-                  <input
-                    type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={project.name || ""}
-                    placeholder="E-commerce Platform"
-                    onChange={(e) => updateProject(project.id, "name", e.target.value)}
-                  />
+              <div className="p-3 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                  <Sparkles className="text-blue-600" size={18} />
+                  <h4 className="font-semibold text-slate-800">Edit Project</h4>
                 </div>
 
-                <div className="flex flex-col gap-1.5 mb-4">
-                  <label>Technologies Used *</label>
-                  <input
-                    type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={project.technologies || ""}
-                    placeholder="React, Node.js, MongoDB"
-                    onChange={(e) => updateProject(project.id, "technologies", e.target.value)}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5 mb-4">
-                  <div className="w-full flex items-center justify-between">
-                    <label>Description *</label>
-                    <button
-                      className="flex gap-2 ml-2 p-2 rounded-lg text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-800"
-                      onClick={() => generateProjectDetails(project.id)}
-                    >
-                      {generatingId === project.id ? (
-                        <RefreshCw size={15} className={`ml-1 animate-spin`} />
-                      ) : (
-                        <Sparkles size={14} />
-                      )}
-                      Enhance with AI
-                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 pr-1 mb-2">
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Project Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={project.name || ""}
+                      placeholder="E-commerce Platform"
+                      onChange={(e) => updateProject(project.id, "name", e.target.value)}
+                    />
                   </div>
-                  <textarea
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[120px] scrollbar-hide"
-                    value={project.description || ""}
-                    maxLength={500}
-                    onChange={(e) => updateProject(project.id, "description", e.target.value)}
-                  />
-                  {/* 
-                  const updated = formData.projects.map((item) =>
-                        item.id === project.id
-                          ? { ...item, description: e.target.value }
-                          : item,
-                      );
-                      setFormData((prev) => ({
-                        ...prev,
-                        projects: updated,
-                      }));
-                  */}
-                  <span className="ml-2 text-xs text-slate-500">
-                    {project.description?.length || 0}/500 Characters
-                  </span>
-                </div>
 
-                <div className="flex flex-col gap-1.5 mb-4">
-                  <label>GitHub Link *</label>
-                  <input
-                    type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={project?.link?.github || ""}
-                    onChange={(e) => {
-                      const updated = formData.projects.map((item) =>
-                        item.id === project.id
-                          ? {
-                            ...item,
-                            link: {
-                              ...item.link,
-                              github: e.target.value,
-                            },
-                          }
-                          : item,
-                      );
-                      setFormData((prev) => ({
-                        ...prev,
-                        projects: updated,
-                      }));
-                    }}
-                  />
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Technologies Used <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={project.technologies || ""}
+                      placeholder="React, Node.js, MongoDB"
+                      onChange={(e) => updateProject(project.id, "technologies", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <div className="w-full flex items-center justify-between mb-1">
+                      <label className="text-sm font-semibold text-slate-700">
+                        Description <span className="text-red-500">*</span>
+                      </label>
+                      <button
+                        className="flex gap-2 ml-2 p-2 rounded-lg text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-800"
+                        onClick={() => generateProjectDetails(project.id)}
+                      >
+                        {generatingId === project.id ? (
+                          <RefreshCw size={15} className={`ml-1 animate-spin`} />
+                        ) : (
+                          <Sparkles size={14} />
+                        )}
+                        Enhance with AI
+                      </button>
+                    </div>
+                    <textarea
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[140px] leading-relaxed"
+                      value={project.description || ""}
+                      maxLength={500}
+                      onChange={(e) => updateProject(project.id, "description", e.target.value)}
+                      placeholder="Describe your project's features and your contributions..."
+                    />
+                    <span className="ml-1 mt-1 text-xs text-slate-400 font-medium self-end">
+                      {project.description?.length || 0} / 500 Characters
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 md:col-span-2 mt-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      GitHub Link <span className="text-slate-400 font-normal">(Optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={project?.link?.github || ""}
+                      placeholder="https://github.com/yourusername/project"
+                      onChange={(e) => {
+                        const updated = formData.projects.map((item) =>
+                          item.id === project.id
+                            ? {
+                              ...item,
+                              link: {
+                                ...item.link,
+                                github: e.target.value,
+                              },
+                            }
+                            : item,
+                        );
+                        setFormData((prev) => ({
+                          ...prev,
+                          projects: updated,
+                        }));
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 

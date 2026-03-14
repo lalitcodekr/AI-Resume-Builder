@@ -51,11 +51,10 @@ const SkillsForm = ({ formData, setFormData }) => {
         <button
           onClick={() => setSkillType("technical")}
           className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300
-      ${
-        skillType === "technical"
-          ? "bg-white text-slate-900 shadow-md scale-105"
-          : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
-      }`}
+      ${skillType === "technical"
+              ? "bg-white text-slate-900 shadow-md scale-105"
+              : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
+            }`}
         >
           Technical Skills
         </button>
@@ -63,61 +62,81 @@ const SkillsForm = ({ formData, setFormData }) => {
         <button
           onClick={() => setSkillType("soft")}
           className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300
-      ${
-        skillType === "soft"
-          ? "bg-white text-slate-900 shadow-md scale-105"
-          : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
-      }`}
+      ${skillType === "soft"
+              ? "bg-white text-slate-900 shadow-md scale-105"
+              : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
+            }`}
         >
           Soft Skills
         </button>
       </div>
 
-      <div className="add-skill-row">
+      <div className="flex gap-2 w-full mt-2 mb-4">
         <input
           type="text"
-          className="border m-2 mr-1 w-4/5 p-2 rounded-lg outline-none"
+          className="flex-grow px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
           value={newSkill}
-          placeholder={`Add a ${skillType} skill...`}
+          placeholder={`Add a ${skillType} skill... (e.g., JavaScript, Leadership)`}
           onChange={(e) => setNewSkill(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && newSkill.trim()) {
+              e.preventDefault();
               addSkill();
             }
           }}
         />
         <button
-          className="bg-black text-white py-2 px-3 rounded-lg"
+          className="bg-black text-white py-2.5 px-5 rounded-lg text-sm font-medium hover:bg-black/80 transition-colors whitespace-nowrap"
           onClick={addSkill}
         >
-          Add
+          Add Skill
         </button>
       </div>
-      <div className="skills-list m-2">
+
+      <div className="w-full flex flex-wrap gap-2 mb-6 min-h-[40px]">
         {(formData?.skills?.[skillType] ?? []).map((skill, idx) => (
           <span
             key={idx}
-            className="inline-flex items-center gap-2 bg-blue-200 text-sm text-blue-500 rounded-xl p-2 mr-2 mb-2"
+            className="inline-flex items-center gap-1.5 bg-blue-50 text-sm font-medium text-blue-700 border border-blue-200 rounded-md px-2.5 py-1.5"
           >
             <span>{skill}</span>
-            <button onClick={() => removeSkill(skillType, idx)}>
-              <X size={14} className="text-blue-500" />
+            <button
+              onClick={() => removeSkill(skillType, idx)}
+              className="hover:text-red-500 hover:bg-blue-100 rounded-full p-0.5 transition-colors"
+            >
+              <X size={14} />
             </button>
           </span>
         ))}
+        {(formData?.skills?.[skillType] ?? []).length === 0 && (
+          <div className="text-sm text-slate-400 italic flex items-center h-full">
+            No {skillType} skills added yet.
+          </div>
+        )}
       </div>
-      <div className="suggested-skills">
-        <p>Suggested skills:</p>
-        <div className="suggested-tags mt-2">
-          {suggestedSkills.map((skill, idx) => (
-            <button
-              key={idx}
-              className="flex items-center bg-black text-white m-1 p-2 text-sm rounded-lg"
-              onClick={() => addSuggestedSkill(skill)}
-            >
-              <Plus size={14} className="mr-1 inline" /> {skill}
-            </button>
-          ))}
+
+      <div className="w-full">
+        <p className="text-sm font-medium text-slate-700 mb-3">
+          Suggested {skillType} skills:
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {suggestedSkills.map((skill, idx) => {
+            const isAdded = (formData?.skills?.[skillType] ?? []).includes(skill);
+            return (
+              <button
+                key={idx}
+                disabled={isAdded}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border transition-all ${isAdded
+                    ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                onClick={() => addSuggestedSkill(skill)}
+              >
+                {!isAdded && <Plus size={14} className="text-slate-400" />}
+                {skill}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

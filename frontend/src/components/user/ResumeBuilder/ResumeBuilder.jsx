@@ -71,10 +71,10 @@ const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
       const containerTop = containerRect.top + window.scrollY;
       const containerHeight = containerRect.height;
       const panelHeight = panelRef.current.offsetHeight;
-      
+
       const desired = window.scrollY + topOffset - containerTop;
       const maxDesired = Math.max(0, containerHeight - panelHeight);
-      
+
       targetY.current = Math.max(0, Math.min(desired, maxDesired));
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -96,7 +96,7 @@ const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
   );
 };
 
-const ResumeBuilder = ({ setActivePage = () => {} }) => {
+const ResumeBuilder = ({ setActivePage = () => { } }) => {
   const headerRef = useRef(null);
   const leftColRef = useRef(null);
   const formContainerRef = useRef(null);
@@ -528,53 +528,35 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
                     {renderFormContent()}
                   </div>
 
-                  {/* Previous & Next */}
-                  <div className="flex-shrink-0 flex items-center justify-between p-4 border-t border-slate-100 bg-white">
-                    {/* Step Indicators */}
-                    <div className="flex items-center gap-2">
-                      {tabs.map((tab, index) => (
-                        <div
-                          key={tab.id}
-                          className={`w-8 h-2 rounded-full transition-colors ${
-                            index < currentIdx
-                              ? "bg-blue-600"
-                              : index === currentIdx
-                                ? "bg-blue-600"
-                                : "bg-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={goLeft}
-                        disabled={currentIdx === 0}
-                        className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                      >
-                        <ArrowLeft size={18} />
-                        <span className="hidden sm:inline">Previous</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (isInputValid(tabs[currentIdx]?.label)) {
-                            setWarning(true);
-                            formContainerRef.current?.scrollTo({
-                              top: 0,
-                              behavior: "smooth",
-                            });
-                            return;
-                          }
-                          setWarning(false);
-                          goRight();
-                        }}
-                        disabled={currentIdx === tabs.length - 1}
-                        className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                      >
-                        <span className="hidden sm:inline">Next</span>
-                        <ArrowRight size={18} />
-                      </button>
-                    </div>
+                  {/* Previous & Next Desktop */}
+                  <div className="flex-shrink-0 flex items-center justify-between p-4 border-t border-slate-100 bg-white rounded-b-2xl">
+                    <button
+                      onClick={goLeft}
+                      disabled={currentIdx === 0}
+                      className="flex gap-2 items-center text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      <ArrowLeft size={16} />
+                      <span className="hidden sm:inline">Previous</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (isInputValid(tabs[currentIdx]?.label)) {
+                          setWarning(true);
+                          formContainerRef.current?.scrollTo({
+                            top: 0,
+                            behavior: "smooth",
+                          });
+                          return;
+                        }
+                        setWarning(false);
+                        goRight();
+                      }}
+                      disabled={currentIdx === tabs.length - 1}
+                      className="flex gap-2 items-center text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      <span className="hidden sm:inline">Next Step</span>
+                      <ArrowRight size={16} />
+                    </button>
                   </div>
                 </div>
               </FloatingFormPanel>
@@ -584,7 +566,7 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
           {/* Mobile form card (no desktop preview here) */}
           <div className="w-full lg:hidden flex flex-col">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden mb-4">
-              <div className="flex-shrink-0 border-b border-slate-100 px-4 py-3">
+              <div className="flex-shrink-0">
                 <FormTabs
                   activeSection={activeSection}
                   setActiveSection={setActiveSection}
@@ -603,46 +585,30 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
               </div>
 
               <div className="flex-shrink-0 flex items-center justify-between p-4 border-t border-slate-100 bg-white">
-                {/* Step Indicators for Mobile */}
-                <div className="flex items-center gap-1.5">
-                  {tabs.map((tab, index) => (
-                    <div
-                      key={tab.id}
-                      className={`w-6 h-1.5 rounded-full transition-colors ${
-                        index < currentIdx
-                          ? "bg-blue-600"
-                          : index === currentIdx
-                            ? "bg-blue-600"
-                            : "bg-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={goLeft}
-                    disabled={currentIdx === 0}
-                    className="flex gap-1 items-center text-sm bg-slate-100 px-3 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                  >
-                    <ArrowLeft size={18} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (isInputValid(tabs[currentIdx]?.label)) {
-                        setWarning(true);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                        return;
-                      }
-                      setWarning(false);
-                      goRight();
-                    }}
-                    disabled={currentIdx === tabs.length - 1}
-                    className="flex gap-1 items-center text-sm bg-black text-white px-3 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                  >
-                    <ArrowRight size={18} />
-                  </button>
-                </div>
+                <button
+                  onClick={goLeft}
+                  disabled={currentIdx === 0}
+                  className="flex gap-2 items-center text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  <ArrowLeft size={16} />
+                  <span>Previous</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (isInputValid(tabs[currentIdx]?.label)) {
+                      setWarning(true);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      return;
+                    }
+                    setWarning(false);
+                    goRight();
+                  }}
+                  disabled={currentIdx === tabs.length - 1}
+                  className="flex gap-2 items-center text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  <span>Next Step</span>
+                  <ArrowRight size={16} />
+                </button>
               </div>
             </div>
           </div>
@@ -693,7 +659,7 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
             formData={formData}
             currentTemplate={currentTemplate}
             isExpanded={true}
-            onExpand={() => {}}
+            onExpand={() => { }}
             onCollapse={() => setIsPreviewExpanded(false)}
             onMinimize={() => setIsPreviewHidden(true)}
           />
@@ -782,8 +748,8 @@ const ResumeBuilder = ({ setActivePage = () => {} }) => {
                   formData={formData}
                   currentTemplate={currentTemplate}
                   isExpanded={false}
-                  onExpand={() => {}}
-                  onCollapse={() => {}}
+                  onExpand={() => { }}
+                  onCollapse={() => { }}
                   onMinimize={() => setShowMobilePreview(false)}
                 />
               </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, EditIcon, Plus, Trash2 } from "lucide-react";
+import { Check, EditIcon, GraduationCap, Plus, Trash2 } from "lucide-react";
 import { getCompletionStatus } from "../completion";
 
 const EducationForm = ({ formData, setFormData }) => {
@@ -122,86 +122,103 @@ const EducationForm = ({ formData, setFormData }) => {
 
           {editingId === edu.id && (
             <>
-              <div className="px-3 py-4">
-                <div className="flex flex-col gap-[6px] mb-[10px] mt-2">
-                  <label>Degree *</label>
-                  <input
-                    type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={edu.degree || ""}
-                    placeholder="Bachelor of Science in Computer Science"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const updated = (formData?.education ?? []).map((item) =>
-                        item.id === edu.id ? { ...item, degree: val } : item,
-                      );
-                      setFormData((prev) => ({ ...prev, education: updated }));
-                    }}
-                  />
+              <div className="p-3 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                  <GraduationCap className="text-blue-600" size={18} />
+                  <h4 className="font-semibold text-slate-800">Edit Education</h4>
                 </div>
-                <div className="flex flex-col gap-1.5 mb-4">
-                  <label>School *</label>
-                  <input
-                    type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={edu.school || ""}
-                    placeholder="University Name"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const updated = (formData?.education ?? []).map((item) =>
-                        item.id === edu.id ? { ...item, school: val } : item,
-                      );
-                      setFormData((prev) => ({ ...prev, education: updated }));
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5 mb-4">
-                  <label>Start Date *</label>
-                  <input
-                    type="month"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={edu.startDate || ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const updated = (formData?.education ?? []).map((item) =>
-                        item.id === edu.id ? { ...item, startDate: val } : item,
-                      );
-                      setFormData((prev) => ({ ...prev, education: updated }));
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5 mb-4">
-                  <label>Graduation Date *</label>
-                  <input
-                    type="month"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={edu.graduationDate || ""}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const updated = (formData?.education ?? []).map((item) =>
-                        item.id === edu.id
-                          ? { ...item, graduationDate: val }
-                          : item,
-                      );
-                      setFormData((prev) => ({ ...prev, education: updated }));
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5 mb-4">
-                  <label>GPA (Optional)</label>
-                  <input
-                    type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={edu.gpa || ""}
-                    placeholder="7.8/10.0"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const updated = (formData?.education ?? []).map((item) =>
-                        item.id === edu.id ? { ...item, gpa: val } : item,
-                      );
-                      setFormData((prev) => ({ ...prev, education: updated }));
-                    }}
-                  />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 pr-1 mb-2">
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Degree <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={edu.degree || ""}
+                      placeholder="Bachelor of Science in Computer Science"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const updated = (formData?.education ?? []).map((item) =>
+                          item.id === edu.id ? { ...item, degree: val } : item,
+                        );
+                        setFormData((prev) => ({ ...prev, education: updated }));
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      School <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={edu.school || ""}
+                      placeholder="University Name"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const updated = (formData?.education ?? []).map((item) =>
+                          item.id === edu.id ? { ...item, school: val } : item,
+                        );
+                        setFormData((prev) => ({ ...prev, education: updated }));
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="month"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={edu.startDate || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const updated = (formData?.education ?? []).map((item) =>
+                          item.id === edu.id ? { ...item, startDate: val } : item,
+                        );
+                        setFormData((prev) => ({ ...prev, education: updated }));
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Graduation Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="month"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={edu.graduationDate || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const updated = (formData?.education ?? []).map((item) =>
+                          item.id === edu.id
+                            ? { ...item, graduationDate: val }
+                            : item,
+                        );
+                        setFormData((prev) => ({ ...prev, education: updated }));
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5 md:col-span-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      GPA <span className="text-slate-400 font-normal">(Optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      value={edu.gpa || ""}
+                      placeholder="7.8/10.0"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const updated = (formData?.education ?? []).map((item) =>
+                          item.id === edu.id ? { ...item, gpa: val } : item,
+                        );
+                        setFormData((prev) => ({ ...prev, education: updated }));
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
               {/* Done Button */}

@@ -3,6 +3,7 @@ import Payment from "../Models/payment.js";
 import Subscription from "../Models/subscription.js";
 import Resume from "../Models/resume.js";
 import ApiMetric from "../Models/ApiMetric.js";
+import Plan from "../Models/Plan.js";
 import Notification from "../Models/notification.js"
 import Download from "../Models/Download.js";
 /* ================== ADMIN DASHBOARD ================== */
@@ -259,7 +260,8 @@ export const getAnalyticsStats = async (req, res) => {
     const last7Days = new Date();
     last7Days.setDate(last7Days.getDate() - 7);
     const activeUsersLast7Days = await User.countDocuments({
-      updatedAt: { $gte: last7Days },
+      lastLogin: { $gte: last7Days },
+      isAdmin: false,
     });
 
     // ---------- DELETED USERS ----------
@@ -268,24 +270,88 @@ export const getAnalyticsStats = async (req, res) => {
     });
 
     // ---------- SUBSCRIPTION BREAKDOWN ----------
-    const subscriptionDistribution = await User.aggregate([
-      {
-        $group: {
-          _id: "$plan",
-          count: { $sum: 1 },
+    const [availablePlans, subscriptionDistribution] = await Promise.all([
+      Plan.find({}, { name: 1, _id: 0 }).lean(),
+      User.aggregate([
+        {
+          $match: {
+            isAdmin: false,
+          },
         },
-      },
+        {
+          $group: {
+            _id: "$plan",
+            count: { $sum: 1 },
+          },
+        },
+      ]),
     ]);
 
-    const subscriptionBreakdown = subscriptionDistribution.map((item) => ({
-      plan: (item._id || "Free").charAt(0).toUpperCase() + (item._id || "Free").slice(1),
-      count: item.count,
-    }));
+    const toTitleCase = (value = "") =>
+      String(value)
+        .trim()
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
 
-    const totalPaidUsers = subscriptionBreakdown.reduce((sum, item) => {
-      if (item.plan !== "Free") return sum + item.count;
-      return sum;
-    }, 0);
+    const canonicalPlanByKey = new Map();
+    availablePlans.forEach((plan) => {
+      if (!plan?.name) return;
+      canonicalPlanByKey.set(plan.name.trim().toLowerCase(), plan.name.trim());
+    });
+
+    if (!canonicalPlanByKey.has("free")) {
+      canonicalPlanByKey.set("free", "Free");
+    }
+
+    const normalizePlanName = (rawPlan) => {
+      const raw = String(rawPlan || "Free").trim();
+      const key = raw.toLowerCase();
+
+      if (canonicalPlanByKey.has(key)) {
+        return canonicalPlanByKey.get(key);
+      }
+
+      // Keep legacy spellings aligned to one canonical tier.
+      if (["lifetime", "life time"].includes(key)) {
+        return canonicalPlanByKey.get("ultra pro") || "Ultra Pro";
+      }
+
+      return toTitleCase(raw) || "Free";
+    };
+
+    const groupedPlanCounts = new Map();
+    subscriptionDistribution.forEach((item) => {
+      const planName = normalizePlanName(item._id);
+      groupedPlanCounts.set(planName, (groupedPlanCounts.get(planName) || 0) + item.count);
+    });
+
+    const knownPlanOrder = availablePlans
+      .map((plan) => plan?.name)
+      .filter(Boolean)
+      .map((name) => normalizePlanName(name));
+
+    const orderedPlans = [
+      ...new Set([
+        "Free",
+        ...knownPlanOrder,
+        ...Array.from(groupedPlanCounts.keys()),
+      ]),
+    ];
+
+    const subscriptionBreakdown = orderedPlans
+      .map((plan) => ({
+        plan,
+        count: groupedPlanCounts.get(plan) || 0,
+      }))
+      .filter((item) => item.count > 0);
+
+    const totalPaidUsers = subscriptionBreakdown.reduce(
+      (sum, item) => (item.plan.toLowerCase() === "free" ? sum : sum + item.count),
+      0
+    );
 
     // ---------- API PERFORMANCE ----------
     const apiStats = await ApiMetric.aggregate([
