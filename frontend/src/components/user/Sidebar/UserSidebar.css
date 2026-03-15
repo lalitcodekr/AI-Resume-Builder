@@ -84,6 +84,10 @@
   max-width: 200px;
 }
 
+.special-tooltip{
+    top: 50%;
+}
+
 div.relative:hover .tooltip {
   opacity: 1;
   visibility: visible;
