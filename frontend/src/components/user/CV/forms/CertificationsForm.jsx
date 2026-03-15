@@ -3,41 +3,56 @@ import { Trash2, EditIcon, Check, Plus } from "lucide-react";
 
 const CertificationsForm = ({ formData, setFormData }) => {
   const [editingId, setEditingId] = useState(null);
+  
+  // Debug log to track form data
+  console.log('Certifications Form - formData:', formData);
 
   const addCertification = () => {
-    const id = crypto.randomUUID();
+    try {
+      const id = crypto.randomUUID();
 
-    setFormData((prev) => ({
-      ...prev,
-      certifications: [
-        ...(prev.certifications ?? []),
-        {
-          id,
-          name: "",
-          issuer: "",
-          date: "",
-          link: "",
-        },
-      ],
-    }));
+      setFormData((prev) => ({
+        ...prev,
+        certifications: [
+          ...(prev.certifications ?? []),
+          {
+            id,
+            name: "",
+            issuer: "",
+            date: "",
+            link: "",
+          },
+        ],
+      }));
 
-    setEditingId(id);
+      setEditingId(id);
+    } catch (error) {
+      console.error('Error adding certification:', error);
+    }
   };
 
   const removeCertification = (id) => {
-    setFormData((prev) => ({
-      ...prev,
-      certifications: (prev.certifications ?? []).filter((c) => c.id !== id),
-    }));
+    try {
+      setFormData((prev) => ({
+        ...prev,
+        certifications: (prev.certifications ?? []).filter((c) => c.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error removing certification:', error);
+    }
   };
 
   const handleChange = (id, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      certifications: (prev.certifications ?? []).map((c) =>
-        c.id === id ? { ...c, [field]: value } : c,
-      ),
-    }));
+    try {
+      setFormData((prev) => ({
+        ...prev,
+        certifications: (prev.certifications ?? []).map((c) =>
+          c.id === id ? { ...c, [field]: value } : c,
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating certification:', error);
+    }
   };
 
   return (

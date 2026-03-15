@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import {
+  Briefcase,
   Check,
   EditIcon,
   Plus,
@@ -186,10 +187,17 @@ const ExperienceForm = ({ formData, setFormData }) => {
               </div>
             )}
             {editingId === exp.id && (
-              <div className="p-2">
-                <div className="pr-0.5">
-                  <div className="flex flex-col gap-[6px] mb-[10px] mt-2">
-                    <label>Job Title *</label>
+              <div className="p-3 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                  <Briefcase className="text-blue-600" size={18} />
+                  <h4 className="font-semibold text-slate-800">Edit Experience</h4>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 pr-1">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Job Title <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
@@ -200,8 +208,10 @@ const ExperienceForm = ({ formData, setFormData }) => {
                       }
                     />
                   </div>
-                  <div className="flex flex-col gap-[6px] mb-[10px] mt-2">
-                    <label>Company *</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Company <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
@@ -212,8 +222,10 @@ const ExperienceForm = ({ formData, setFormData }) => {
                       }
                     />
                   </div>
-                  <div className="flex flex-col gap-[6px] mb-[10px] mt-2">
-                    <label>Start Date *</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="month"
                       className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
@@ -223,8 +235,10 @@ const ExperienceForm = ({ formData, setFormData }) => {
                       }
                     />
                   </div>
-                  <div className="flex flex-col gap-[6px] mb-[10px] mt-2">
-                    <label>End Date *</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700">
+                      End Date <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
@@ -236,9 +250,11 @@ const ExperienceForm = ({ formData, setFormData }) => {
                     />
                   </div>
                 </div>
-                <div className="flex flex-col gap-[6px] mb-[10px] mt-2 full-width">
+                <div className="flex flex-col gap-1.5 mt-5 full-width">
                   <div className="w-full flex items-center justify-between">
-                    <label>Description *</label>
+                    <label className="text-sm font-semibold text-slate-700">
+                      Description <span className="text-red-500">*</span>
+                    </label>
                     <button
                       className="flex gap-2 ml-2 p-2 rounded-lg text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-800"
                       onClick={() => handleAIEnhance(exp.id)}
@@ -253,15 +269,15 @@ const ExperienceForm = ({ formData, setFormData }) => {
                   </div>
                   <textarea
                     placeholder="Describe your responsibilities and achievements..."
-                    className="h-40 px-2.5 py-2 border text-sm resize-none rounded border-1.5 focus:border-[#007bff] focus:outline-none focus:bg-white focus:shadow-[0_2px_8px_rgba(0,123,255,0.07)]"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[140px] leading-relaxed"
                     value={exp.description || ""}
                     maxLength={500}
                     onChange={(e) =>
                       updateExperience(exp.id, "description", e.target.value)
                     }
                   />
-                  <span className="ml-2 text-xs text-slate-500">
-                    {exp.description?.length || 0}/500 Characters
+                  <span className="ml-1 mt-1 text-xs text-slate-400 font-medium self-end">
+                    {exp.description?.length || 0} / 500 Characters
                   </span>
                 </div>
                 {/* Done Button */}

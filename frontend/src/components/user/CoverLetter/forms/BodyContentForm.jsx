@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, RefreshCw, Copy, Check } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, FileText } from "lucide-react";
 import axiosInstance from "./../../../../api/axios";
 
 const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
@@ -10,7 +10,7 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
     setGenerating((prev) => ({ ...prev, [field]: true }));
 
     try {
-      const token = localStorage.getItem("token"); // Assuming auth token is needed
+      const token = localStorage.getItem("token");
       const response = await axiosInstance.post(
         "/api/resume/cover-letter/generate",
         {
@@ -31,15 +31,7 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
         },
       );
 
-      // const data = await response.json();
-      console.log(response);
-      
       onInputChange(field, response.data.result);
-      // if (data.success) {
-      // } else {
-      //   console.error("AI Generation failed:", data.error);
-      //   alert("Failed to generate content. Please try again.");
-      // }
     } catch (error) {
       console.error("Error generating content:", error);
       alert("Error processing request.");
@@ -55,18 +47,18 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
   };
 
   const renderTextArea = (field, label, placeholder, rows = 4) => (
-    <div className="form-group full-width content-block">
-      <div className="content-header">
-        <label>{label}</label>
-        <div className="content-actions">
+    <div className="flex flex-col gap-2 mb-5">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-semibold text-slate-700">{label}</label>
+        <div className="flex gap-2">
           <button
-            className="ai-generate-btn"
+            className="flex gap-1.5 items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors disabled:opacity-50"
             onClick={() => handleGenerate(field)}
             disabled={generating[field]}
           >
             {generating[field] ? (
               <>
-                <RefreshCw size={14} className="spinning" /> Generating...
+                <RefreshCw size={14} className="animate-spin" /> Generating...
               </>
             ) : (
               <>
@@ -75,11 +67,11 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
             )}
           </button>
           <button
-            className="copy-btn"
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-30"
             onClick={() => handleCopy(field)}
             disabled={!formData[field]}
           >
-            {copied[field] ? <Check size={14} /> : <Copy size={14} />}
+            {copied[field] ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
           </button>
         </div>
       </div>
@@ -88,21 +80,25 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
         value={formData[field]}
         onChange={(e) => onInputChange(field, e.target.value)}
         rows={rows}
+        className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[100px] leading-relaxed"
       />
     </div>
   );
 
   return (
-    <div className="form-section">
-      <h3 className="form-section-title">Letter Content</h3>
-      <p className="form-description">
-        Write your cover letter content below or use AI to generate compelling
-        paragraphs.
+    <div className="p-2 animate-in fade-in duration-300">
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+        <FileText className="text-blue-600" size={20} />
+        <h3 className="text-lg font-bold text-slate-800">Letter Content</h3>
+      </div>
+
+      <p className="text-sm text-slate-500 mb-4">
+        Write your cover letter content below or use AI to generate compelling paragraphs.
       </p>
 
-      <div className="content-tip">
-        <span className="tip-icon">💡</span>
-        <div>
+      <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg mb-6 text-sm">
+        <span className="text-lg leading-none">💡</span>
+        <div className="text-slate-700">
           <strong>Pro Tip:</strong> A great cover letter has 3-4 paragraphs: an
           engaging opening, 1-2 body paragraphs highlighting your relevant
           experience, and a strong closing.
@@ -137,7 +133,7 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
         4,
       )}
 
-      <div className="word-count-info">
+      <div className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg text-sm text-slate-500 border border-slate-100">
         <span>
           📊 Total Words:{" "}
           {
@@ -153,7 +149,7 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
               .filter(Boolean).length
           }
         </span>
-        <span className="ideal-range">Ideal range: 250-400 words</span>
+        <span className="text-blue-600 font-medium">Ideal: 250-400 words</span>
       </div>
     </div>
   );

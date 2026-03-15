@@ -1,5 +1,6 @@
 import { ArrowLeft, Download, Printer, Share2 } from "lucide-react";
 
+
 const CoverLetterFullPreview = ({
   formData,
   selectedTemplate,
@@ -20,17 +21,60 @@ const CoverLetterFullPreview = ({
     });
   };
 
+
   const handleDownload = () => {
     // Placeholder for download functionality
     console.log("Downloading cover letter...");
   };
 
+
   const handlePrint = () => {
     window.print();
   };
 
+
   return (
     <div className="full-preview-container">
+      <style>{`
+        @page {
+          size: A4;
+          margin: 10mm;
+        }
+       
+        /* Ensure content flows to next page instead of being cut */
+        .letter-page {
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+       
+        /* Allow specific elements to break between pages */
+        .sender-info,
+        .recipient-info,
+        .letter-body,
+        .letter-closing {
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+       
+        /* If content is too long, allow it to break */
+        .letter-body {
+          page-break-inside: auto;
+          break-inside: auto;
+        }
+       
+        /* Prevent small elements from being orphaned */
+        .subject-line,
+        .greeting,
+        .salutation {
+          page-break-after: avoid;
+          break-after: avoid;
+        }
+       
+        /* Ensure paragraphs don't break awkwardly */
+        .letter-body p {
+          page-break-inside: avoid;
+        }
+      `}</style>
       <div className="full-preview-toolbar">
         <button
           className="toolbar-btn back"
@@ -55,6 +99,7 @@ const CoverLetterFullPreview = ({
         </div>
       </div>
 
+
       <div className="full-preview-wrapper">
         <div className={`full-preview-document template-${selectedTemplate}`}>
           <div className="letter-page">
@@ -74,8 +119,10 @@ const CoverLetterFullPreview = ({
               )}
             </div>
 
+
             {/* Date */}
             <p className="letter-date">{formatDate(formData.letterDate)}</p>
+
 
             {/* Recipient Info */}
             <div className="recipient-info">
@@ -93,6 +140,7 @@ const CoverLetterFullPreview = ({
               {formData.companyAddress && <p>{formData.companyAddress}</p>}
             </div>
 
+
             {/* Subject Line */}
             {formData.jobTitle && (
               <p className="subject-line">
@@ -105,10 +153,12 @@ const CoverLetterFullPreview = ({
               </p>
             )}
 
+
             {/* Greeting */}
             <p className="greeting">
               Dear {formData.recipientName || "Hiring Manager"},
             </p>
+
 
             {/* Body */}
             <div className="letter-body">
@@ -117,6 +167,7 @@ const CoverLetterFullPreview = ({
               {formData.bodyParagraph2 && <p>{formData.bodyParagraph2}</p>}
               {formData.closingParagraph && <p>{formData.closingParagraph}</p>}
             </div>
+
 
             {/* Closing */}
             <div className="letter-closing">
@@ -135,4 +186,8 @@ const CoverLetterFullPreview = ({
   );
 };
 
+
 export default CoverLetterFullPreview;
+
+
+

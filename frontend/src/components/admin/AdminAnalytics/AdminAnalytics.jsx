@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TrendingUp, Users, UserCheck, UserMinus, Activity, Zap, Shield, Crown, Award, Gem, RefreshCw } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import axiosInstance from "../../../api/axios";
@@ -9,7 +9,10 @@ export default function AdminAnalytics() {
   const [conversions, setConversions] = useState({ count: 0, note: "" });
   const [activeUsers, setActiveUsers] = useState({ count: 0, note: "" });
   const [deletedUsers, setDeletedUsers] = useState({ count: 0, note: "" });
-  const [mostUsedTemplates, setMostUsedTemplates] = useState([]);
+  const [mostUsedResumeTemplates, setMostUsedResumeTemplates] = useState([]);
+  const [mostUsedCvTemplates, setMostUsedCvTemplates] = useState([]);
+  const [templateView, setTemplateView] = useState("resume");
+  const [refreshingTemplates, setRefreshingTemplates] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [subscriptionBreakdown, setSubscriptionBreakdown] = useState([]);
   const [summary, setSummary] = useState({
@@ -21,15 +24,26 @@ export default function AdminAnalytics() {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-     const fetchAnalyticsData = async () => {
+  const displaySubscriptionBreakdown = useMemo(() => {
+    return [...subscriptionBreakdown].sort((a, b) => b.count - a.count);
+  }, [subscriptionBreakdown]);
+
+  const totalSubscriptionUsers = useMemo(() => {
+    return displaySubscriptionBreakdown.reduce((acc, curr) => acc + curr.count, 0);
+  }, [displaySubscriptionBreakdown]);
+
+  const fetchAnalyticsData = useCallback(async (showLoader = false) => {
+    if (showLoader) setLoading(true);
     try {
       const response = await axiosInstance.get("/api/admin/analytics-stat");
       setUserGrowth(response.data.userGrowth);
       setConversions(response.data.conversions);
       setActiveUsers(response.data.activeUsers);
       setDeletedUsers(response.data.deletedUsers || { count: 0, note: "" });
-      setMostUsedTemplates(response.data.mostUsedTemplates || []);
+      setMostUsedResumeTemplates(
+        response.data.mostUsedResumeTemplates || response.data.mostUsedTemplates || []
+      );
+      setMostUsedCvTemplates(response.data.mostUsedCvTemplates || []);
       setChartData(response.data.chartData || []);
       setSubscriptionBreakdown(response.data.subscriptionBreakdown || []);
       setSummary(response.data.summary || {
@@ -39,16 +53,19 @@ export default function AdminAnalytics() {
         totalApiCalls: 0,
         systemUptime: "99.98%"
       });
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching analytics:", error);
+    } finally {
       setLoading(false);
+      setRefreshingTemplates(false);
     }
-  };
-    fetchAnalyticsData();
-    const fetchInterval = setInterval(fetchAnalyticsData,30000);
-    return () => clearInterval(fetchInterval); 
   }, []);
+
+  useEffect(() => {
+    fetchAnalyticsData(true);
+    const fetchInterval = setInterval(() => fetchAnalyticsData(false), 5000);
+    return () => clearInterval(fetchInterval); 
+  }, [fetchAnalyticsData]);
 
  
 
@@ -319,31 +336,95 @@ export default function AdminAnalytics() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Most Used Templates */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Most Used Templates</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Most Used Templates</h2>
+            <button
+              type="button"
+              onClick={() => {
+                setRefreshingTemplates(true);
+                fetchAnalyticsData(false);
+              }}
+              disabled={refreshingTemplates || loading}
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <RefreshCw size={14} className={refreshingTemplates ? "animate-spin" : ""} />
+              {refreshingTemplates ? "Refreshing" : "Refresh"}
+            </button>
+          </div>
+
+          <div className="inline-flex bg-slate-100 rounded-lg p-1 mb-4">
+            <button
+              type="button"
+              onClick={() => setTemplateView("resume")}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition ${
+                templateView === "resume"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Resume
+            </button>
+            <button
+              type="button"
+              onClick={() => setTemplateView("cv")}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition ${
+                templateView === "cv"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              CV
+            </button>
+          </div>
 
           {loading ? (
             <div className="text-center text-slate-400 py-8">Loading...</div>
-          ) : mostUsedTemplates.length > 0 ? (
-            <div className="space-y-4 text-sm">
-              {mostUsedTemplates.map((template, index) => {
-                const colors = ["text-blue-600", "text-purple-600", "text-emerald-600", "text-orange-600", "text-slate-500"];
-                const bgs = ["bg-blue-50", "bg-purple-50", "bg-emerald-50", "bg-orange-50", "bg-slate-50"];
-                return (
-                  <div key={template.templateId} className={`flex justify-between items-center p-3 rounded-xl ${bgs[index % bgs.length]}`}>
-                    <span className="font-medium text-slate-700">
-                      {template.templateId}
-                    </span>
-                    <span className={`${colors[index % colors.length]} font-bold`}>
-                      {template.count} uses ({template.percentage}%)
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+          ) : templateView === "resume" ? (
+            mostUsedResumeTemplates.length > 0 ? (
+              <div className="space-y-3 text-sm">
+                {mostUsedResumeTemplates.map((template, index) => {
+                  const colors = ["text-blue-600", "text-purple-600", "text-emerald-600", "text-orange-600", "text-slate-500"];
+                  const bgs = ["bg-blue-50", "bg-purple-50", "bg-emerald-50", "bg-orange-50", "bg-slate-50"];
+                  return (
+                    <div key={`resume-${template.templateId}-${index}`} className={`flex justify-between items-center p-3 rounded-xl ${bgs[index % bgs.length]}`}>
+                      <span className="font-medium text-slate-700">
+                        {template.templateId}
+                      </span>
+                      <span className={`${colors[index % colors.length]} font-bold`}>
+                        {template.count} uses ({template.percentage}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center text-slate-400 py-6 border border-dashed border-slate-200 rounded-xl">
+                No resume template usage yet
+              </div>
+            )
           ) : (
-            <div className="text-center text-slate-400 py-8">
-              No template usage data yet
-            </div>
+            mostUsedCvTemplates.length > 0 ? (
+              <div className="space-y-3 text-sm">
+                {mostUsedCvTemplates.map((template, index) => {
+                  const colors = ["text-indigo-600", "text-cyan-600", "text-teal-600", "text-amber-600", "text-slate-500"];
+                  const bgs = ["bg-indigo-50", "bg-cyan-50", "bg-teal-50", "bg-amber-50", "bg-slate-50"];
+                  return (
+                    <div key={`cv-${template.templateId}-${index}`} className={`flex justify-between items-center p-3 rounded-xl ${bgs[index % bgs.length]}`}>
+                      <span className="font-medium text-slate-700">
+                        {template.templateId}
+                      </span>
+                      <span className={`${colors[index % colors.length]} font-bold`}>
+                        {template.count} uses ({template.percentage}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center text-slate-400 py-6 border border-dashed border-slate-200 rounded-xl">
+                No CV template usage yet
+              </div>
+            )
           )}
         </div>
 
@@ -371,7 +452,7 @@ export default function AdminAnalytics() {
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
                     <Pie
-                      data={subscriptionBreakdown}
+                      data={displaySubscriptionBreakdown}
                       cx="50%"
                       cy="50%"
                       innerRadius={75}
@@ -379,7 +460,7 @@ export default function AdminAnalytics() {
                       paddingAngle={5}
                       dataKey="count"
                     >
-                      {subscriptionBreakdown.map((entry, index) => {
+                      {displaySubscriptionBreakdown.map((entry, index) => {
                         const colors = ['#94a3b8', '#3b82f6', '#8b5cf6', '#f59e0b', '#10b981'];
                         return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
                       })}
@@ -389,7 +470,7 @@ export default function AdminAnalytics() {
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <span className="text-3xl font-bold text-slate-900">
-                    {subscriptionBreakdown.reduce((acc, curr) => acc + curr.count, 0)}
+                    {totalSubscriptionUsers}
                   </span>
                   <span className="text-xs text-slate-500 font-medium uppercase tracking-widest">Total Users</span>
                 </div>
@@ -403,25 +484,37 @@ export default function AdminAnalytics() {
               Array(4).fill(0).map((_, i) => (
                 <div key={i} className="h-28 bg-slate-50 rounded-2xl animate-pulse" />
               ))
-            ) : subscriptionBreakdown.length > 0 ? (
-              subscriptionBreakdown.map((item, index) => {
-                const configs = {
-                  Free: { icon: <Users size={18} />, color: "bg-slate-500", light: "bg-slate-50", text: "text-slate-600", border: "border-slate-100" },
-                  Pro: { icon: <TrendingUp size={18} />, color: "bg-blue-600", light: "bg-blue-50", text: "text-blue-700", border: "border-blue-100" },
-                  Premium: { icon: <Award size={18} />, color: "bg-purple-600", light: "bg-purple-50", text: "text-purple-700", border: "border-purple-100" },
-                  "Ultra pro": { icon: <Crown size={18} />, color: "bg-amber-500", light: "bg-amber-50", text: "text-amber-700", border: "border-amber-100" },
-                  "Ultra Pro": { icon: <Crown size={18} />, color: "bg-amber-500", light: "bg-amber-50", text: "text-amber-700", border: "border-amber-100" },
-                  Basic: { icon: <Zap size={18} />, color: "bg-emerald-500", light: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-100" },
+            ) : displaySubscriptionBreakdown.length > 0 ? (
+              displaySubscriptionBreakdown.map((item, index) => {
+                const key = String(item.plan || "").trim().toLowerCase();
+                const getConfig = () => {
+                  if (key === "free") {
+                    return { icon: <Users size={18} />, color: "bg-slate-500", light: "bg-slate-50", text: "text-slate-600", border: "border-slate-100" };
+                  }
+                  if (key === "pro") {
+                    return { icon: <TrendingUp size={18} />, color: "bg-blue-600", light: "bg-blue-50", text: "text-blue-700", border: "border-blue-100" };
+                  }
+                  if (key.includes("premium")) {
+                    return { icon: <Award size={18} />, color: "bg-purple-600", light: "bg-purple-50", text: "text-purple-700", border: "border-purple-100" };
+                  }
+                  if (key.includes("ultra") || key.includes("lifetime") || key.includes("life time")) {
+                    return { icon: <Crown size={18} />, color: "bg-amber-500", light: "bg-amber-50", text: "text-amber-700", border: "border-amber-100" };
+                  }
+                  if (key.includes("basic")) {
+                    return { icon: <Zap size={18} />, color: "bg-emerald-500", light: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-100" };
+                  }
+                  return { icon: <Gem size={18} />, color: "bg-slate-400", light: "bg-slate-50", text: "text-slate-600", border: "border-slate-100" };
                 };
-                const config = configs[item.plan] || { icon: <Gem size={18} />, color: "bg-slate-400", light: "bg-slate-50", text: "text-slate-600", border: "border-slate-100" };
-                const total = subscriptionBreakdown.reduce((s, b) => s + b.count, 0) || 1;
+
+                const config = getConfig();
+                const total = totalSubscriptionUsers || 1;
                 const percentage = Math.round((item.count / total) * 100);
 
                 return (
-                  <div key={item.plan} className={`group p-5 rounded-2xl border ${config.border} bg-white hover:shadow-lg hover:shadow-slate-100 transition-all duration-300`}>
+                  <div key={item.plan} className={`p-5 rounded-2xl border ${config.border} bg-white`}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl ${config.light} ${config.text} group-hover:scale-110 transition-transform`}>
+                        <div className={`p-2.5 rounded-xl ${config.light} ${config.text}`}>
                           {config.icon}
                         </div>
                         <div>

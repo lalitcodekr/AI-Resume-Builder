@@ -3,7 +3,9 @@ import Payment from "../Models/payment.js";
 import Subscription from "../Models/subscription.js";
 import Resume from "../Models/resume.js";
 import ApiMetric from "../Models/ApiMetric.js";
+import Plan from "../Models/Plan.js";
 import Notification from "../Models/notification.js"
+import Download from "../Models/Download.js";
 /* ================== ADMIN DASHBOARD ================== */
 
 export const getAdminDashboardStats = async (req, res) => {
@@ -258,7 +260,8 @@ export const getAnalyticsStats = async (req, res) => {
     const last7Days = new Date();
     last7Days.setDate(last7Days.getDate() - 7);
     const activeUsersLast7Days = await User.countDocuments({
-      updatedAt: { $gte: last7Days },
+      lastLogin: { $gte: last7Days },
+      isAdmin: false,
     });
 
     // ---------- DELETED USERS ----------
@@ -267,24 +270,88 @@ export const getAnalyticsStats = async (req, res) => {
     });
 
     // ---------- SUBSCRIPTION BREAKDOWN ----------
-    const subscriptionDistribution = await User.aggregate([
-      {
-        $group: {
-          _id: "$plan",
-          count: { $sum: 1 },
+    const [availablePlans, subscriptionDistribution] = await Promise.all([
+      Plan.find({}, { name: 1, _id: 0 }).lean(),
+      User.aggregate([
+        {
+          $match: {
+            isAdmin: false,
+          },
         },
-      },
+        {
+          $group: {
+            _id: "$plan",
+            count: { $sum: 1 },
+          },
+        },
+      ]),
     ]);
 
-    const subscriptionBreakdown = subscriptionDistribution.map((item) => ({
-      plan: (item._id || "Free").charAt(0).toUpperCase() + (item._id || "Free").slice(1),
-      count: item.count,
-    }));
+    const toTitleCase = (value = "") =>
+      String(value)
+        .trim()
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
 
-    const totalPaidUsers = subscriptionBreakdown.reduce((sum, item) => {
-      if (item.plan !== "Free") return sum + item.count;
-      return sum;
-    }, 0);
+    const canonicalPlanByKey = new Map();
+    availablePlans.forEach((plan) => {
+      if (!plan?.name) return;
+      canonicalPlanByKey.set(plan.name.trim().toLowerCase(), plan.name.trim());
+    });
+
+    if (!canonicalPlanByKey.has("free")) {
+      canonicalPlanByKey.set("free", "Free");
+    }
+
+    const normalizePlanName = (rawPlan) => {
+      const raw = String(rawPlan || "Free").trim();
+      const key = raw.toLowerCase();
+
+      if (canonicalPlanByKey.has(key)) {
+        return canonicalPlanByKey.get(key);
+      }
+
+      // Keep legacy spellings aligned to one canonical tier.
+      if (["lifetime", "life time"].includes(key)) {
+        return canonicalPlanByKey.get("ultra pro") || "Ultra Pro";
+      }
+
+      return toTitleCase(raw) || "Free";
+    };
+
+    const groupedPlanCounts = new Map();
+    subscriptionDistribution.forEach((item) => {
+      const planName = normalizePlanName(item._id);
+      groupedPlanCounts.set(planName, (groupedPlanCounts.get(planName) || 0) + item.count);
+    });
+
+    const knownPlanOrder = availablePlans
+      .map((plan) => plan?.name)
+      .filter(Boolean)
+      .map((name) => normalizePlanName(name));
+
+    const orderedPlans = [
+      ...new Set([
+        "Free",
+        ...knownPlanOrder,
+        ...Array.from(groupedPlanCounts.keys()),
+      ]),
+    ];
+
+    const subscriptionBreakdown = orderedPlans
+      .map((plan) => ({
+        plan,
+        count: groupedPlanCounts.get(plan) || 0,
+      }))
+      .filter((item) => item.count > 0);
+
+    const totalPaidUsers = subscriptionBreakdown.reduce(
+      (sum, item) => (item.plan.toLowerCase() === "free" ? sum : sum + item.count),
+      0
+    );
 
     // ---------- API PERFORMANCE ----------
     const apiStats = await ApiMetric.aggregate([
@@ -371,8 +438,8 @@ export const getAnalyticsStats = async (req, res) => {
       if (revenueMatch) tick.revenue = revenueMatch.revenue;
     });
 
-    // ---------- MOST USED TEMPLATES (Top 5) ----------
-    const mostUsedTemplatesAgg = await Resume.aggregate([
+    // ---------- MOST USED TEMPLATES (Resume + CV templates) ----------
+    const mostUsedResumeTemplatesAgg = await Resume.aggregate([
       {
         $match: { templateId: { $exists: true, $ne: null } }
       },
@@ -404,12 +471,89 @@ export const getAnalyticsStats = async (req, res) => {
       },
       { $unwind: { path: "$templateDetails", preserveNullAndEmptyArrays: true } },
       { $sort: { count: -1 } },
-      { $limit: 5 },
     ]);
 
-    const totalTemplateUsage = await Resume.countDocuments({ templateId: { $ne: null } });
+    const mostUsedResumeDownloadTemplatesAgg = await Download.aggregate([
+      {
+        $match: {
+          type: "resume",
+          action: "download",
+          template: { $exists: true, $ne: null, $ne: "" },
+        },
+      },
+      {
+        $group: {
+          _id: "$template",
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
 
-    const mostUsedTemplates = mostUsedTemplatesAgg.map((item) => {
+    const mostUsedCvTemplatesAgg = await Download.aggregate([
+      {
+        $match: {
+          type: "cv",
+          action: "download",
+          template: { $exists: true, $ne: null, $ne: "" },
+        },
+      },
+      {
+        $group: {
+          _id: "$template",
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
+
+    const toReadableTemplateName = (value) => {
+      if (!value) return "Standard";
+      const str = String(value);
+
+      const canonicalNames = {
+        professional: "Professional",
+        modern: "Modern",
+        creative: "Creative",
+        minimal: "Minimal",
+        executive: "Executive",
+        academic: "Academic",
+        twoColumn: "Two Column ATS",
+        simple: "Simple",
+        academicSidebar: "Academic Sidebar",
+        Elegant: "Clinica Elegant",
+        vertex: "Vertex Sidebar",
+        elite: "Elite Sidebar",
+        eclipse: "Eclipse",
+        eclipse1: "Eclipse Alt",
+        harbor: "Harbor",
+        "jessica-claire": "Jessica Claire (Sidebar)",
+        "jessica-claire-1": "Jessica Claire (Classic)",
+        "jessica-claire-2": "Jessica Claire (Refined)",
+        "jessica-claire-3": "Jessica Claire (Modern Blue)",
+        "jessica-claire-4": "Jessica Claire (Green Accent)",
+        "jessica-claire-5": "Jessica Claire (Green/Blue)",
+        "jessica-claire-6": "Jessica Claire (Teal Three-Tone)",
+        "jessica-claire-7": "Jessica Claire (Saira Blue)",
+        "jessica-claire-8": "Jessica Claire (Fira Sans)",
+        "jessica-claire-9": "Jessica Claire (Saira Split)",
+        "jessica-claire-10": "Jessica Claire (Cyan Header)",
+      };
+
+      if (canonicalNames[str]) return canonicalNames[str];
+      if (str.length > 40) return `ID: ${str.substring(0, 8)}...`;
+      // Convert template ids like "jessica-claire" into "Jessica Claire".
+      return str
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\b\w/g, (ch) => ch.toUpperCase());
+    };
+
+    const resumeTemplateCountMap = new Map();
+    const cvTemplateCountMap = new Map();
+
+    mostUsedResumeTemplatesAgg.forEach((item) => {
       let name = item.templateDetails?.name;
       if (!name) {
         const hardcodedNames = {
@@ -429,14 +573,67 @@ export const getAnalyticsStats = async (req, res) => {
           eclipse1: "Eclipse Alt",
           harbor: "Harbor"
         };
-        name = hardcodedNames[item._id] || (typeof item._id === 'string' && item._id.length > 20 ? `ID: ${item._id.substring(0, 8)}...` : item._id);
+        const rawId = typeof item._id === "string" ? item._id : String(item._id);
+        name = hardcodedNames[rawId] || toReadableTemplateName(rawId);
       }
-      return {
-        templateId: name || "Standard",
-        count: item.count,
-        percentage: totalTemplateUsage > 0 ? Math.round((item.count / totalTemplateUsage) * 100) : 0,
-      };
+
+      const key = name || "Standard";
+      resumeTemplateCountMap.set(key, (resumeTemplateCountMap.get(key) || 0) + item.count);
     });
+
+    mostUsedResumeDownloadTemplatesAgg.forEach((item) => {
+      const key = toReadableTemplateName(item._id);
+      resumeTemplateCountMap.set(key, (resumeTemplateCountMap.get(key) || 0) + item.count);
+    });
+
+    mostUsedCvTemplatesAgg.forEach((item) => {
+      const key = toReadableTemplateName(item._id);
+      cvTemplateCountMap.set(key, (cvTemplateCountMap.get(key) || 0) + item.count);
+    });
+
+    const buildTopTemplates = (countMap) => {
+      const total = Array.from(countMap.values()).reduce(
+        (sum, count) => sum + count,
+        0
+      );
+
+      return Array.from(countMap.entries())
+        .map(([templateId, count]) => ({
+          templateId,
+          count,
+          percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+    };
+
+    const mostUsedResumeTemplates = buildTopTemplates(resumeTemplateCountMap);
+    const mostUsedCvTemplates = buildTopTemplates(cvTemplateCountMap);
+
+    const combinedTemplateCountMap = new Map();
+    Array.from(resumeTemplateCountMap.entries()).forEach(([key, count]) => {
+      combinedTemplateCountMap.set(key, (combinedTemplateCountMap.get(key) || 0) + count);
+    });
+    Array.from(cvTemplateCountMap.entries()).forEach(([key, count]) => {
+      combinedTemplateCountMap.set(key, (combinedTemplateCountMap.get(key) || 0) + count);
+    });
+
+    const totalTemplateUsage = Array.from(combinedTemplateCountMap.values()).reduce(
+      (sum, count) => sum + count,
+      0
+    );
+
+    const mostUsedTemplates = Array.from(combinedTemplateCountMap.entries())
+      .map(([templateId, count]) => ({
+        templateId,
+        count,
+        percentage:
+          totalTemplateUsage > 0
+            ? Math.round((count / totalTemplateUsage) * 100)
+            : 0,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
 
     const chartData = trendData.map(item => ({
       month: item.monthName,
@@ -466,6 +663,8 @@ export const getAnalyticsStats = async (req, res) => {
         count: deletedUsersCount,
         note: "Total deleted accounts",
       },
+      mostUsedResumeTemplates,
+      mostUsedCvTemplates,
       mostUsedTemplates,
       chartData,
       subscriptionBreakdown,

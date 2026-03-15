@@ -446,44 +446,6 @@ const Downloads = () => {
             </h3>
           </div>
 
-          {/* Three-dot menu */}
-          <div className="relative flex-shrink-0">
-            <button
-              onClick={() => setOpenMenuId(isMenuOpen ? null : download.id)}
-              className="menu-trigger w-6 h-6 rounded-lg flex items-center justify-center text-gray-300 hover:text-gray-600 hover:bg-white/80 transition-colors"
-            >
-              <FiMoreVertical size={13} />
-            </button>
-            <AnimatePresence>
-              {isMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.93, y: -4 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.93, y: -4 }}
-                  transition={{ duration: 0.1 }}
-                  className="menu-dropdown absolute right-0 top-7 bg-white rounded-xl border border-gray-100 z-20 py-1 w-32"
-                  style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.12)" }}
-                >
-                  <button
-                    onClick={() => {
-                      handleView(download);
-                      setOpenMenuId(null);
-                    }}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                  >
-                    <FiEye size={11} /> Preview
-                  </button>
-                  <div className="h-px bg-gray-100 my-0.5" />
-                  <button
-                    onClick={() => handleDelete(download.id)}
-                    className="w-full text-left px-3 py-1.5 text-xs text-red-500 hover:bg-red-50 flex items-center gap-2"
-                  >
-                    <FiTrash2 size={11} /> Delete
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
 
         {/* Meta strip */}
@@ -538,7 +500,7 @@ const Downloads = () => {
           <button
             onClick={() => handleDelete(download.id)}
             disabled={isDeleting}
-            className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl border border-gray-100 text-gray-300 hover:text-red-400 hover:bg-red-50 hover:border-red-100 transition-all disabled:opacity-40"
+            className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl border border-red-100 text-red-400 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-all disabled:opacity-40"
           >
             {isDeleting ? (
               <div className="w-3 h-3 border border-red-300 border-t-transparent rounded-full animate-spin" />
@@ -563,8 +525,8 @@ const Downloads = () => {
   return (
     <>
       <UserNavBar />
-      <div className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
-        <div className="w-full px-4 sm:px-6 lg:px-10 py-8">
+          <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#f8f9fb" }}>  
+          <div className="flex-1 w-full px-4 sm:px-6 lg:px-10 py-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div>
@@ -680,28 +642,7 @@ const Downloads = () => {
             </div>
           )}
 
-          {/* Results count */}
-          {filteredTotal > 0 && (
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs text-gray-400">
-                <span className="font-semibold text-gray-700">
-                  {filteredTotal}
-                </span>{" "}
-                document{filteredTotal !== 1 ? "s" : ""}
-                {filteredTotal !== downloads.length && (
-                  <span className="text-gray-300">
-                    {" "}
-                    of {downloads.length} total
-                  </span>
-                )}
-              </p>
-              {totalPages > 1 && (
-                <p className="text-xs text-gray-400">
-                  Page {currentPage} / {totalPages}
-                </p>
-              )}
-            </div>
-          )}
+
 
           {/* Grid */}
           {filteredDownloads.length === 0 ? (
@@ -789,10 +730,11 @@ const Downloads = () => {
             </div>
           )}
 
-          <footer className="mt-auto text-center py-4 bg-white border-t text-sm text-gray-600">
-            © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
-          </footer>
+          
         </div>
+        <footer className="text-center py-4 bg-white border-t text-sm text-gray-600">
+    © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
+  </footer>
       </div>
 
       {/* ========== PREVIEW MODAL (FLOATING + MOBILE RESPONSIVE) ========== */}

@@ -4,7 +4,7 @@ import Plan from "../Models/Plan.js";
 // -------------------- GET ALL PLANS --------------------
 export const getAllPlans = async (req, res) => {
   try {
-    const plans = await Plan.find().sort({ planId: 1 });
+    const plans = await Plan.find().sort({ order: 1 });
     res.status(200).json(plans);
   } catch (error) {
     res
@@ -34,7 +34,6 @@ export const getPlanById = async (req, res) => {
 export const updateAllPlans = async (req, res) => {
   try {
     const plans = req.body;
-
     if (!Array.isArray(plans)) {
       return res.status(400).json({ message: "Invalid data format. Expected an array of plans." });
     }
@@ -46,6 +45,12 @@ export const updateAllPlans = async (req, res) => {
           message: "Each plan must have planId, name, and price"
         });
       }
+      //Validate plan name is unique
+      const notUniqueName = await Plan.findOne({
+        name: plan.name,
+        planId: { $ne: plan.planId }
+      });
+      if (notUniqueName) return res.status(409).json({ message: `Plan name cannot be same , Change Plan Name : ${plan.name}` });
     }
 
     // Delete missing plans dynamically
@@ -59,12 +64,15 @@ export const updateAllPlans = async (req, res) => {
         { planId: plan.planId },
         {
           name: plan.name,
+          badge: plan.badge,
           price: plan.price,
           active: plan.active,
+          order : plan.order,
           description: plan.description,
           features: plan.features,
         },
-        { new: true, upsert: true } // Create if doesn't exist
+        { new: true, upsert: true },
+        { $sort : {order : 1}} // Create if doesn't exist
       );
     });
 
@@ -84,9 +92,8 @@ export const updateAllPlans = async (req, res) => {
 // -------------------- UPDATE SINGLE PLAN --------------------
 export const updatePlan = async (req, res) => {
   try {
-    const { name, price, active, description, features } = req.body;
+    const { name, badge, price, active, description, features } = req.body;
     const planId = req.params.id;
-
     const plan = await Plan.findOne({ planId });
 
     if (!plan) {
@@ -95,6 +102,7 @@ export const updatePlan = async (req, res) => {
 
     // Update fields
     if (name) plan.name = name;
+    if (badge !== undefined) plan.badge = badge;
     if (price !== undefined) plan.price = price;
     if (active !== undefined) plan.active = active;
     if (description) plan.description = description;

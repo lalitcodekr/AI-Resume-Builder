@@ -10,6 +10,10 @@ const planSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      unique: true,
+    },
+    badge : {
+      type : String,
     },
     price: {
       type: Number,
@@ -28,6 +32,10 @@ const planSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
+    order : {
+      type : Number,
+      required : true
+    }
   },
   { timestamps: true }
 );

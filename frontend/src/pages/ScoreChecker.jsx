@@ -92,8 +92,7 @@ const staggerContainer = {
 
 const ScoreChecker = () => {
   const navigate = useNavigate();
-  const isLoggedIn =
-    typeof window !== "undefined" && !!localStorage.getItem("token");
+  const isLoggedIn = typeof window !== "undefined" && !!localStorage.getItem("token");
 
   const handleFeatureClick = (path) => {
     if (isLoggedIn) navigate(path);
@@ -107,13 +106,11 @@ const ScoreChecker = () => {
     "Senior Software Engineer\n\n- Spearheaded a team of 5 developers to build a scalable React application.\n- Improved page load speed by 40% using code splitting and lazy loading.\n- Integrated RESTful APIs and optimized database queries for better performance."
   );
 
-  const [openFaq, setOpenFaq] = useState(0);
+  // default to -1 so no FAQ item is opened on initial load
+  const [openFaq, setOpenFaq] = useState(-1);
 
-  const [heroRef, heroVisible] = useInView(0.2);
-  const [demoRef, demoVisible] = useInView(0.15);
   const [breakRef, breakVisible] = useInView(0.15);
   const [calcRef, calcVisible] = useInView(0.15);
-  const [whyRef, whyVisible] = useInView(0.15);
   const [faqRef, faqVisible] = useInView(0.15);
   const [ctaRef, ctaVisible] = useInView(0.2);
 

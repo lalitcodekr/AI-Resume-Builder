@@ -21,7 +21,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
     } else {
       setEditingId(formData?.projects?.[0]?.id || null);
     }
-  }, []);
+  }, [formData]);
 
   const addProject = () => {
     const id = crypto.randomUUID();
@@ -51,7 +51,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
   const updateProject = (id, field, value) => {
     setFormData((prev) => ({
       ...prev,
-      projects: prev.projects.map((p) =>
+      projects: (prev?.projects ?? []).map((p) =>
         p.id === id ? { ...p, [field]: value } : p,
       ),
     }));
@@ -60,7 +60,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
   const updateGithub = (id, value) => {
     setFormData((prev) => ({
       ...prev,
-      projects: prev.projects.map((p) =>
+      projects: (prev?.projects ?? []).map((p) =>
         p.id === id ? { ...p, link: { ...(p.link || {}), github: value } } : p,
       ),
     }));

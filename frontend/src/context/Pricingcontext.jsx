@@ -25,8 +25,10 @@ export const PricingProvider = ({ children }) => {
       const transformedPlans = response.data.map(plan => ({
         id: plan.planId,
         name: plan.name,
+        badge : plan.badge,
         price: plan.price,
         active: plan.active,
+        order : plan.order,
         description: plan.description,
         features: plan.features,
       }));
@@ -46,8 +48,10 @@ export const PricingProvider = ({ children }) => {
       const backendPlans = updatedPlans.map(plan => ({
         planId: plan.id,
         name: plan.name,
+        badge : plan.badge,
         price: Number(plan.price),
         active: plan.active,
+        order : plan.order,
         description: plan.description,
         features: plan.features,
       }));

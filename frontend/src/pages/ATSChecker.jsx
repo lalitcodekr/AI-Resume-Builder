@@ -35,6 +35,10 @@ const useInView = (threshold = 0.15) => {
   return [ref, isVisible];
 };
 
+
+
+
+
 /** ✅ ATS donut chart data */
 const atsBreakdown = [
   { name: "Keyword Match", value: 52 },
@@ -158,7 +162,10 @@ function ATSDonutCard({ score = 78 }) {
 }
 
 const ATSCheckerFeature = () => {
-  const navigate = useNavigate();
+ const navigate = useNavigate();
+
+  const isLoggedIn =
+  localStorage.getItem("token") || sessionStorage.getItem("token");
   
   /** ✅ Updated: Changed to navigate to login page */
   const handleCTA = () => {
@@ -203,7 +210,13 @@ const ATSCheckerFeature = () => {
               </p>
 
               <button
-                onClick={handleCTA}
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    navigate("/login", { state: { from: "/user/ats-checker" } });
+                  } else {
+                    navigate("/user/ats-checker");
+                  }
+                }}
                 className="group relative inline-flex w-full sm:w-auto max-w-full justify-center items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-[#1a2e52] text-white rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-xl hover:bg-[#0077cc] hover:-translate-y-1"
               >
                 <span>Run Free Scan</span>

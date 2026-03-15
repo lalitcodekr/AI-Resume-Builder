@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mammoth from "mammoth";
 
 // Models
 import Resume from "../Models/resume.js";
@@ -17,14 +18,14 @@ import {
 import {
   parseResume,
   extractResumeData,
-} from "../service/Resumeparser.service.js";
+} from "../service/ResumeParser.service.js";
 
 // ATS Analyzer Services
 import {
   analyzeATSCompatibility,
   generateRecommendations,
   passesATSThreshold,
-} from "../service/Atsanalyzer.service.js";
+} from "../service/AtsAnalyzer.service.js";
 
 import SpellChecker from "simple-spellchecker";
 import nlp from "compromise";
@@ -298,6 +299,19 @@ export const getResumeById = async (req, res) => {
    Uploads a resume, parses it, analyzes ATS compatibility,
    saves results to MongoDB
 ===================================================== */
+const extractTextFromDoc = async (filePath) => {
+  try {
+    const result = await mammoth.extractRawText({ path: filePath });
+    return result.value;
+  } catch (error) {
+    console.error("Error extracting text from DOC:", error);
+    return null;
+  }
+};
+
+
+
+
 export const uploadAndAnalyzeResume = async (req, res) => {
   console.log("🔥 uploadAndAnalyzeResume HIT");
   try {
@@ -310,18 +324,40 @@ export const uploadAndAnalyzeResume = async (req, res) => {
 
     const userId = req.userId;
     const file = req.file;
+    const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
+    
+    let resumeText;
+    let parseResult;
 
-    // Parse resume text
-    const parseResult = await parseResume(file);
-    if (!parseResult?.success || !parseResult?.text) {
-      deleteFile(file.path);
+    // Handle different file types
+    if (fileExtension === 'pdf') {
+      parseResult = await parseResume(file);
+      if (!parseResult?.success || !parseResult?.text) {
+        deleteFile(file.path);
+        return res.status(400).json({
+          success: false,
+          message: "Failed to parse resume",
+        });
+      }
+      resumeText = parseResult.text;
+    } else if (['doc', 'docx'].includes(fileExtension)) {
+      // Extract text from DOC/DOCX
+      resumeText = await extractTextFromDoc(file.path);
+      if (!resumeText) {
+        deleteFile(file.path);
+        return res.status(400).json({
+          success: false,
+          message: "Failed to parse DOC/DOCX file",
+        });
+      }
+      // Also try to parse it with your existing parser
+      parseResult = await parseResume(file);
+    } else {
       return res.status(400).json({
         success: false,
-        message: "Failed to parse resume",
+        message: "Unsupported file format. Please upload PDF, DOC, or DOCX.",
       });
     }
-
-    const resumeText = parseResult.text;
 
     // Extract structured data
     const extractedData = extractResumeData(resumeText);
@@ -335,19 +371,19 @@ export const uploadAndAnalyzeResume = async (req, res) => {
     const recommendations = generateRecommendations(analysis);
 
     // Validate required fields from frontend
-    const { jobTitle, templateId, resumeprofileId } = req.body;
-    if (!jobTitle || !templateId || !resumeprofileId) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required fields"
-      });
-    }
+   const { jobTitle, templateId, resumeprofileId } = req.body;
 
-    // ✅ FIX 1: Ensure File Format Compatibility score is correct for valid formats
-    const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
+if (!jobTitle) {
+  return res.status(400).json({
+    success: false,
+    message: "Job title is required"
+  });
+}
+
+    // ✅ FIX: Ensure File Format Compatibility score is correct
     const isValidFormat = ['pdf', 'doc', 'docx'].includes(fileExtension) ||
-                         ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.mimetype);
-    
+      ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.mimetype);
+
     if (analysis.sectionScores) {
       analysis.sectionScores = analysis.sectionScores.map(section => {
         if (section.sectionName === "File Format Compatibility") {
@@ -362,14 +398,14 @@ export const uploadAndAnalyzeResume = async (req, res) => {
       });
     }
 
-    // ✅ FIX 2: Recalculate overallScore from sectionScores to ensure consistency
+    // ✅ FIX: Recalculate overallScore from sectionScores
     if (analysis.sectionScores && Array.isArray(analysis.sectionScores)) {
       const totalEarned = analysis.sectionScores.reduce(
-        (sum, s) => sum + (typeof s.score === 'number' ? s.score : 0), 
+        (sum, s) => sum + (typeof s.score === 'number' ? s.score : 0),
         0
       );
       const totalPossible = analysis.sectionScores.reduce(
-        (sum, s) => sum + (typeof s.maxScore === 'number' ? s.maxScore : 0), 
+        (sum, s) => sum + (typeof s.maxScore === 'number' ? s.maxScore : 0),
         0
       );
       
@@ -387,7 +423,7 @@ export const uploadAndAnalyzeResume = async (req, res) => {
       filePath: `/uploads/resumes/${file.filename}`,
       fileSize: file.size,
       fileType: file.mimetype,
-      overallScore: analysis.overallScore,  // Now consistent with sections
+      overallScore: analysis.overallScore,
       sectionScores: analysis.sectionScores,
       matchedKeywords: analysis.matchedKeywords,
       missingKeywords: analysis.missingKeywords,
@@ -395,8 +431,10 @@ export const uploadAndAnalyzeResume = async (req, res) => {
       extractedText: resumeText,
       extractedData,
       passThreshold: passes,
-      templateId: new mongoose.Types.ObjectId(templateId),
-      resumeprofileId: new mongoose.Types.ObjectId(resumeprofileId),
+      templateId: templateId || null,
+       resumeprofileId: resumeprofileId
+      ? new mongoose.Types.ObjectId(resumeprofileId)
+     : null,
       jobTitle,
     });
 
@@ -410,7 +448,8 @@ export const uploadAndAnalyzeResume = async (req, res) => {
         filename: file.filename,
         originalName: file.originalname,
         filePath: atsScan.filePath,
-        overallScore: analysis.overallScore,  // ✅ Now matches section sum
+        fileType: fileExtension, // Add file type to response
+        overallScore: analysis.overallScore,
         sectionScores: analysis.sectionScores,
         matchedKeywords: analysis.matchedKeywords,
         missingKeywords: analysis.missingKeywords,
@@ -665,13 +704,12 @@ export const enhanceWorkExperience = async (req, res) => {
   try {
     console.log("Received AI generation request:", req.body);
     // 1. Generate AI professional summary
-    const aiResponse = await refineExperienceDescription(req.body);
-    console.log(aiResponse);
+    const aiText = await refineExperienceDescription(req.body);
+    console.log(aiText);
 
     console.log("AI Summary generated successfully");
-    const aiText = JSON.parse(aiResponse);
     // 2. Try to save to MongoDB (optional - won't fail if DB is down)
-    if (aiText.status === "success") {
+    if (aiText) {
       try {
         await Resume.findOneAndUpdate(
           {
@@ -693,10 +731,10 @@ export const enhanceWorkExperience = async (req, res) => {
       // 3. Send AI summary back to frontend
       return res.json({
         message: "Experience description enhanced successfully",
-        aiResume: aiText.text
+        aiResume: aiText
       });
     }
-    throw new Error(aiText.text || "AI generation failed without specific error message");
+    throw new Error(aiText || "AI generation failed without specific error message");
   } catch (error) {
     console.error("AI ERROR:", error);
     res.status(500).json({
@@ -712,13 +750,12 @@ export const enhanceProjectDescription = async (req, res) => {
   try {
     console.log("Received AI generation request:", req.body);
     // 1. Generate AI professional summary
-    const aiResponse = await refineProjectDescription(req.body);
-    console.log(aiResponse);
+    const projectDescription = await refineProjectDescription(req.body);
+    console.log(projectDescription);
 
     console.log("AI Summary generated successfully");
-    const projectDescription = JSON.parse(aiResponse);
     // 2. Try to save to MongoDB (optional - won't fail if DB is down)
-    if (projectDescription.status === "success") {
+    if (projectDescription) {
       try {
         await Resume.findOneAndUpdate(
           {
@@ -740,10 +777,10 @@ export const enhanceProjectDescription = async (req, res) => {
       // 3. Send AI summary back to frontend
       return res.json({
         message: "Project Description enhanced successfully",
-        projectDescription: projectDescription.text
+        projectDescription: projectDescription
       });
     }
-    throw new Error(projectDescription.text || "AI generation failed without specific error message");
+    throw new Error(projectDescription || "AI generation failed without specific error message");
   } catch (error) {
     console.error("AI ERROR:", error);
     res.status(500).json({

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -41,12 +41,53 @@ import CVBuilderTopBar from "../CV/Cvbuildernavbar";
    stays pinned beneath the sticky navbar while scrolling.
 ───────────────────────────────────────────────────────── */
 const FloatingFormPanel = ({ children, topOffset, containerRef }) => {
+  const panelRef = useRef(null);
+  const rafRef = useRef(null);
+  const currentY = useRef(0);
+  const targetY = useRef(0);
+
+  // spring animation loop
+  useEffect(() => {
+    const STIFFNESS = 0.12;
+    const tick = () => {
+      currentY.current += (targetY.current - currentY.current) * STIFFNESS;
+      if (panelRef.current) {
+        panelRef.current.style.transform = `translateY(${currentY.current}px)`;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  // update target on scroll — anchor to container's top in the DOM
+  useEffect(() => {
+    const onScroll = () => {
+      if (!containerRef?.current || !panelRef?.current) {
+        targetY.current = Math.max(0, window.scrollY - topOffset);
+        return;
+      }
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const containerTop = containerRect.top + window.scrollY;
+      const containerHeight = containerRect.height;
+      const panelHeight = panelRef.current.offsetHeight;
+
+      const desired = window.scrollY + topOffset - containerTop;
+      const maxDesired = Math.max(0, containerHeight - panelHeight);
+
+      targetY.current = Math.max(0, Math.min(desired, maxDesired));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [topOffset, containerRef]);
+
   return (
     <div
+      ref={panelRef}
       style={{
-        position: 'sticky',
-        top: `${topOffset}px`,
-        height: `calc(100vh - ${topOffset}px - 80px)`,
+        willChange: "transform",
+        height: `calc(100vh - ${topOffset}px)`,
       }}
       className="flex flex-col"
     >
@@ -132,14 +173,51 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
   // ============== Completed Status ===========
   const [completion, setcompletion] = useState({});
   useEffect(() => {
-    const statusInfo = getCompletionStatus(formData);
-    setcompletion(statusInfo);
+    try {
+      const statusInfo = getCompletionStatus(formData);
+      setcompletion(statusInfo || {});
+    } catch (error) {
+      console.error('Error getting completion status:', error);
+      setcompletion({ isComplete: false, missingSections: [] });
+    }
   }, [formData]);
 
   /* ------------Input Validation ------------- */
   const [warning, setWarning] = useState(false);
+  const [showCompletionPopup, setShowCompletionPopup] = useState(false);
+  const isSectionValid = () => {
+    switch (activeSection) {
+      case "personal":
+        return (
+          formData?.fullName?.trim() &&
+          formData?.email?.trim() &&
+          formData?.phone?.trim() &&
+          formData?.location?.trim()
+        );
+
+      case "work":
+        return formData?.experience && formData.experience.length > 0;
+
+      case "education":
+        return formData?.education && formData.education.length > 0;
+
+      case "skills":
+        return formData?.skills && formData.skills.length > 0;
+
+      case "projects":
+        return formData?.projects && formData.projects.length > 0;
+
+      case "certs":
+        return formData?.certifications && formData.certifications.length > 0;
+
+      default:
+        return true;
+    }
+  };
   const isInputValid = (label) => {
-    return completion?.missingSections?.includes(label);
+    // For now, allow navigation to all sections regardless of completion status
+    // Users can navigate freely and fill sections as needed
+    return false; // Always return false to allow navigation
   };
 
   /*------------------- PREVIOUS & NEXT BUTTON ------------*/
@@ -147,37 +225,6 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const previewRef = useRef(null);
-
-  /* ======================================================
-   SAVE ACTIVITY WHEN BUILDER OPENS
-====================================================== */
-  useEffect(() => {
-    const saveVisit = async () => {
-      const html = await previewRef.current?.getResumeHTML();
-      if (!html) return;
-
-      await saveRecentActivity(html, "visited");
-    };
-
-    const timer = setTimeout(saveVisit, 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  /* ======================================================
-     SAVE ACTIVITY WHEN USER EDITS RESUME
-  ====================================================== */
-  useEffect(() => {
-    const saveEditActivity = async () => {
-      const html = await previewRef.current?.getResumeHTML();
-      if (!html) return;
-
-      await saveRecentActivity(html, "preview");
-    };
-
-    const timer = setTimeout(saveEditActivity, 1500);
-
-    return () => clearTimeout(timer);
-  }, [formData]);
 
   /* Measure sticky navbar height for float offset (same as CV) */
   useEffect(() => {
@@ -245,8 +292,21 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
     try {
       setExporting(true);
       await GenerateResumePDF(html);
-      // Save to downloads page
-      await saveDownloadRecord(html, "PDF");
+
+      // Save download record to database
+      try {
+        const nameToUse = documentTitle || formData.fullName || "Resume";
+        await axiosInstance.post("/api/downloads", {
+          name: `Resume - ${nameToUse}`,
+          type: "resume",
+          format: "PDF",
+          html,
+          template: selectedTemplate,
+          size: "250 KB",
+        });
+      } catch (err) {
+        console.error("Failed to save resume download:", err);
+      }
     } finally {
       setExporting(false);
     }
@@ -271,63 +331,89 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
     a.click();
     URL.revokeObjectURL(url);
 
-    // Save to downloads page
-    await saveDownloadRecord(html, "DOCX");
-  };
-
-  /* ======================================================
-     SAVE RESUME DOWNLOAD RECORD
-  ====================================================== */
-  const saveDownloadRecord = async (html, format = "PDF") => {
+    // Save download record to database
     try {
-      const sanitize = (s) =>
-        (s || "")
-          .replace(/[^a-z0-9_\- ]/gi, "")
-          .trim()
-          .replace(/\s+/g, "_");
-      const nameToUse = sanitize(documentTitle) || sanitize(formData.fullName) || "Document";
-
+      const nameToUse = documentTitle || formData.fullName || "Resume";
       await axiosInstance.post("/api/downloads", {
         name: `Resume - ${nameToUse}`,
         type: "resume",
-        format,
+        format: "DOCX",
         html,
         template: selectedTemplate,
-        size: format === "PDF" ? "250 KB" : "200 KB",
+        size: "200 KB",
       });
     } catch (err) {
       console.error("Failed to save resume download:", err);
     }
   };
 
-  /* ======================================================
-   SAVE RECENT ACTIVITY (VISITED / PREVIEW / DOWNLOAD)
-====================================================== */
-  const saveRecentActivity = async (html, action = "visited") => {
+  // ===============================
+  // RESUME UPLOAD HANDLER
+  // ===============================
+  const handleResumeUpload = async (file) => {
     try {
-      const sanitize = (s) =>
-        (s || "")
-          .replace(/[^a-z0-9_\- ]/gi, "")
-          .trim()
-          .replace(/\s+/g, "_");
+      if (!file) return;
 
-      const nameToUse =
-        sanitize(documentTitle) || sanitize(formData.fullName) || "Document";
+      const formDataUpload = new FormData();
+      formDataUpload.append("resume", file);
 
-      await axiosInstance.post("/api/downloads", {
-        name: `Resume - ${nameToUse}`,
-        type: "resume",
-        action, // visited | preview | download
-        format: "PDF",
-        html,
-        template: selectedTemplate,
-        size: "250 KB",
-      });
-    } catch (err) {
-      console.error("Failed to save activity:", err);
+      // required backend fields
+      formDataUpload.append("jobTitle", "Resume Builder Upload");
+      formDataUpload.append("templateId", selectedTemplate);
+      formDataUpload.append("resumeprofileId", "000000000000000000000000");
+
+      const res = await axiosInstance.post(
+        "/api/resume/upload",
+        formDataUpload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      const parsed = res.data?.data?.extractedData;
+      console.log("🔍 Parsed resume data:", parsed);
+
+      if (!parsed) {
+        alert("Failed to parse resume.");
+        return;
+      }
+
+      // Auto-fill builder form - use correct field names from backend
+      setFormData((prev) => ({
+        ...prev,
+        fullName: parsed.fullName || parsed.name || prev.fullName,
+        email: parsed.email || prev.email,
+        phone: parsed.phone || prev.phone,
+        location: parsed.location || prev.location,
+        summary: parsed.summary || prev.summary, // This should now work
+        linkedin: parsed.linkedin || prev.linkedin,
+        website: parsed.website || prev.website,
+        education: parsed.education || prev.education,
+        experience: parsed.experience || prev.experience,
+        projects: parsed.projects || prev.projects,
+        skills: parsed.skills || prev.skills,
+        certifications: parsed.certifications || prev.certifications,
+      }));
+
+      console.log("📝 Summary extracted:", parsed.summary);
+      alert("Resume uploaded and imported successfully!");
+    } catch (error) {
+      console.error("Upload failed:", error);
+
+      // Better error handling for authentication issues
+      if (error.response?.status === 401) {
+        alert("Authentication required. Please log in again to upload resume.");
+        // Optionally redirect to login page
+        // window.location.href = "/login";
+      } else {
+        alert(
+          `Resume upload failed: ${error.response?.data?.message || error.message}`,
+        );
+      }
     }
   };
-
 
   /*------------------- PREVIOUS & NEXT BUTTON ------------*/
   const tabs = [
@@ -400,54 +486,68 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
 
     // BUILDER TAB – mirror CV layout with floating form + desktop preview
     return (
-      <div className="flex flex-col w-full relative z-10 mx-auto max-w-[1920px]">
-
-        {/* Floating Global Banner logic moved from inside the left col */}
-        {activeTab !== "templates" && (
-          <div className={`flex gap-3 pt-3 pb-3 px-4 border rounded-xl mb-4 shadow-sm items-center w-full ${completion?.isComplete ? "bg-emerald-50 border-emerald-200" : "bg-amber-50 border-amber-200"}`}>
-            {!completion.isComplete ? (
-              <AlertTriangle className="text-amber-500 flex-shrink-0" size={18} />
-            ) : (
-              <CheckCircle className="text-emerald-500 flex-shrink-0" size={18} />
-            )}
-            <span className={`text-sm font-medium ${completion?.isComplete ? "text-emerald-800" : "text-amber-800"}`}>
-              {!completion.isComplete
-                ? `Complete Your Resume: Add ${completion?.missingSections?.join(', ') || 'missing details'} to enable export functionality.`
-                : "Your resume is ready to export."}
-            </span>
+      <>
+        {completion?.isComplete ? (
+          <div className="px-4 mt-2">
+            <div className="flex gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl shadow-sm px-2">
+              <CheckCircle
+                className="text-emerald-500 flex-shrink-0 mt-0.5"
+                size={18}
+              />
+              <span className="text-sm font-medium text-emerald-800">
+                Resume Ready: All necessary information has been added. You can
+                now export your resume.
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="px-4 mt-2">
+            <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl shadow-sm px-2">
+              <AlertTriangle
+                className="text-amber-500 flex-shrink-0 mt-0.5"
+                size={18}
+              />
+              <span className="text-sm font-medium text-amber-800">
+                Complete Your Resume: Add the missing information to enable
+                export functionality.
+              </span>
+            </div>
           </div>
         )}
-
-        {/* 2-Column Flex Layout */}
-        <div className="flex gap-[10px] w-full mt-2 lg:mt-5 p-0 sm:p-2 lg:flex-row flex-col max-w-[1920px] mx-auto relative z-10">
+        <div className="flex gap-5 px-4 pb-20 pt-4 items-start">
           {/* Desktop floating form panel */}
           {!isPreviewExpanded && (
             <div
               ref={leftColRef}
-              className="flex-shrink-0 hidden lg:block"
-              style={{ width: 520 }}
+              className="flex-shrink-0 hidden lg:block self-stretch"
+              style={{ width: 480 }}
             >
               <FloatingFormPanel
                 topOffset={headerHeight}
                 containerRef={leftColRef}
               >
-                <div className="bg-white rounded-xl h-full overflow-hidden flex flex-col border border-slate-200">
+                <div
+                  className="bg-white rounded-2xl flex flex-col overflow-hidden"
+                  style={{
+                    height: "100%",
+                    boxShadow:
+                      "0 4px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
+                  }}
+                >
                   {/* Tabs + step info */}
-                  <div className="flex-shrink-0 border-b border-slate-100 px-4 py-3 bg-white">
+                  <div className="flex-shrink-0 border-b border-slate-100 px-4 py-3 bg-white rounded-t-2xl">
                     <FormTabs
                       activeSection={activeSection}
                       setActiveSection={setActiveSection}
                       showPreview={showMobilePreview}
-                      onTogglePreview={() =>
-                        setShowMobilePreview((v) => !v)
-                      }
+                      onTogglePreview={() => setShowMobilePreview((v) => !v)}
                     />
                   </div>
 
                   {/* Scrollable form content */}
                   <div
                     ref={formContainerRef}
-                    className="flex-1 overflow-y-auto p-6"
+                    className="flex-1 overflow-y-auto p-4 pb-0"
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: "#e2e8f0 transparent",
@@ -461,38 +561,38 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
                     )}
 
                     {renderFormContent()}
+                  </div>
 
-                    {/* Previous & Next */}
-                    <div className="w-full flex items-center justify-between mt-8">
-                      <button
-                        onClick={goLeft}
-                        disabled={currentIdx === 0}
-                        className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                      >
-                        <ArrowLeft size={18} />
-                        <span>Previous</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (isInputValid(tabs[currentIdx]?.label)) {
+                  {/* Previous & Next Desktop */}
+                  <div className="flex-shrink-0 flex items-center justify-between p-4 border-t border-slate-100 bg-white rounded-b-2xl">
+                    <button
+                      onClick={goLeft}
+                      disabled={currentIdx === 0}
+                      className="flex gap-2 items-center text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      <ArrowLeft size={16} />
+                      <span className="hidden sm:inline">Previous</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (completion?.isComplete) {
+                          setShowCompletionPopup(true);
+                        } else {
+                          if (!isSectionValid()) {
                             setWarning(true);
-                            formContainerRef.current?.scrollTo({
-                              top: 0,
-                              behavior: "smooth",
-                            });
+                            window.scrollTo({ top: 0, behavior: "smooth" });
                             return;
                           }
                           setWarning(false);
                           goRight();
-                        }}
-                        disabled={currentIdx === tabs.length - 1}
-                        className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                      >
-                        <span>Next</span>
-                        <ArrowRight size={18} />
-                      </button>
-                    </div>
-                    <div style={{ height: 48 }} />
+                        }
+                      }}
+                      disabled={!completion?.isComplete && currentIdx === tabs.length - 1}
+                      className="flex gap-2 items-center text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      <span className="hidden sm:inline">{completion?.isComplete ? "Finish" : "Next Step"}</span>
+                      <ArrowRight size={16} />
+                    </button>
                   </div>
                 </div>
               </FloatingFormPanel>
@@ -502,7 +602,7 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
           {/* Mobile form card (no desktop preview here) */}
           <div className="w-full lg:hidden flex flex-col">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden mb-4">
-              <div className="flex-shrink-0 border-b border-slate-100 px-4 py-3">
+              <div className="flex-shrink-0">
                 <FormTabs
                   activeSection={activeSection}
                   setActiveSection={setActiveSection}
@@ -510,9 +610,7 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
                   onTogglePreview={() => setShowMobilePreview((v) => !v)}
                 />
               </div>
-              <div className="p-4">
-
-
+              <div className="flex-1 min-h-[400px] overflow-y-auto p-4 pb-0">
                 {warning && (
                   <div className="text-sm text-red-700 bg-yellow-100 border border-yellow-300 px-4 py-2 mb-3 rounded-lg">
                     Please fill in all required fields to continue.
@@ -520,62 +618,78 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
                 )}
 
                 {renderFormContent()}
+              </div>
 
-                <div className="w-full flex items-center justify-between mt-6">
-                  <button
-                    onClick={goLeft}
-                    disabled={currentIdx === 0}
-                    className="flex gap-1 items-center text-sm bg-slate-100 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                  >
-                    <ArrowLeft size={18} />
-                    <span>Previous</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (isInputValid(tabs[currentIdx]?.label)) {
+              <div className="flex-shrink-0 flex items-center justify-between p-4 border-t border-slate-100 bg-white">
+                <button
+                  onClick={goLeft}
+                  disabled={currentIdx === 0}
+                  className="flex gap-2 items-center text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  <ArrowLeft size={16} />
+                  <span>Previous</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (completion?.isComplete) {
+                      setShowCompletionPopup(true);
+                    } else {
+                      if (!isSectionValid()) {
                         setWarning(true);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
+                        formContainerRef.current?.scrollTo({
+                          top: 0,
+                          behavior: "smooth",
+                        });
                         return;
                       }
                       setWarning(false);
                       goRight();
-                    }}
-                    disabled={currentIdx === tabs.length - 1}
-                    className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
-                  >
-                    <span>Next</span>
-                    <ArrowRight size={18} />
-                  </button>
-                </div>
+                    }
+                  }}
+                  disabled={!completion?.isComplete && currentIdx === tabs.length - 1}
+                  className="flex gap-2 items-center text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  <span>{completion?.isComplete ? "Finish" : "Next"}</span>
+                  <ArrowRight size={16} />
+                </button>
               </div>
             </div>
           </div>
 
           {/* Desktop preview panel */}
           {!isPreviewHidden && !isPreviewExpanded && (
-            <div className="hidden lg:flex flex-col flex-1 min-w-0 bg-[#eef2f7] rounded-xl overflow-hidden border border-slate-200 relative order-1 lg:order-2 z-10" style={{ minHeight: 'calc(100vh - 80px)' }}>
-              <LivePreview
-                ref={previewRef}
-                formData={formData}
-                currentTemplate={currentTemplate}
-                isExpanded={false}
-                onExpand={() => setIsPreviewExpanded(true)}
-                onCollapse={() => setIsPreviewExpanded(false)}
-                onMinimize={() => setIsPreviewHidden(true)}
-              />
+            <div className="hidden lg:flex flex-1 flex-col min-w-0">
+              <div
+                className="rounded-2xl overflow-hidden border border-slate-100 bg-white"
+                style={{
+                  minHeight: "calc(100vh - 80px)",
+                  boxShadow:
+                    "0 4px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
+                }}
+              >
+                <LivePreview
+                  ref={previewRef}
+                  formData={formData}
+                  currentTemplate={currentTemplate}
+                  isExpanded={false}
+                  onExpand={() => setIsPreviewExpanded(true)}
+                  onCollapse={() => setIsPreviewExpanded(false)}
+                  onMinimize={() => setIsPreviewHidden(true)}
+                />
+              </div>
             </div>
           )}
         </div>
         <div className="w-full h-4" />
-      </div>
+      </>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-50 font-sans tracking-[0.01em] relative z-0 flex flex-col">
+    <div className="min-h-screen bg-[#f1f3f6] font-sans tracking-[0.01em]">
       {/* Sticky navbar like CV */}
       {!isPreviewExpanded && (
-        <div ref={headerRef} className="sticky top-0 z-30 bg-gradient-to-br from-slate-50 to-gray-50">
+        <div ref={headerRef} className="sticky top-0 z-30 bg-[#f1f3f6]">
           <UserNavbar />
         </div>
       )}
@@ -601,9 +715,9 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
         setActiveTab={setActiveTab}
         onDownload={handleDownload}
         onDownloadWord={handleDownloadWord}
-        onUpload={(file) => console.log("Resume upload:", file?.name)}
+        onUpload={handleResumeUpload}
         isDownloading={loading}
-        downloadDisabled={!completion.isComplete}
+        downloadDisabled={false} // Allow downloads regardless of completion status
         title={documentTitle}
         onTitleChange={(_, val) => setDocumentTitle(val)}
         titlePlaceholder="Untitled Resume"
@@ -623,7 +737,7 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
         }
       />
 
-      <div className="px-2 py-4 sm:px-4 lg:px-4 w-screen max-w-full mx-0 flex flex-col">
+      <div className="p-2.5 overflow-hidden">
         {activeTab !== "builder" && (
           <div className="relative w-full md:w-80 mb-4 px-3">
             <Search
@@ -686,11 +800,10 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
           </div>
         )}
 
+        <footer className="mt-auto text-center py-4 bg-white border-t text-sm text-gray-600">
+          © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
+        </footer>
       </div>
-
-      <footer className="mt-auto text-center py-4 bg-white border-t text-sm text-gray-600">
-        © {new Date().getFullYear()} ResumeAI Inc. All rights reserved.
-      </footer>
 
       <style>{`
         @keyframes resumePreviewSlideUp {
@@ -698,6 +811,41 @@ const ResumeBuilder = ({ setActivePage = () => { } }) => {
           to   { transform: translateY(0);    opacity: 1;   }
         }
       `}</style>
+      
+      {/* Completion Popup */}
+      {showCompletionPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Resume Complete!</h3>
+              <p className="text-gray-600 mb-6">Your resume has been successfully completed with all required information. You can now download or preview your resume.</p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowCompletionPopup(false)}
+                  className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Continue Editing
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCompletionPopup(false);
+                    // Navigate to templates or download
+                    setActiveTab("templates");
+                  }}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  View Templates
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
