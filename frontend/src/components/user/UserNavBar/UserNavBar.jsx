@@ -139,13 +139,37 @@ export default function UserNavbar() {
   }, []);
 
   // =================== LOGOUT ===================
-  const logout = async () => {
-    try {
-      await axiosInstance.post("/api/auth/logout");
-    } finally {
-      navigate("/login");
-    }
-  };
+ const logout = async () => {
+  try {
+    // Call backend logout endpoint
+    await axiosInstance.post("/api/auth/logout");
+  } catch (err) {
+    console.error("Logout API error:", err);
+    // Continue with local cleanup even if API call fails
+  } finally {
+    // Clear local storage tokens
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    sessionStorage.clear();
+    
+    // Clear any axios default auth headers
+    axiosInstance.defaults.headers.common["Authorization"] = "";
+    
+    // Reset user state
+    setUser({
+      name: "User",
+      email: "",
+      isAdmin: false,
+    });
+    
+    // Close any open menus
+    setShowUserMenu(false);
+    setShowNotifications(false);
+    
+    // Navigate to login
+    navigate("/login", { replace: true });
+  }
+};
 
   return (
     <>
