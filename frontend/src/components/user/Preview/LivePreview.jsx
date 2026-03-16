@@ -390,6 +390,12 @@ const LivePreview = forwardRef((props, ref) => {
       location: formData.location || "City, Country",
       email: formData.email || "email@example.com",
       phone: formData.phone || "+1 234 567 890",
+      // Ensure arrays are preserved correctly
+      experience: formData.experience || [],
+      education: formData.education || [],
+      projects: formData.projects || [],
+      certifications: formData.certifications || [],
+      skills: formData.skills || { technical: [], soft: [] },
     };
 
     if (ResolvedTemplate) {

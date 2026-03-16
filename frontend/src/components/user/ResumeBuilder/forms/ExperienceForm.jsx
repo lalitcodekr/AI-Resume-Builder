@@ -20,7 +20,7 @@ const ExperienceForm = ({ formData, setFormData, highlightEmpty }) => {
     if (highlightEmpty && !value?.trim()) return 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10';
     return 'border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10';
   };
-  // initial load effect
+  // Initial load effect - only runs once on mount
   useEffect(() => {
     const { sectionValidationStatus } = getCompletionStatus(formData);
     if (sectionValidationStatus.hasValidExperience) {
@@ -28,7 +28,7 @@ const ExperienceForm = ({ formData, setFormData, highlightEmpty }) => {
     } else {
       setEditingId(formData?.experience?.[0]?.id || null);
     }
-  }, []);
+  }, []); // Correctly limited to mount
 
   const addExperience = () => {
     const id = crypto.randomUUID();
