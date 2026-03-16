@@ -9,11 +9,13 @@ import {
   CreditCard,
   Info,
   User,
+  Key,
   X,
   Clock,
   CheckCircle,
   AlertCircle,
   Menu,
+  ChevronDown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -195,88 +197,67 @@ export default function UserNavbar() {
           <div className="relative" ref={menuRef}>
             <motion.button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="p-1 rounded-full hover:bg-gray-100 transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="group flex items-center gap-2 p-1.5 md:p-2 rounded-2xl hover:bg-slate-50 transition-all duration-300 focus:outline-none"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <div className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center font-semibold shadow-md">
+              <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md group-hover:shadow-lg transition-all font-bold">
                 {user.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
+              <div className="hidden md:flex flex-col items-start" style={{ minWidth: 'max-content' }}>
+                <span className="text-sm font-bold text-slate-800 leading-none whitespace-nowrap" style={{ display: 'inline-block', width: 'max-content' }}>{user.name}</span>
+                <span className="text-[10px] font-medium text-slate-500 whitespace-nowrap" style={{ display: 'inline-block', width: 'max-content' }}>User</span>
+              </div>
+              <ChevronDown
+                size={16}
+                className={`text-slate-400 transition-transform duration-300 ${showUserMenu ? 'rotate-180' : ''}`}
+              />
             </motion.button>
 
             <AnimatePresence>
               {showUserMenu && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-64 bg-white border rounded-xl shadow-lg z-50"
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute right-0 mt-3 w-[280px] bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[120]"
                 >
-                  {/* USER INFO */}
-                  <div className="px-4 py-3 border-b">
-                    <p className="text-sm font-semibold">{user.name}</p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {user.email}
-                    </p>
+                  {/* Header */}
+                  <div className="px-4 py-3 flex gap-3 items-center border-b">
+                    <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+                      {user.name?.charAt(0)?.toUpperCase() || "U"}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-slate-900 whitespace-nowrap" style={{ display: 'inline-block', width: 'max-content' }}>{user.name}</p>
+                        <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-bold whitespace-nowrap border border-indigo-100" style={{ display: 'inline-block', width: 'max-content' }}>
+                          User
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-500 truncate">{user.email}</p>
+                    </div>
                   </div>
-                  <DropdownItem
-                    icon={<UserCog size={16} />}
-                    label="Edit Profile"
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      navigate("/user/edit-profile");
-                    }}
-                  />
-                  <DropdownItem
-                    icon={<Shield size={16} />}
-                    label="Password Changer"
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      navigate("/user/security");
-                    }}
-                  />
-                  <DropdownItem
-                    icon={<CreditCard size={16} />}
-                    label="Plans & Billing"
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      navigate("/pricing");
-                    }}
-                  />
-                  <DropdownItem
-                    icon={<Info size={16} />}
-                    label="About Us"
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      navigate("/about");
-                    }}
-                  />
-                  <DropdownItem
-                    icon={<HelpCircle size={16} />}
-                    label="Help Center"
-                    onClick={() => {
-                      setShowUserMenu(false);
-                      navigate("/help-center");
-                    }}
-                  />
-                  {user.isAdmin && (
-                    <DropdownItem
-                      icon={<Repeat size={16} />}
-                      label="Switch to Admin Dashboard"
-                      onClick={() => {
-                        setShowUserMenu(false);
-                        navigate("/admin");
-                      }}
-                    />
-                  )}
-                  <div className="border-t my-1" />
-                  <DropdownItem
-                    icon={<LogOut size={16} />}
-                    label="Logout"
-                    danger
-                    onClick={logout}
-                  />
+
+                  {/* Menu */}
+                  <div className="px-2 pb-2 space-y-0.5">
+                    <DropdownItem icon={UserCog} label="Edit Profile" onClick={() => { setShowUserMenu(false); navigate('/user/edit-profile'); }} />
+                    <DropdownItem icon={Key} label="Change Password" onClick={() => { setShowUserMenu(false); navigate('/user/security'); }} />
+                    <DropdownItem icon={CreditCard} label="Plans & Billing" onClick={() => { setShowUserMenu(false); navigate('/pricing'); }} />
+                    <DropdownItem icon={Info} label="About Us" onClick={() => { setShowUserMenu(false); navigate('/about'); }} />
+                    <DropdownItem icon={HelpCircle} label="Help Center" onClick={() => { setShowUserMenu(false); navigate('/help-center'); }} />
+
+                    {user.isAdmin && (
+                      <div className="bg-slate-50 rounded-xl mt-1">
+                        <DropdownItem icon={Repeat} label="Switch to Admin Dashboard" onClick={() => { setShowUserMenu(false); navigate('/admin'); }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Logout */}
+                  <div className="border-t px-2 py-2">
+                    <DropdownItem icon={LogOut} label="Logout" variant="danger" onClick={() => { setShowUserMenu(false); logout(); }} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -471,16 +452,19 @@ const NotificationItemDropdown = ({
 );
 
 /* ================= DROPDOWN ITEM COMPONENT ================= */
-const DropdownItem = ({ icon, label, onClick, danger }) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-2 text-sm text-left transition-all
-      ${danger
-        ? "text-amber-600 hover:bg-amber-50"
-        : "text-gray-700 hover:bg-gray-100"
-      }`}
-  >
-    {icon}
-    <span>{label}</span>
-  </button>
-);
+function DropdownItem({ icon: Icon, label, onClick, variant = "default" }) {
+  const styles = {
+    default: "text-slate-600 hover:text-slate-900 hover:bg-slate-50",
+    danger: "text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${styles[variant]} group`}
+    >
+      <Icon size={18} className={`${variant === 'danger' ? 'text-rose-500' : 'text-slate-400 group-hover:text-blue-500'} transition-colors`} />
+      <span>{label}</span>
+    </button>
+  );
+}

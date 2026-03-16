@@ -10,18 +10,27 @@ import {
 import { getCompletionStatus } from "../completion";
 import axiosInstance from "../../../../api/axios";
 
-const ProjectsForm = ({ formData, setFormData }) => {
+const ProjectsForm = ({ formData, setFormData, highlightEmpty }) => {
   const [editingId, setEditingId] = useState(null);
   const [generatingId, setGeneratingId] = useState(null);
 
+  // Helper to get border class for required fields
+  const getBorderClass = (value) => {
+    if (highlightEmpty && !value?.trim()) return 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10';
+    return 'border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10';
+  };
+
   useEffect(() => {
-    const { sectionValidationStatus } = getCompletionStatus(formData);
-    if (sectionValidationStatus.hasValidProject) {
-      setEditingId(null);
-    } else {
-      setEditingId(formData?.projects?.[0]?.id || null);
+    // Only auto-open the first project on initial mount if there are no valid projects.
+    // We avoid running this on every formData change to prevent the form from
+    // unexpectedly collapsing (submitting) while the user is actively typing.
+    if (editingId === null) {
+      const { sectionValidationStatus } = getCompletionStatus(formData);
+      if (!sectionValidationStatus.hasValidProject && formData?.projects?.length > 0) {
+        setEditingId(formData.projects[0].id);
+      }
     }
-  }, []);
+  }, [formData?.projects?.length]); // Only run when the number of projects changes, not on every keystroke
 
   const addProject = () => {
     const id = crypto.randomUUID();
@@ -51,7 +60,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
   const updateProject = (id, field, value) => {
     setFormData((prev) => ({
       ...prev,
-      projects: prev.projects.map((p) =>
+      projects: (prev?.projects ?? []).map((p) =>
         p.id === id ? { ...p, [field]: value } : p,
       ),
     }));
@@ -60,9 +69,11 @@ const ProjectsForm = ({ formData, setFormData }) => {
   const updateGithub = (id, value) => {
     setFormData((prev) => ({
       ...prev,
-      projects: prev.projects.map((p) =>
-        p.id === id ? { ...p, link: { ...(p.link || {}), github: value } } : p,
-      ),
+      projects: (prev?.projects ?? []).map((p) => {
+        if (p.id !== id) return p;
+        const currentLink = typeof p.link === 'string' ? { github: p.link } : (p.link || {});
+        return { ...p, link: { ...currentLink, github: value } };
+      }),
     }));
   };
 
@@ -147,9 +158,9 @@ const ProjectsForm = ({ formData, setFormData }) => {
                   </div>
                 )}
 
-                {project?.link?.github && (
+                {(typeof project?.link === 'string' ? project.link : project?.link?.github) && (
                   <a
-                    href={project.link.github}
+                    href={typeof project?.link === 'string' ? project.link : project?.link?.github}
                     target="_blank"
                     rel="noreferrer"
                     className="text-xs text-blue-600 mt-1 inline-block"
@@ -169,7 +180,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
                   <label>Project Name *</label>
                   <input
                     type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                    className={`w-full px-3.5 py-2.5 border rounded-lg text-sm text-slate-900 focus:outline-none transition-all bg-white ${getBorderClass(project.name)}`}
                     value={project.name || ""}
                     placeholder="E-commerce Platform"
                     onChange={(e) =>
@@ -182,7 +193,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
                   <label>Technologies Used *</label>
                   <input
                     type="text"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                    className={`w-full px-3.5 py-2.5 border rounded-lg text-sm text-slate-900 focus:outline-none transition-all bg-white ${getBorderClass(project.technologies)}`}
                     value={project.technologies || ""}
                     placeholder="React, Node.js, MongoDB"
                     onChange={(e) =>
@@ -208,7 +219,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
                   </div>
 
                   <textarea
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[120px] scrollbar-hide"
+                    className={`w-full px-3.5 py-2.5 border rounded-lg text-sm text-slate-900 focus:outline-none transition-all bg-white resize-y min-h-[120px] scrollbar-hide ${getBorderClass(project.description)}`}
                     value={project.description || ""}
                     maxLength={1000}
                     onChange={(e) =>
@@ -226,7 +237,7 @@ const ProjectsForm = ({ formData, setFormData }) => {
                   <input
                     type="text"
                     className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
-                    value={project?.link?.github || ""}
+                    value={(typeof project?.link === 'string' ? project.link : project?.link?.github) || ""}
                     placeholder="github.com/username/project"
                     onChange={(e) => updateGithub(project.id, e.target.value)}
                   />

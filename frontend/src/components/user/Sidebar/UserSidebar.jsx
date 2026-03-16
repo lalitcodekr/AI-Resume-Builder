@@ -193,7 +193,7 @@ export default function UserSidebar() {
           </button>
           {/* Tooltip for logout in collapsed state */}
           {isCollapsed && hoveredItem === "logout" && (
-            <div className="tooltip">Logout</div>
+            <div className="tooltip special-tooltip">Logout</div>
           )}
         </div>
       </motion.aside>

@@ -36,6 +36,8 @@ import CVBuilderTopBar from "../CV/Cvbuildernavbar";
 
 import axiosInstance from "../../../api/axios";
 
+import { getCompletionStatus } from "../ResumeBuilder/completion";
+
 import "./CoverLetterBuilder.css";
 
 /* ─────────────────────────────────────────────────────────
@@ -1068,11 +1070,118 @@ ${
 
   const currentIdx = tabs.findIndex((t) => t.id === activeSection);
 
-  const goLeft = () =>
-    currentIdx > 0 && setActiveSection(tabs[currentIdx - 1].id);
+  /* ------------Input Validation ------------- */
+  const [warning, setWarning] = useState(false);
+  const [highlightEmpty, setHighlightEmpty] = useState(false);
+  const [completion, setcompletion] = useState({});
+  const [showCompletionPopup, setShowCompletionPopup] = useState(false);
 
-  const goRight = () =>
-    currentIdx < tabs.length - 1 && setActiveSection(tabs[currentIdx + 1].id);
+  // Cover Letter-specific completion logic
+  const getCoverLetterCompletionStatus = (formData) => {
+    const missing = [];
+
+    /* ---------- SENDER INFO ---------- */
+    const hasSenderInfo = formData?.fullName?.trim() && formData?.email?.trim();
+
+    if (!hasSenderInfo) missing.push("Sender");
+
+    /* ---------- RECIPIENT INFO ---------- */
+    const hasRecipientInfo = formData?.companyName?.trim();
+
+    if (!hasRecipientInfo) missing.push("Recipient");
+
+    /* ---------- JOB DETAILS ---------- */
+    const hasJobDetails =
+      formData?.jobTitle?.trim() && formData?.companyName?.trim();
+
+    if (!hasJobDetails) missing.push("Job");
+
+    /* ---------- BODY CONTENT ---------- */
+    const hasBodyContent =
+      formData?.openingParagraph?.trim() && formData?.bodyParagraph1?.trim() && formData?.closingParagraph?.trim();
+
+    if (!hasBodyContent) missing.push("Body");
+
+    /* ---------- CLOSING ---------- */
+    const hasClosing =
+      formData?.salutation?.trim() &&
+      (formData.salutation !== "custom" || formData?.customSalutation?.trim());
+
+    if (!hasClosing) missing.push("Closing");
+
+    return {
+      isComplete: missing.length === 0,
+      missingSections: missing,
+    };
+  };
+
+  useEffect(() => {
+    const statusInfo = getCoverLetterCompletionStatus(formData);
+    console.log("Cover Letter Completion Status:", statusInfo); // Debug log
+    setcompletion(statusInfo);
+  }, [formData]);
+
+  // Enhanced validation for section navigation
+  const isSectionValid = () => {
+    switch (activeSection) {
+      case "sender":
+        return formData?.fullName?.trim() && formData?.email?.trim();
+      case "recipient":
+        return formData?.companyName?.trim();
+      case "job":
+        return formData?.jobTitle?.trim() && formData?.companyName?.trim();
+      case "body":
+        return (
+          formData?.openingParagraph?.trim() && formData?.bodyParagraph1?.trim() && formData?.closingParagraph?.trim()
+        );
+      case "closing":
+        return formData?.salutation?.trim() &&
+          (formData.salutation !== "custom" || formData?.customSalutation?.trim());
+      default:
+        return true;
+    }
+  };
+
+  const getRequiredFieldsMessage = () => {
+    switch (activeSection) {
+      case "sender":
+        return "Your Name and Email are required";
+      case "recipient":
+        return "Company Name is required";
+      case "job":
+        return "Job Title is required";
+      case "body":
+        return "Opening Paragraph, Body Paragraph 1 and Closing Paragraph are required";
+      case "closing":
+        return "Salutation is required";
+      default:
+        return "";
+    }
+  };
+
+  // Clear warning when switching tabs (via tab click or navigation)
+  useEffect(() => {
+    setWarning(false);
+    setHighlightEmpty(false);
+  }, [activeSection]);
+
+  const goLeft = () => {
+    if (currentIdx > 0) {
+      setActiveSection(tabs[currentIdx - 1].id);
+    }
+  };
+
+  const goRight = () => {
+    if (currentIdx < tabs.length - 1 && isSectionValid()) {
+      setActiveSection(tabs[currentIdx + 1].id);
+      setWarning(false);
+      setHighlightEmpty(false);
+    } else {
+      setWarning(true);
+      setHighlightEmpty(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const renderFormContent = () => {
     switch (activeSection) {
@@ -1081,6 +1190,7 @@ ${
           <SenderInfoForm
             formData={formData}
             onInputChange={handleInputChange}
+            highlightEmpty={highlightEmpty}
           />
         );
 
@@ -1089,6 +1199,7 @@ ${
           <RecipientInfoForm
             formData={formData}
             onInputChange={handleInputChange}
+            highlightEmpty={highlightEmpty}
           />
         );
 
@@ -1097,6 +1208,7 @@ ${
           <JobDetailsForm
             formData={formData}
             onInputChange={handleInputChange}
+            highlightEmpty={highlightEmpty}
           />
         );
 
@@ -1105,12 +1217,17 @@ ${
           <BodyContentForm
             formData={formData}
             onInputChange={handleInputChange}
+            highlightEmpty={highlightEmpty}
           />
         );
 
       case "closing":
         return (
-          <ClosingForm formData={formData} onInputChange={handleInputChange} />
+          <ClosingForm
+            formData={formData}
+            onInputChange={handleInputChange}
+            highlightEmpty={highlightEmpty}
+          />
         );
 
       default:
@@ -1238,6 +1355,13 @@ ${
                     scrollbarColor: "#e2e8f0 transparent",
                   }}
                 >
+                  {/* Validation warning */}
+                  {warning && (
+                    <div className="text-sm text-red-700 bg-yellow-100 border border-yellow-300 px-4 py-2 mb-3 rounded-lg">
+                      {getRequiredFieldsMessage()}
+                    </div>
+                  )}
+
                   {renderFormContent()}
                 </div>
 
@@ -1255,11 +1379,25 @@ ${
                   </div>
 
                   <button
-                    onClick={goRight}
-                    disabled={currentIdx === tabs.length - 1}
+                    onClick={() => {
+                      if (currentIdx === tabs.length - 1) {
+                        if (isSectionValid() && completion?.isComplete) {
+                          setShowCompletionPopup(true);
+                        } else {
+                          setWarning(true);
+                          setHighlightEmpty(true);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }
+                      } else {
+                        goRight();
+                      }
+                    }}
+                    disabled={false}
                     className="flex gap-2 items-center text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
                   >
-                    <span className="hidden sm:inline">Next Step</span>
+                    <span className="hidden sm:inline">
+                      {currentIdx === tabs.length - 1 ? "Finish" : "Next Step"}
+                    </span>
                     <ArrowRight size={16} />
                   </button>
                 </div>
@@ -1320,6 +1458,13 @@ ${
             />
 
             <div className="mt-3 flex-1 overflow-y-auto py-2 pr-2">
+              {/* Validation warning */}
+              {warning && (
+                <div className="text-sm text-red-700 bg-yellow-100 border border-yellow-300 px-4 py-2 mb-3 rounded-lg">
+                  {getRequiredFieldsMessage()}
+                </div>
+              )}
+
               {renderFormContent()}
             </div>
 
@@ -1337,8 +1482,20 @@ ${
               </div>
 
               <button
-                onClick={goRight}
-                disabled={currentIdx === tabs.length - 1}
+                onClick={() => {
+                  if (currentIdx === tabs.length - 1) {
+                    if (isSectionValid() && completion?.isComplete) {
+                      setShowCompletionPopup(true);
+                    } else {
+                      setWarning(true);
+                      setHighlightEmpty(true);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  } else {
+                    goRight();
+                  }
+                }}
+                disabled={false}
                 className="flex gap-1 items-center text-sm bg-black text-white px-4 py-2 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 {currentIdx === tabs.length - 1 ? "Finish" : "Next"}
@@ -1412,6 +1569,57 @@ ${
         }
 
       `}</style>
+
+      {/* Completion Popup */}
+      {showCompletionPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Cover Letter Complete!
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Your cover letter has been successfully completed with all
+                required information. You can now download or preview your cover
+                letter.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowCompletionPopup(false)}
+                  className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Continue Editing
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCompletionPopup(false);
+                    // Navigate to templates or download
+                    // For cover letter, we can show a success message or navigate to download
+                  }}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -7,6 +7,9 @@ import axiosInstance from "../../../api/axios";
 import { toast } from "react-hot-toast";
 import { ArrowRight, X } from "lucide-react";
 
+import { getCompletionStatus } from "../ResumeBuilder/completion";
+import ResumeCompletionBanner from "./ResumeCompletionBanner";
+
 // Forms
 import PersonalInfoForm from "./forms/PersonalInfoForm";
 import ExperienceForm from "./forms/ExperienceForm";
@@ -22,7 +25,6 @@ import CVTemplates from "./Cvtemplates";
 import mergeWithSampleData from "../../../utils/Datahelpers";
 
 import CVBuilderTopBar from "./Cvbuildernavbar";
-import ResumeCompletionBanner from "./ResumeCompletionBanner";
 import "./CVBuilder.css";
 
 import jsPDF from "jspdf";
@@ -77,7 +79,7 @@ const createEmptyResume = () => ({
   ],
   skills: { technical: [], soft: [] },
   projects: [
-    { id: generateId(), name: "", description: "", technologies: "", link: "" },
+    { id: generateId(), name: "", description: "", technologies: "", link: { github: "" } },
   ],
   certifications: [
     { id: generateId(), name: "", issuer: "", date: "", link: "" },
@@ -605,7 +607,7 @@ const CVBuilder = () => {
       file.type === "application/pdf" ||
       file.type === "application/msword" ||
       file.type ===
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
       file.name.endsWith(".pdf") ||
       file.name.endsWith(".doc") ||
       file.name.endsWith(".docx");
@@ -882,13 +884,135 @@ const CVBuilder = () => {
   };
 
   /* ================= SECTION NAV ================= */
+  const [warning, setWarning] = useState(false);
+  const [highlightEmpty, setHighlightEmpty] = useState(false);
+  const [completion, setcompletion] = useState({});
+  const [showCompletionPopup, setShowCompletionPopup] = useState(false);
+
+  // CV-specific completion logic
+  const getCVCompletionStatus = (formData) => {
+    const missing = [];
+
+    console.log('CV Completion Check - formData:', formData); // Debug log
+
+    /* ---------- PERSONAL INFO ---------- */
+    const hasPersonalInfo =
+      formData?.fullName?.trim() &&
+      formData?.email?.trim() &&
+      formData?.phone?.trim() &&
+      formData?.location?.trim();
+
+    console.log('CV Completion Check - hasPersonalInfo:', hasPersonalInfo); // Debug log
+
+    if (!hasPersonalInfo) missing.push("Personal");
+
+    /* ---------- EXPERIENCE ---------- */
+    const hasValidExperience =
+      Array.isArray(formData?.experience) &&
+      formData.experience.length > 0 &&
+      formData.experience.some(
+        (exp) => exp.title?.trim() && exp.company?.trim()
+      );
+
+    console.log('CV Completion Check - hasValidExperience:', hasValidExperience); // Debug log
+
+    if (!hasValidExperience) missing.push("Work");
+
+    /* ---------- EDUCATION ---------- */
+    const hasValidEducation =
+      Array.isArray(formData?.education) &&
+      formData.education.length > 0 &&
+      formData.education.some(
+        (edu) => edu.school?.trim() && edu.degree?.trim()
+      );
+
+    console.log('CV Completion Check - hasValidEducation:', hasValidEducation); // Debug log
+
+    if (!hasValidEducation) missing.push("Education");
+
+    /* ---------- SKILLS ---------- */
+    const hasSkills =
+      (formData?.skills?.technical?.length ?? 0) > 0 ||
+      (formData?.skills?.soft?.length ?? 0) > 0;
+
+    console.log('CV Completion Check - hasSkills:', hasSkills); // Debug log
+    console.log('CV Completion Check - missing sections:', missing); // Debug log
+
+    // Projects and Certifications are optional for completion
+
+    return {
+      isComplete: missing.length === 0,
+      missingSections: missing,
+    };
+  };
+
+  useEffect(() => {
+    const statusInfo = getCVCompletionStatus(formData);
+    console.log('CV Completion Status:', statusInfo); // Debug log
+    setcompletion(statusInfo);
+  }, [formData]);
+
+  // Enhanced validation for section navigation
+  const isSectionValid = () => {
+    switch (activeSection) {
+      case "personal":
+        return formData?.fullName?.trim() &&
+          formData?.email?.trim() &&
+          formData?.phone?.trim() &&
+          formData?.location?.trim();
+      case "work":
+        return formData?.experience && formData.experience.length > 0;
+      case "education":
+        return formData?.education && formData.education.length > 0;
+      case "skills":
+        return (formData?.skills?.technical?.length ?? 0) > 0 ||
+          (formData?.skills?.soft?.length ?? 0) > 0;
+      case "projects":
+        return formData?.projects && formData.projects.length > 0;
+      case "certifications":
+        return formData?.certifications && formData.certifications.length > 0;
+      default:
+        return true;
+    }
+  };
+
+  const getRequiredFieldsMessage = () => {
+    switch (activeSection) {
+      case "personal":
+        return "Full Name, Email, Phone, and Location are required";
+      case "work":
+        return "At least one work experience is required";
+      case "education":
+        return "At least one education entry is required";
+      case "skills":
+        return "At least one skill is required";
+      case "projects":
+        return "At least one project is required";
+      case "certifications":
+        return "At least one certification is required";
+      default:
+        return "";
+    }
+  };
+
   const currentIndex = Math.max(0, sections.indexOf(activeSection));
   const goNext = () => {
-    if (currentIndex < sections.length - 1)
+    if (currentIndex < sections.length - 1 && isSectionValid()) {
       setActiveSection(sections[currentIndex + 1]);
+      setWarning(false);
+      setHighlightEmpty(false);
+    } else {
+      setWarning(true);
+      setHighlightEmpty(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
   const goPrevious = () => {
-    if (currentIndex > 0) setActiveSection(sections[currentIndex - 1]);
+    if (currentIndex > 0) {
+      setActiveSection(sections[currentIndex - 1]);
+      setWarning(false);
+      setHighlightEmpty(false);
+    }
   };
 
   /* ================= FORM RENDER ================= */
@@ -899,19 +1023,20 @@ const CVBuilder = () => {
           <PersonalInfoForm
             formData={formData}
             onInputChange={handleInputChange}
+            highlightEmpty={highlightEmpty}
           />
         );
       case "work":
-        return <ExperienceForm formData={formData} setFormData={setFormData} />;
+        return <ExperienceForm formData={formData} setFormData={setFormData} highlightEmpty={highlightEmpty} />;
       case "education":
-        return <EducationForm formData={formData} setFormData={setFormData} />;
+        return <EducationForm formData={formData} setFormData={setFormData} highlightEmpty={highlightEmpty} />;
       case "skills":
         return <SkillsForm formData={formData} setFormData={setFormData} />;
       case "projects":
-        return <ProjectsForm formData={formData} setFormData={setFormData} />;
+        return <ProjectsForm formData={formData} setFormData={setFormData} highlightEmpty={highlightEmpty} />;
       case "certifications":
         return (
-          <CertificationsForm formData={formData} setFormData={setFormData} />
+          <CertificationsForm formData={formData} setFormData={setFormData} highlightEmpty={highlightEmpty} />
         );
       default:
         return null;
@@ -1024,6 +1149,13 @@ const CVBuilder = () => {
                         scrollbarColor: "#e2e8f0 transparent",
                       }}
                     >
+                      {/* Validation warning */}
+                      {warning && (
+                        <div className="text-sm text-red-700 bg-yellow-100 border border-yellow-300 px-4 py-2 mb-3 rounded-lg">
+                          {getRequiredFieldsMessage()}
+                        </div>
+                      )}
+
                       {renderFormContent()}
                     </div>
 
@@ -1037,11 +1169,18 @@ const CVBuilder = () => {
                         ← Previous
                       </button>
                       <button
-                        onClick={goNext}
-                        disabled={currentIndex === sections.length - 1}
+                        onClick={() => {
+                          // Only show popup if it's the absolute last step AND the resume is complete
+                          if (currentIndex === sections.length - 1 && completion?.isComplete) {
+                            setShowCompletionPopup(true);
+                          } else {
+                            goNext();
+                          }
+                        }}
+                        disabled={false}
                         className="flex gap-2 items-center text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg select-none disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
                       >
-                        <span className="hidden sm:inline">Next Step</span>
+                        <span className="hidden sm:inline">{currentIndex === sections.length - 1 ? "Finish" : "Next Step"}</span>
                         <ArrowRight size={16} />
                       </button>
                     </div>
@@ -1100,6 +1239,13 @@ const CVBuilder = () => {
                   />
                 </div>
                 <div className="flex-1 overflow-y-auto min-h-[400px] p-6 pb-2 bg-slate-50/50">
+                  {/* Validation warning */}
+                  {warning && (
+                    <div className="text-sm text-red-700 bg-yellow-100 border border-yellow-300 px-4 py-2 mb-3 rounded-lg">
+                      {getRequiredFieldsMessage()}
+                    </div>
+                  )}
+
                   {renderFormContent()}
                 </div>
                 <div className="flex justify-between p-4 bg-white border-t border-slate-100">
@@ -1111,11 +1257,18 @@ const CVBuilder = () => {
                     ← Previous
                   </button>
                   <button
-                    onClick={goNext}
-                    disabled={currentIndex === sections.length - 1}
+                    onClick={() => {
+                      // Only show popup if it's the absolute last step AND the resume is complete
+                      if (currentIndex === sections.length - 1 && completion?.isComplete) {
+                        setShowCompletionPopup(true);
+                      } else {
+                        goNext();
+                      }
+                    }}
+                    disabled={false}
                     className="flex gap-1 items-center px-4 py-2 rounded-lg bg-black text-white font-medium disabled:opacity-40 hover:bg-slate-800 transition-colors text-sm"
                   >
-                    Next →
+                    {currentIndex === sections.length - 1 ? "Finish" : "Next"} →
                   </button>
                 </div>
               </div>
@@ -1185,7 +1338,7 @@ const CVBuilder = () => {
               <CVPreview
                 {...previewProps}
                 isMaximized={false}
-                onToggleMaximize={() => {}}
+                onToggleMaximize={() => { }}
               />
             </div>
           </div>
@@ -1200,8 +1353,44 @@ const CVBuilder = () => {
           to   { transform: translateY(0);    opacity: 1;   }
         }
       `}</style>
+
+      {/* Completion Popup */}
+      {showCompletionPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">CV Complete!</h3>
+              <p className="text-gray-600 mb-6">Your CV has been successfully completed with all required information. You can now download or preview your CV.</p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowCompletionPopup(false)}
+                  className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Continue Editing
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCompletionPopup(false);
+                    // Navigate to templates or download
+                    setActiveTab("templates");
+                  }}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  View Templates
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default CVBuilder;
+

@@ -1,42 +1,63 @@
 import { useState } from "react";
 import { Trash2, EditIcon, Check, GraduationCap, Plus } from "lucide-react";
 
-const EducationForm = ({ formData, setFormData }) => {
+const EducationForm = ({ formData, setFormData, highlightEmpty }) => {
   const [editingId, setEditingId] = useState(null);
 
+  // Helper to get border class for required fields
+  const getBorderClass = (value) => {
+    if (highlightEmpty && !value?.trim()) return 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10';
+    return 'border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10';
+  };
+  
+  // Debug log to track form data
+  console.log('Education Form - formData:', formData);
+
   const addEducation = () => {
-    const id = crypto.randomUUID();
-    setFormData((prev) => ({
-      ...prev,
-      education: [
-        ...(prev.education ?? []),
-        {
-          id,
-          school: "",
-          degree: "",
-          location: "",
-          graduationDate: "",
-          gpa: "",
-        },
-      ],
-    }));
-    setEditingId(id);
+    try {
+      const id = crypto.randomUUID();
+      setFormData((prev) => ({
+        ...prev,
+        education: [
+          ...(prev.education ?? []),
+          {
+            id,
+            school: "",
+            degree: "",
+            location: "",
+            graduationDate: "",
+            gpa: "",
+          },
+        ],
+      }));
+      setEditingId(id);
+    } catch (error) {
+      console.error('Error adding education:', error);
+    }
   };
 
   const removeEducation = (id) => {
-    setFormData((prev) => ({
-      ...prev,
-      education: (prev.education ?? []).filter((e) => e.id !== id),
-    }));
+    try {
+      setFormData((prev) => ({
+        ...prev,
+        education: (prev.education ?? []).filter((e) => e.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error removing education:', error);
+    }
   };
 
   const handleChange = (id, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      education: (prev.education ?? []).map((e) =>
-        e.id === id ? { ...e, [field]: value } : e,
-      ),
-    }));
+    try {
+      setFormData((prev) => ({
+        ...prev,
+        education: (prev.education ?? []).map((e) =>
+          e.id === id ? { ...e, [field]: value } : e,
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating education:', error);
+    }
   };
 
   return (
@@ -109,7 +130,7 @@ const EducationForm = ({ formData, setFormData }) => {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      className={`w-full px-3.5 py-2.5 border rounded-lg text-sm text-slate-900 focus:outline-none transition-all bg-white ${getBorderClass(edu.school)}`}
                       placeholder="University Name"
                       value={edu.school}
                       onChange={(e) =>
@@ -124,7 +145,7 @@ const EducationForm = ({ formData, setFormData }) => {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+                      className={`w-full px-3.5 py-2.5 border rounded-lg text-sm text-slate-900 focus:outline-none transition-all bg-white ${getBorderClass(edu.degree)}`}
                       placeholder="Bachelor of Science"
                       value={edu.degree}
                       onChange={(e) =>

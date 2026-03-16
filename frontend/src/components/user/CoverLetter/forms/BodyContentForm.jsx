@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Sparkles, RefreshCw, Copy, Check, FileText } from "lucide-react";
 import axiosInstance from "./../../../../api/axios";
 
-const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
+const BodyContentForm = ({ formData, onInputChange, onAIGenerate, highlightEmpty }) => {
   const [generating, setGenerating] = useState({});
   const [copied, setCopied] = useState({});
 
@@ -52,7 +52,7 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
         <label className="text-sm font-semibold text-slate-700">{label}</label>
         <div className="flex gap-2">
           <button
-            className="flex gap-1.5 items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors disabled:opacity-50"
+            className="flex gap-1.5 items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors disabled:opacity-50 whitespace-nowrap shrink-0"
             onClick={() => handleGenerate(field)}
             disabled={generating[field]}
           >
@@ -62,7 +62,7 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
               </>
             ) : (
               <>
-                <Sparkles size={14} /> AI Generate
+                <Sparkles size={14} /> Enhance with AI
               </>
             )}
           </button>
@@ -80,7 +80,7 @@ const BodyContentForm = ({ formData, onInputChange, onAIGenerate }) => {
         value={formData[field]}
         onChange={(e) => onInputChange(field, e.target.value)}
         rows={rows}
-        className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[100px] leading-relaxed"
+        className={`w-full px-4 py-3 border rounded-lg text-sm text-slate-900 focus:outline-none transition-all bg-white resize-y min-h-[100px] leading-relaxed ${highlightEmpty && label.includes('*') && !formData[field]?.trim() ? 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10' : 'border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10'}`}
       />
     </div>
   );

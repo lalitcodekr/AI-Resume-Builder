@@ -1,43 +1,64 @@
 import { useState } from "react";
 import { Trash2, EditIcon, Check, Plus } from "lucide-react";
 
-const CertificationsForm = ({ formData, setFormData }) => {
+const CertificationsForm = ({ formData, setFormData, highlightEmpty }) => {
   const [editingId, setEditingId] = useState(null);
 
+  // Helper to get border class for required fields
+  const getBorderClass = (value) => {
+    if (highlightEmpty && !value?.trim()) return 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10';
+    return 'border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10';
+  };
+  
+  // Debug log to track form data
+  console.log('Certifications Form - formData:', formData);
+
   const addCertification = () => {
-    const id = crypto.randomUUID();
+    try {
+      const id = crypto.randomUUID();
 
-    setFormData((prev) => ({
-      ...prev,
-      certifications: [
-        ...(prev.certifications ?? []),
-        {
-          id,
-          name: "",
-          issuer: "",
-          date: "",
-          link: "",
-        },
-      ],
-    }));
+      setFormData((prev) => ({
+        ...prev,
+        certifications: [
+          ...(prev.certifications ?? []),
+          {
+            id,
+            name: "",
+            issuer: "",
+            date: "",
+            link: "",
+          },
+        ],
+      }));
 
-    setEditingId(id);
+      setEditingId(id);
+    } catch (error) {
+      console.error('Error adding certification:', error);
+    }
   };
 
   const removeCertification = (id) => {
-    setFormData((prev) => ({
-      ...prev,
-      certifications: (prev.certifications ?? []).filter((c) => c.id !== id),
-    }));
+    try {
+      setFormData((prev) => ({
+        ...prev,
+        certifications: (prev.certifications ?? []).filter((c) => c.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error removing certification:', error);
+    }
   };
 
   const handleChange = (id, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      certifications: (prev.certifications ?? []).map((c) =>
-        c.id === id ? { ...c, [field]: value } : c,
-      ),
-    }));
+    try {
+      setFormData((prev) => ({
+        ...prev,
+        certifications: (prev.certifications ?? []).map((c) =>
+          c.id === id ? { ...c, [field]: value } : c,
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating certification:', error);
+    }
   };
 
   return (
@@ -109,7 +130,7 @@ const CertificationsForm = ({ formData, setFormData }) => {
                   <label>Certification Name *</label>
                   <input
                     type="text"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
+                    className={`px-2.5 py-2 border text-sm rounded focus:outline-none focus:shadow-sm ${getBorderClass(cert.name)}`}
                     placeholder="AWS Solutions Architect"
                     value={cert.name}
                     onChange={(e) =>
@@ -122,7 +143,7 @@ const CertificationsForm = ({ formData, setFormData }) => {
                   <label>Issuing Organization *</label>
                   <input
                     type="text"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
+                    className={`px-2.5 py-2 border text-sm rounded focus:outline-none focus:shadow-sm ${getBorderClass(cert.issuer)}`}
                     placeholder="Amazon Web Services"
                     value={cert.issuer}
                     onChange={(e) =>
@@ -135,7 +156,7 @@ const CertificationsForm = ({ formData, setFormData }) => {
                   <label>Date Obtained *</label>
                   <input
                     type="month"
-                    className="px-2.5 py-2 border text-sm rounded focus:border-blue-500 focus:outline-none focus:shadow-sm"
+                    className={`px-2.5 py-2 border text-sm rounded focus:outline-none focus:shadow-sm ${getBorderClass(cert.date)}`}
                     value={cert.date}
                     onChange={(e) =>
                       handleChange(cert.id, "date", e.target.value)

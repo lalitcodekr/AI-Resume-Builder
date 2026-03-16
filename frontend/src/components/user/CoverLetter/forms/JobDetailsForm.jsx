@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Briefcase } from "lucide-react";
+import { Briefcase, RefreshCw, Sparkles } from "lucide-react";
+import axiosInstance from "./../../../../api/axios";
 
-const JobDetailsForm = ({ formData, onInputChange }) => {
+const JobDetailsForm = ({ formData, onInputChange, highlightEmpty }) => {
   const whereFoundOptions = [
     "Company Website",
     "LinkedIn",
@@ -19,6 +20,34 @@ const JobDetailsForm = ({ formData, onInputChange }) => {
     whereFound: "",
     jobDescription: "",
   });
+  const [isEnhancing, setIsEnhancing] = useState(false);
+
+  const handleEnhanceJobDescription = async () => {
+    if (!localData.jobDescription.trim()) {
+      alert("Please enter a Job Description before enhancing with AI.");
+      return;
+    }
+    try {
+      setIsEnhancing(true);
+      const response = await axiosInstance.post("/api/resume/cover-letter/generate", {
+        sectionType: "jobDescription",
+        jobDetails: {
+          jobTitle: localData.jobTitle || "Role",
+          companyName: formData.companyName || "Company",
+          fullName: formData.fullName || "Candidate",
+          skills: formData.skills || "",
+          experience: formData.experience || "",
+          jobDescription: localData.jobDescription,
+        },
+      });
+      handleChange("jobDescription", response.data.result);
+    } catch (error) {
+      console.error("Error enhancing job description:", error);
+      alert("Error processing request.");
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
 
   useEffect(() => {
     setLocalData({
@@ -54,7 +83,7 @@ const JobDetailsForm = ({ formData, onInputChange }) => {
           <input
             type="text"
             placeholder="Software Engineer"
-            className="w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white"
+            className={`w-full px-3.5 py-2.5 border rounded-lg text-sm text-slate-900 focus:outline-none transition-all bg-white ${highlightEmpty && !localData.jobTitle?.trim() ? 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/10' : 'border-slate-200 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10'}`}
             value={localData.jobTitle}
             onChange={(e) => handleChange("jobTitle", e.target.value)}
           />
@@ -94,9 +123,23 @@ const JobDetailsForm = ({ formData, onInputChange }) => {
       </div>
 
       <div className="flex flex-col gap-1.5 mt-6">
-        <label className="block text-sm font-semibold text-slate-700">
-          Job Description <span className="text-slate-400 font-normal">(Optional)</span>
-        </label>
+        <div className="w-full flex items-center justify-between mb-1">
+          <label className="text-sm font-semibold text-slate-700">
+            Job Description <span className="text-slate-400 font-normal">(Optional)</span>
+          </label>
+          <button
+            className="flex gap-2 ml-2 p-2 rounded-lg text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-800 whitespace-nowrap shrink-0"
+            onClick={handleEnhanceJobDescription}
+            disabled={isEnhancing}
+          >
+            {isEnhancing ? (
+              <RefreshCw size={15} className="ml-1 animate-spin" />
+            ) : (
+              <Sparkles size={14} />
+            )}
+            Enhance with AI
+          </button>
+        </div>
         <textarea
           placeholder="Paste job description for better AI suggestions..."
           className="w-full px-4 py-3 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all bg-white resize-y min-h-[140px] leading-relaxed"
