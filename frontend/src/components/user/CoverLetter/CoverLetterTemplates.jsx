@@ -173,8 +173,23 @@ const PreviewModalComponent = ({ template, zoomLevel, displayData, onZoomChange,
   );
 };
 
+/* ─────────────────────────────────────────────────────────
+   HELPERS: decode the JWT to get the current user's ID
+   (matches CoverLetterBuilder)
+───────────────────────────────────────────────────────── */
+const getLoggedInUserId = () => {
+  try {
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.id || payload.userId || payload._id || null;
+  } catch {
+    return null;
+  }
+};
 
-const CoverLetterTemplates = ({ selectedTemplate, onSelectTemplate }) => {
+const CoverLetterTemplates = ({ selectedTemplate, onSelectTemplate, formData: propFormData }) => {
   const [previewTemplate, setPreviewTemplate] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [searchQuery, setSearchQuery] = useState("");
@@ -184,16 +199,24 @@ const CoverLetterTemplates = ({ selectedTemplate, onSelectTemplate }) => {
 
   useEffect(() => {
     setMounted(true);
-    // Fetch data for previews
-    const saved = localStorage.getItem("coverLetterFormData");
-    if (saved) {
-      try {
-        setDisplayData(JSON.parse(saved));
-      } catch (e) {
-        console.error("Error parsing cover letter data", e);
+    // Use prop formData if it has keys, otherwise fallback to localStorage
+    if (propFormData && Object.values(propFormData).some(val => val !== "" && val != null)) {
+      setDisplayData(propFormData);
+    } else {
+      // Fetch data for previews based on current logged in user
+      const userId = getLoggedInUserId();
+      if (userId) {
+        const saved = localStorage.getItem(`coverLetterFormData_${userId}`);
+        if (saved) {
+          try {
+            setDisplayData(JSON.parse(saved));
+          } catch (e) {
+            console.error("Error parsing cover letter data", e);
+          }
+        }
       }
     }
-  }, []);
+  }, [propFormData]);
 
   useEffect(() => {
     document.body.style.overflow = previewTemplate ? 'hidden' : 'unset';
