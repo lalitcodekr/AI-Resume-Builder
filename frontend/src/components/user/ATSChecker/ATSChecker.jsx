@@ -1,5 +1,6 @@
 import "./ATSChecker.css";
 import ATSPdfPreview from "./ATSPdfPreview";
+import ATSDocPreview from "./ATSDocPreview";
 import UserNavBar from "../UserNavBar/UserNavBar";
 import JobRecommendations from "./JobRecommendations";
 import {
