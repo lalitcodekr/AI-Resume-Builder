@@ -14,7 +14,6 @@ export default function AdminUsers({ head = "Manage Users" }) {
   const [roleFilter, setRoleFilter] = useState("all");
   const [planFilter, setPlanFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [planOptions, setPlanOptions] = useState([]);
 
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -36,18 +35,8 @@ export default function AdminUsers({ head = "Manage Users" }) {
 
   const fetchUsers = async () => {
     try {
-      const [usersResponse, plansResponse] = await Promise.all([
-        axiosInstance.get("/api/user"),
-        axiosInstance.get("/api/plans"),
-      ]);
-
-      setUsers(usersResponse.data);
-
-      const dynamicPlanNames = (plansResponse.data || [])
-        .map((plan) => plan?.name)
-        .filter(Boolean);
-
-      setPlanOptions(Array.from(new Set(["Free", ...dynamicPlanNames])));
+      const response = await axiosInstance.get("/api/user");
+      setUsers(response.data);
       setLoading(false);
     } catch (err) {
       setError("Failed to fetch users");
@@ -268,8 +257,9 @@ export default function AdminUsers({ head = "Manage Users" }) {
       (roleFilter === "pending" && u.adminRequestStatus === 'pending');
 
     // Plan filter
-    const userPlan = (u.plan || "Free").toLowerCase();
-    const matchesPlan = planFilter === "all" || userPlan === planFilter;
+    const matchesPlan = planFilter === "all" ||
+      (planFilter === "free" && (!u.plan || u.plan.toLowerCase() === "free")) ||
+      (planFilter === "pro" && u.plan?.toLowerCase() === "pro");
 
     // Status filter
     const matchesStatus = statusFilter === "all" ||
@@ -336,11 +326,8 @@ export default function AdminUsers({ head = "Manage Users" }) {
                     className="bg-transparent focus:outline-none text-sm font-medium text-gray-700 cursor-pointer pr-1 sm:pr-2"
                   >
                     <option value="all">All Plans</option>
-                    {planOptions.map((planName) => (
-                      <option key={planName} value={planName.toLowerCase()}>
-                        {planName}
-                      </option>
-                    ))}
+                    <option value="free">Free</option>
+                    <option value="pro">Pro</option>
                   </select>
                 </div>
               </div>
