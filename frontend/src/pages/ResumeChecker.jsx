@@ -129,7 +129,7 @@ const AIResumeChecker = () => {
       <NavBar />
       <div className="" />
       {/* --- HERO SECTION: FULL WIDTH/HEIGHT --- */}
-   <section className="relative min-h-[60vh] flex items-center px-6 md:px-8 pt-20 md:pt-24 pb-6">
+      <section className="relative min-h-[60vh] flex items-center px-6 md:px-8 pt-20 md:pt-24 pb-6">
         <div className="absolute top-0 right-0 w-[40%] h-full -translate-y-1/4 translate-x-1/4 opacity-20 bg-gradient-to-bl from-blue-200 to-transparent blur-3xl"></div>
         <div className="absolute bottom-0 left-0 bg-blue-100 rounded-full w-72 h-72 -translate-x-1/3 opacity-10 blur-3xl"></div>
 
@@ -327,8 +327,8 @@ const AIResumeChecker = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 border rounded-2xl bg-white/5 border-white/10">
                   <span className="flex items-center gap-2">
-                    <CheckCircle2 className="text-green-400" size={16} /> Contact
-                    Info
+                    <CheckCircle2 className="text-green-400" size={16} />{" "}
+                    Contact Info
                   </span>
                   <span className="text-sm font-bold">10/10</span>
                 </div>
@@ -504,14 +504,16 @@ const AIResumeChecker = () => {
                   </h5>
                   <ChevronDown
                     size={18}
-                    className={`text-gray-400 transition-transform duration-450 ${openFAQ === i ? "rotate-180" : ""
-                      }`}
+                    className={`text-gray-400 transition-transform duration-450 ${
+                      openFAQ === i ? "rotate-180" : ""
+                    }`}
                   />
                 </div>
                 <p className="mt-2 text-sm text-gray-500">{faq.a}</p>
                 <div
-                  className={`overflow-hidden transition-all duration-300 ${openFAQ === i ? "max-h-40 mt-3" : "max-h-0"
-                    }`}
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openFAQ === i ? "max-h-40 mt-3" : "max-h-0"
+                  }`}
                 >
                   <p className="text-sm leading-relaxed text-gray-600">
                     {faq.extra}
